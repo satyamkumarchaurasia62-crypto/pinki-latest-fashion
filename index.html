@@ -204,10 +204,9 @@
                       <span class="text-xs text-stone-400 line-through">₹${product.mrp}</span>
                     </div>
                     <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-stone-600 font-medium focus:outline-none focus:border-boutique-600">${sizeOptions}</select>
-                  </div>
-                  <button onclick="handleBuyNow(${product.id})" class="w-full bg-stone-900 hover:bg-boutique-800 text-white text-xs font-semibold py-3 rounded-xl tracking-wide uppercase transition duration-200">
-                    Buy Now / आर्डर करें
-                  </button>
+                <button onclick="openOrderModal('${product.title}', '${product.price}', document.getElementById('size-${product.id}').value)" class="w-full bg-stone-900 hover:bg-boutique-800 text-white font-bold py-2 rounded-lg">
+  BUY NOW / ऑर्डर करें
+</button>
                 </div>
               </div>
             </div>
@@ -221,18 +220,13 @@
 
     // आर्डर सबमिशन फंक्शन
     function handleBuyNow(id) {
-      const item = PRODUCTS.find(p => p.id === id);
-      const selectedSize = document.getElementById(`size-${id}`).value;
-      const userName = localStorage.getItem("currentLoggedInUser") ? JSON.parse(localStorage.getItem("currentLoggedInUser")).name : "";
-
-      const customerName = prompt("कृपया अपना नाम डालें:", userName);
-      const customerPhone = prompt("कृपया अपना फ़ोन नंबर डालें:");
-      const customerAddress = prompt("डिलिवरी का पूरा पता (Address) लिखें:");
-
-      if (!customerName || !customerPhone || !customerAddress) {
-        alert("आर्डर पूरा करने के लिए सभी जानकारी भरना ज़रूरी है!");
-        return;
-      }
+  const item = PRODUCTS.find(p => p.id === id);
+  const sizeElem = document.getElementById(`size-${id}`);
+  const selectedSize = sizeElem ? sizeElem.value : "Standard";
+  if (item) {
+    openOrderModal(item.title, item.price, selectedSize);
+  }
+}
 
       const orderData = {
         name: customerName,
