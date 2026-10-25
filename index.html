@@ -328,12 +328,8 @@
 कृपया मेरा ऑर्डर कन्फर्म करें।`;
 
       const waUrl = "https://api.whatsapp.com/send?phone=" + myWhatsAppNumber + "&text=" + encodeURIComponent(message);
-      window.location.href = waUrl;
-    }
-}
-
-    
-      let currentOrder = {};
+      window.location.href = waUrl;}
+let currentOrder = {};
 
       function openOrderModal(title, price, size) {
         currentOrder = { title, price, size };
