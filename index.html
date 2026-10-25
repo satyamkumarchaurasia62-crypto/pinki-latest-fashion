@@ -261,29 +261,31 @@
       const gridContainer = document.getElementById("product-grid");
       if (gridContainer && typeof PRODUCTS !== 'undefined') {
         gridContainer.innerHTML = "";
-        PRODUCTS.forEach(product => {
-          let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
-          const productCard = `
-            <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col h-full">
-              <div class="relative pt-[135%] bg-stone-50 overflow-hidden">
-                <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition duration-500">
+        PRODUCTS.forEach(product => {  let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+          const productCard = ' <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
+              <div>
+                <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
+                  <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                  <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
+                  <p class="text-xs text-stone-500 mt-1">${product.desc || 'प्रीमियम रेडीमेड कलेक्शन'}</p>
+                  
+                  <div class="flex items-center justify-between mt-3">
+                    <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
+                    <div class="flex items-center gap-1">
+                      <span class="text-xs text-stone-500">Size:</span>
+                      <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
+                        ${sizeOptions}
+                    </select>
+                  </div>
+                </div>
               </div>
-              <div class="p-5 flex flex-col flex-grow justify-between space-y-4">
-                <div>
-                  <h3 class="font-serif font-bold text-stone-900 text-base tracking-tight line-clamp-1">${product.title}</h3>
-                  <p class="text-xs text-stone-500 leading-relaxed line-clamp-2 mt-1.5">${product.desc}</p>
-                </div>
-                <div class="space-y-3">
-                  <div class="flex items-center justify-between border-t border-stone-100 pt-3">
-                    <div class="flex items-baseline gap-2">
-                      <span class="text-base font-bold text-boutique-800">₹${product.price}</span>
-                      <span class="text-xs text-stone-400 line-through">₹${product.mrp}</span>
-                    </div>
-                    <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-stone-600 font-medium focus:outline-none focus:border-boutique-600">${sizeOptions}</select>
-              <button onclick="handleBuyNow(${product.id})" style="width: 100%; padding: 12px; background-color: #db2777; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; display: block;">
-  BUY NOW / ऑर्डर करें
-</button>
-                </div>
+
+              <div class="p-4 pt-0">
+                <button onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition duration-200 shadow">
+                  BUY NOW / अभी खरीदें
+                </button>
               </div>
             </div>
           `;
@@ -294,13 +296,39 @@
       }
     });
 
-    // आर्डर सबमिशन फंक्शन
+    // नया और सही handleBuyNow फ़ंक्शन
     function handleBuyNow(id) {
-  const item = PRODUCTS.find(p => p.id === id);
-  const sizeElem = document.getElementById(`size-${id}`);
-  const selectedSize = sizeElem ? sizeElem.value : "Standard";
-  if (item) {
-    openOrderModal(item.title, item.price, selectedSize);
+      const loggedInRaw = localStorage.getItem("currentLoggedInUser");
+      if (!loggedInRaw) {
+        alert("कृपया ऑर्डर करने के लिए पहले लॉगिन करें!");
+        window.location.href = "account.html";
+        return;
+      }
+
+      const user = JSON.parse(loggedInRaw);
+      const item = PRODUCTS.find(p => p.id === id);
+      const sizeElem = document.getElementById(`size-${id}`);
+      const selectedSize = sizeElem ? sizeElem.value : "Standard";
+
+      if (!item) return;
+
+      const myWhatsAppNumber = "918130748293";
+      const message = `🛍️ *नया ऑर्डर प्राप्त हुआ - Pinki Latest Fashion*
+----------------------------
+👗 *प्रोडक्ट:* ${item.title}
+📏 *साइज़:* ${selectedSize}
+💰 *कीमत:* ₹${item.price}
+----------------------------
+👤 *ग्राहक:* ${user.name || "उपलब्ध नहीं"}
+📞 *फ़ोन:* ${user.phone || "उपलब्ध नहीं"}
+🏠 *पता:* ${user.address || "उपलब्ध नहीं"}
+📍 *शहर:* ${user.city || ""} - ${user.pincode || ""}
+----------------------------
+कृपया मेरा ऑर्डर कन्फर्म करें।`;
+
+      const waUrl = "https://api.whatsapp.com/send?phone=" + myWhatsAppNumber + "&text=" + encodeURIComponent(message);
+      window.location.href = waUrl;
+    }
   }
 }
 
