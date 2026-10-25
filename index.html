@@ -262,7 +262,113 @@
         alert("सर्वर से कनेक्ट नहीं हो पाया।");
       });
     }
-  </script>
+<!-- 1. पहले फॉर्म वाला HTML कोड (जो चरण 1 में दिया था) -->
+    <div id="order-modal" style="display: none; ...">
+      ...
+    </div>
 
+    <!-- 2. इसके ठीक नीचे जावास्क्रिप्ट कोड (चरण 2 वाला) -->
+    <script>
+      let currentOrder = {};
+
+      function openOrderModal(title, price, size) {
+        currentOrder = { title, price, size };
+        document.getElementById("modal-product-title").innerText = title;
+        document.getElementById("modal-product-price").innerText = price;
+        document.getElementById("modal-product-size").innerText = size;
+
+        const modal = document.getElementById("order-modal");
+        modal.style.display = "flex";
+      }
+
+      function closeOrderModal() {
+        document.getElementById("order-modal").style.display = "none";
+      }
+
+      document.getElementById("customer-order-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById("cust-name").value;
+        const phone = document.getElementById("cust-phone").value;
+        const address = document.getElementById("cust-address").value;
+        const city = document.getElementById("cust-city").value;
+        const pincode = document.getElementById("cust-pincode").value;
+
+        const myWhatsAppNumber = "918130748293";
+
+        const message = `🛍️ *नया ऑर्डर प्राप्त हुआ - Pinki Latest Fashion*
+----------------------------
+👗 *प्रोडक्ट:* ${currentOrder.title}
+📏 *साइज़:* ${currentOrder.size}
+💰 *कीमत:* ₹${currentOrder.price}
+----------------------------
+👤 *ग्राहक का नाम:* ${name}
+📞 *फ़ोन नंबर:* ${phone}
+🏠 *पता:* ${address}
+📍 *शहर:* ${city} - ${pincode}
+----------------------------
+कृपया मेरा ऑर्डर कन्फर्म करके डिलीवरी का समय बताएं।`;
+
+        const waUrl = `https://wa.me/${myWhatsAppNumber}?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, "_blank");
+
+        closeOrderModal();
+        document.getElementById("customer-order-form").reset();
+      });
+    </script>
+
+  <!-- 3. और अंत में बॉडी बंद होगी -->
+  </body>
+</html>
+  </script>
+<!-- ऑर्डर फॉर्म पॉपअप (Order Modal) -->
+<div id="order-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 15px;">
+  <div style="background: white; border-radius: 12px; max-width: 450px; width: 100%; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 style="margin: 0; font-size: 18px; color: #1f2937;">डिलीवरी एड्रेस भरें</h3>
+      <button onclick="closeOrderModal()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #6b7280;">&times;</button>
+    </div>
+
+    <!-- सिलेक्टेड प्रोडक्ट की समरी -->
+    <div style="background: #fdf2f8; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; color: #831843;">
+      <strong id="modal-product-title"></strong><br>
+      साइज़: <span id="modal-product-size"></span> | कीमत: ₹<span id="modal-product-price"></span>
+    </div>
+
+    <form id="customer-order-form">
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151;">आपका पूरा नाम</label>
+        <input type="text" id="cust-name" placeholder="उदा. प्रिया शर्मा" required style="width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151;">मोबाइल नंबर</label>
+        <input type="tel" id="cust-phone" placeholder="उदा. 9876543210" pattern="[0-9]{10}" required style="width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151;">पूरा पता (मकान नं., गली, इलाका)</label>
+        <textarea id="cust-address" rows="3" placeholder="उदा. मकान नं. 12, सेक्टर 62..." required style="width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <div style="flex: 1;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151;">शहर</label>
+          <input type="text" id="cust-city" placeholder="उदा. नोएडा" required style="width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151;">पिनकोड</label>
+          <input type="text" id="cust-pincode" placeholder="उदा. 201301" pattern="[0-9]{6}" required style="width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <button type="submit" style="width: 100%; background: #25D366; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer;">
+        WhatsApp पर ऑर्डर कन्फर्म करें
+      </button>
+    </form>
+
+  </div>
+</div>
 </body>
 </html>
