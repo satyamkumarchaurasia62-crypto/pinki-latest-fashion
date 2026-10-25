@@ -304,41 +304,7 @@
   }
 }
 
-      const orderData = {
-        name: customerName,
-        phone: customerPhone,
-        address: customerAddress,
-        product: item.title,
-        size: selectedSize,
-        amount: item.price
-      };
-
-      fetch("order.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData)
-      })
-      .then(res => res.json())
-      .then(resData => {
-        if (resData.status === "success") {
-          alert("आपका आर्डर सुरक्षित सेव हो गया है! अब आपको व्हाट्सएप पर भेजा जा रहा है।");
-          window.location.href = resData.whatsapp_url;
-        } else {
-          alert("आर्डर सेव करने में कोई गड़बड़ हुई।");
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("सर्वर से कनेक्ट नहीं हो पाया।");
-      });
     
-<!-- 1. पहले फॉर्म वाला HTML कोड (जो चरण 1 में दिया था) -->
-    div id="order-modal" style="display: none; ...">
-      ...
-    </div>
-
-    <!-- 2. इसके ठीक नीचे जावास्क्रिप्ट कोड (चरण 2 वाला) -->
-    <script>
       let currentOrder = {};
 
       function openOrderModal(title, price, size) {
