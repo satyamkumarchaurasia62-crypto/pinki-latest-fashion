@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pinki Latest Fashion | Premium Ladies Clothes</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Razorpay Payment Integration Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            boutique: {
+              50: '#fdf8f6',
+              100: '#f2e8e5',
+              200: '#eaddd7',
+              600: '#9b2c2c',
+              800: '#742a2a',
+              900: '#4a1515',
+              gold: '#c59b27',
+              goldHover: '#ad871f'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-stone-900">
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-stone-950 text-stone-200 text-xs py-2.5 px-4 text-center tracking-wide flex justify-center items-center gap-2 border-b border-stone-800">
+    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span class="font-medium">Direct Delivery Across Gautam Buddha Nagar & NCR | 100% Stitched Ready Outfits</span>
+    <span class="hidden sm:inline text-stone-600">|</span>
+    <a href="tel:8130748293" class="hidden sm:inline font-semibold text-rose-300 hover:text-white transition">
+      <i class="fa-solid fa-phone text-[10px] mr-1"></i>8130748293
+    </a>
+  </div>
+
+  <!-- Minimalist Sticky Header -->
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200/80 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo / Typography -->
+      <a href="#" class="flex flex-col">
+        <span class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-stone-950">
+          Pinki <span class="text-boutique-800 italic font-medium">Latest Fashion</span>
+        </span>
+        <span class="text-[10px] tracking-[0.2em] uppercase text-stone-500 font-semibold mt-0.5">
+          Ready-to-Wear Ladies Clothes & Designer Clothes
+        </span>
+      </a>
+
+      <!-- Direct Actions (Profile & Contact) -->
+      <div class="flex items-center gap-4">
+        
+        <!-- Live Profile Status Widget Button -->
+        <div class="live-profile-widget">
+          <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-4 py-2 rounded-full border border-stone-200 shadow-sm text-stone-700 text-sm font-semibold transition">
+            <div style="width: 28px; height: 24px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-2 text-xs" id="home-user-logo">
+              <i class="fa-solid fa-user text-[10px]"></i>
+            </div>
+            <span id="home-user-text">Account Dashboard</span>
+          </a>
+        </div>
+
+        <!-- Call Button -->
+        <a href="tel:8130748293" class="hidden md:flex items-center gap-2 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 px-3.5 py-2 rounded-full transition">
+          <i class="fa-solid fa-phone text-stone-600"></i>
+          <span>8130748293</span>
+        </a>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-stone-100 via-[#fbf7f5] to-[#fcfaf9] py-14 sm:py-20 border-b border-stone-200/70">
+    <div class="max-w-5xl mx-auto px-4 text-center space-y-4">
+      <div class="inline-flex items-center gap-2 bg-rose-50 border border-rose-200/60 text-boutique-800 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+        <i class="fa-solid fa-sparkles text-xs"></i>
+        New Festive & Wedding Arrivals
+      </div>
+      
+      <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-stone-900 tracking-tight leading-tight">
+        Handcrafted Ready Fashion Clothes & <br class="hidden sm:inline"/><span class="italic font-normal text-boutique-800">Premium Ladies Outfits</span>
+      </h1>
+      
+      <p class="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+        Completely ready to wear premium ladies attire. No tailoring delays—simply choose your preferred size and place your order instantly.
+      </p>
+
+      <div class="pt-2 flex flex-wrap justify-center items-center gap-6 text-xs text-stone-500 font-medium">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-600"></i> Fully Stitched & Lined</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-600"></i> Instant Razorpay UPI Checkout</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-600"></i> Fast Local Dispatch</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Catalog -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex-grow w-full">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-stone-200 pb-4 mb-10 gap-2">
+      <div>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Curated Ethnic Collection</h2>
+        <p class="text-xs sm:text-sm text-stone-500 mt-1">Select your preferred fit and buy directly with Online UPI or WhatsApp</p>
+      </div>
+      <div class="text-xs font-semibold text-stone-500">
+        4 Exclusive Readymade Outfits
+      </div>
+    </div>
+    
+    <!-- Dynamic Product Populating Grid -->
+    <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
+      <!-- Your premium ready outfits configurations can be safely populated down here -->
+    </div>
+  </main>
+
+  <!-- Contact & Footer Section -->
+  <section class="bg-white border-t border-stone-200 py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-stone-50 rounded-3xl p-6 sm:p-10 border border-stone-200/80 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+        
+        
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-full bg-rose-100 text-boutique-800 flex items-center justify-center">
+            <i class="fa-solid fa-location-dot text-base"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-stone-900 text-base">Pinki Latest Fashion</h3>
+            <p class="text-stone-500 mt-1">Premium Ladies Clothing Hub</p>
+            <p class="text-stone-500 text-xs">Gautam Buddha Nagar, Delhi NCR</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Persistent Active Sessions Script -->
+  <script>
+    // Page Session Init Check Validation Toggling
+    document.addEventListener("DOMContentLoaded", function() {
+      const loggedInUser = localStorage.getItem("currentLoggedInUser");
+      if (loggedInUser) {
+        const user = JSON.parse(loggedInUser);
+        // Sync real name configurations inside the homepage widget structure
+        document.getElementById("home-user-text").innerText = "Hi, " + user.name;
+        document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase();
+        document.getElementById("home-user-logo").style.background = "#10b981"; // Success logging indicator green flag
+      }
+    });
+  </script>    
+  <!-- Core Javascript Connections -->
+  <script src="product.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. लोकल स्टोरेज से सेशन सिंक करना
+      const loggedInUser = localStorage.getItem("currentLoggedInUser");
+      if (loggedInUser) {
+        const user = JSON.parse(loggedInUser);
+        document.getElementById("home-user-text").innerText = "Hi, " + user.name;
+        document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase();
+        document.getElementById("home-user-logo").style.background = "#10b981"; 
+      }
+
+      // 2. product.js फ़ाइल के PRODUCTS ऐरे से कपड़े ग्रिड में लोड करना
+      const gridContainer = document.getElementById("product-grid");
+      if (gridContainer && typeof PRODUCTS !== 'undefined') {
+        gridContainer.innerHTML = "";
+        PRODUCTS.forEach(product => {
+          let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+          const productCard = `
+            <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col h-full">
+              <div class="relative pt-[135%] bg-stone-50 overflow-hidden">
+                <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition duration-500">
+              </div>
+              <div class="p-5 flex flex-col flex-grow justify-between space-y-4">
+                <div>
+                  <h3 class="font-serif font-bold text-stone-900 text-base tracking-tight line-clamp-1">${product.title}</h3>
+                  <p class="text-xs text-stone-500 leading-relaxed line-clamp-2 mt-1.5">${product.desc}</p>
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between border-t border-stone-100 pt-3">
+                    <div class="flex items-baseline gap-2">
+                      <span class="text-base font-bold text-boutique-800">₹${product.price}</span>
+                      <span class="text-xs text-stone-400 line-through">₹${product.mrp}</span>
+                    </div>
+                    <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-stone-600 font-medium focus:outline-none focus:border-boutique-600">${sizeOptions}</select>
+                  </div>
+                  <button onclick="handleBuyNow(${product.id})" class="w-full bg-stone-900 hover:bg-boutique-800 text-white text-xs font-semibold py-3 rounded-xl tracking-wide uppercase transition duration-200">
+                    Buy Now / आर्डर करें
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          gridContainer.innerHTML += productCard;
+        });
+      } else {
+        console.error("PRODUCTS array is missing or product.js failed to load.");
+      }
+    });
+
+    // आर्डर सबमिशन फंक्शन
+    function handleBuyNow(id) {
+      const item = PRODUCTS.find(p => p.id === id);
+      const selectedSize = document.getElementById(`size-${id}`).value;
+      const userName = localStorage.getItem("currentLoggedInUser") ? JSON.parse(localStorage.getItem("currentLoggedInUser")).name : "";
+
+      const customerName = prompt("कृपया अपना नाम डालें:", userName);
+      const customerPhone = prompt("कृपया अपना फ़ोन नंबर डालें:");
+      const customerAddress = prompt("डिलिवरी का पूरा पता (Address) लिखें:");
+
+      if (!customerName || !customerPhone || !customerAddress) {
+        alert("आर्डर पूरा करने के लिए सभी जानकारी भरना ज़रूरी है!");
+        return;
+      }
+
+      const orderData = {
+        name: customerName,
+        phone: customerPhone,
+        address: customerAddress,
+        product: item.title,
+        size: selectedSize,
+        amount: item.price
+      };
+
+      fetch("order.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData)
+      })
+      .then(res => res.json())
+      .then(resData => {
+        if (resData.status === "success") {
+          alert("आपका आर्डर सुरक्षित सेव हो गया है! अब आपको व्हाट्सएप पर भेजा जा रहा है।");
+          window.location.href = resData.whatsapp_url;
+        } else {
+          alert("आर्डर सेव करने में कोई गड़बड़ हुई।");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("सर्वर से कनेक्ट नहीं हो पाया।");
+      });
+    }
+  </script>
+
+</body>
+</html>
