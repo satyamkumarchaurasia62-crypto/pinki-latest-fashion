@@ -196,14 +196,21 @@
           const password = document.getElementById("signup-password").value;
           const question = document.getElementById("signup-question").value;
           const answer = document.getElementById("signup-answer").value.trim().toLowerCase();
-
+          const phone = document.getElementById("signup-phone").value.trim();
+          const address = document.getElementById("signup-address").value.trim();
+          const city = document.getElementById("signup-city").value.trim();
+          const pincode = document.getElementById("signup-pincode").value.trim();    
           const users = getUsers();
           if (users[email]) {
             alert("यह ईमेल एड्रेस पहले से ही रजिस्टर्ड है!");
             return;
           }
 
-          users[email] = { name, email, password, question, answer };
+users[email] = { 
+  name, email, password, question, answer, 
+  phone, address, city, pincode, 
+  orders: [] 
+};
           localStorage.setItem("registeredUsers", JSON.stringify(users));
           
           alert("अकाउंट सफलतापूर्वक बन गया है! अब आप लॉगिन कर सकते हैं।");
