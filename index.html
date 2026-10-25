@@ -261,23 +261,24 @@
       const gridContainer = document.getElementById("product-grid");
       if (gridContainer && typeof PRODUCTS !== 'undefined') {
         gridContainer.innerHTML = "";
-        PRODUCTS.forEach(product => {  let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
-          const productCard = ' <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
-              <div>
-                <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
-                  <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
-                </div>
-                <div class="p-4">
-                  <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
-                  <p class="text-xs text-stone-500 mt-1">${product.desc || 'प्रीमियम रेडीमेड कलेक्शन'}</p>
-                  
-                  <div class="flex items-center justify-between mt-3">
-                    <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
-                    <div class="flex items-center gap-1">
-                      <span class="text-xs text-stone-500">Size:</span>
-                      <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
-                        ${sizeOptions}
-                    </select>
+        PRODUCTS.forEach(product => {let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+            const productCard = `
+              <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
+                <div>
+                  <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
+                    <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
+                  </div>
+                  <div class="p-4">
+                    <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
+                    <p class="text-xs text-stone-500 mt-1">${product.desc || 'प्रीमियम रेडीमेड कलेक्शन'}</p>
+                    
+                    <div class="flex items-center justify-between mt-3">
+                      <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
+                      <div class="flex items-center gap-1">
+                        <span class="text-xs text-stone-500">Size:</span>
+                        <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
+                          ${sizeOptions}
+                        </select>
                   </div>
                 </div>
               </div>
