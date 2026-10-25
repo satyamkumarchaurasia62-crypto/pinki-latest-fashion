@@ -1,151 +1,5 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Gateway - Account & Security</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f3f4f6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .auth-container {
-      background: #ffffff;
-      padding: 35px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 420px;
-      box-sizing: border-box;
-    }
-    h2 { margin: 0 0 10px 0; color: #1f2937; font-size: 24px; }
-    .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #374151; }
-    input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
-    input:focus, select:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-    button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
-    .btn-primary { background-color: #2563eb; }
-    .btn-primary:hover { background-color: #1d4ed8; }
-    .btn-danger { background-color: #ef4444; }
-    .btn-danger:hover { background-color: #dc2626; }
-    .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
-    .toggle-text a { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
-    .toggle-text a:hover { text-decoration: underline; }
-    .profile-view { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
-    .profile-view p { margin: 8px 0; color: #374151; }
-    .forgot-link { display: block; text-align: right; font-size: 12px; color: #2563eb; text-decoration: none; margin-top: 4px; cursor: pointer; }
-  </style>
-</head>
-<body>
-
-  <div class="auth-container">
-    
-    <!-- 1. लॉगिन फ़ॉर्म (Sign In) -->
-    <div id="login-box">
-      <h2>Sign In</h2>
-      <p class="subtitle">अपने ईमेल और पासवर्ड से लॉग इन करें।</p>
-      <form id="login-form">
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="login-email" placeholder="example@mail.com" required>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="login-password" placeholder="••••••••" required>
-          <a class="forgot-link" onclick="showBox('forgot')">Forgot Password? (पासवर्ड भूल गए?)</a>
-        </div>
-        <button type="submit" class="btn-primary">Login</button>
-      </form>
-      <p class="toggle-text">अकाउंट नहीं है? <a onclick="showBox('signup')">नया अकाउंट बनाएं (Sign Up)</a></p>
-    </div>
-
-    <!-- 2. रजिस्ट्रेशन फ़ॉर्म (Sign Up / Create Account) -->
-    <div id="signup-box" style="display: none;">
-      <h2>Create Account</h2>
-      <p class="subtitle">शॉपिंग शुरू करने के लिए अपनी डिटेल्स भरें।</p>
-      <form id="signup-form">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="signup-name" placeholder="John Doe" required>
-        </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="signup-email" placeholder="example@mail.com" required>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signup-password" placeholder="कम से कम 8 अक्षर" minlength="8" required>
-        </div>
-        <div class="form-group">
-          <label>Security Question (पासवर्ड रिकवरी के लिए)</label>
-          <select id="signup-question" required>
-            <option value="pet">आपके पहले पालतू जानवर का नाम क्या था?</option>
-            <option value="school">आपके पहले स्कूल का नाम क्या था?</option>
-            <option value="city">आपका जन्म किस शहर में हुआ था?</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Your Answer (जवाब)</label>
-          <input type="text" id="signup-answer" placeholder="अपना गुप्त जवाब लिखें" required>
-        </div>
-        <button type="submit" class="btn-primary">Register & Create Account</button>
-      </form>
-      <p class="toggle-text">पहले से अकाउंट है? <a onclick="showBox('login')">लॉग इन करें (Sign In)</a></p>
-    </div>
-
-    <!-- 3. फ़ॉरगोट पासवर्ड फ़ॉर्म -->
-    <div id="forgot-box" style="display: none;">
-      <h2>Reset Password</h2>
-      <p class="subtitle">अपना अकाउंट रिकवर करने के लिए डिटेल्स भरें।</p>
-      <form id="forgot-form">
-        <div class="form-group">
-          <label>Registered Email Address</label>
-          <input type="email" id="forgot-email" placeholder="अपना रजिस्टर्ड ईमेल डालें" required>
-        </div>
-        <div class="form-group">
-          <label>Select Your Security Question</label>
-          <select id="forgot-question" required>
-            <option value="pet">आपके पहले पालतू जानवर का नाम क्या था?</option>
-            <option value="school">आपके पहले स्कूल का नाम क्या था?</option>
-            <option value="city">आपका जन्म किस शहर में हुआ था?</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Your Answer</label>
-          <input type="text" id="forgot-answer" placeholder="अपना सही जवाब टाइप करें" required>
-        </div>
-        <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
-          <label>New Password (नया पासवर्ड)</label>
-          <input type="password" id="forgot-new-password" placeholder="नया पासवर्ड सेट करें (min 8 chars)" minlength="8" required>
-        </div>
-        <button type="submit" class="btn-primary">Update & Save Password</button>
-      </form>
-      <p class="toggle-text"><a onclick="showBox('login')">← वापस लॉगिन पर जाएँ</a></p>
-    </div>
-
-    <!-- 4. प्रोफाइल डैशबोर्ड -->
-    <div id="profile-box" style="display: none;">
-      <h2>Welcome Back!</h2>
-      <p class="subtitle">आप सफलतापूर्वक अपने अकाउंट में लॉग इन हैं।</p>
-      <div class="profile-view">
-        <p><strong>Name:</strong> <span id="user-display-name"></span></p>
-        <p><strong>Email:</strong> <span id="user-display-email"></span></p>
-      </div>
-      <button onclick="logout()" class="btn-danger">Logout (लॉगआउट करें)</button>
-      <br><br>
-      <a href="index.html" style="color: #2563eb; text-decoration: none; display: block; text-align: center; font-weight: 600;">← Back to Homepage</a>
-    </div>
-
-  </div>
-
-  <script>
-    // स्क्रीन बदलने का फंक्शन (FIXED: style.style एरर ठीक कर दिया गया है)
+<script>
+    // स्क्रीन बदलने का फंक्शन
     function showBox(type) {
       document.getElementById("login-box").style.display = type === 'login' ? 'block' : 'none';
       document.getElementById("signup-box").style.display = type === 'signup' ? 'block' : 'none';
@@ -171,6 +25,13 @@
       showBox('profile');
       document.getElementById("user-display-name").innerText = user.name;
       document.getElementById("user-display-email").innerText = user.email;
+    }
+
+    // लॉगआउट फंक्शन
+    function logout() {
+      localStorage.removeItem("currentLoggedInUser");
+      alert("आप सफलतापूर्वक लॉगआउट हो चुके हैं।");
+      showBox('login');
     }
 
     // एक्शन 1: नया अकाउंट बनाना (Sign Up)
@@ -223,4 +84,29 @@
       e.preventDefault();
 
       const email = document.getElementById("forgot-email").value.trim().toLowerCase();
+      const question = document.getElementById("forgot-question").value;
+      const answer = document.getElementById("forgot-answer").value.trim().toLowerCase();
+      const newPassword = document.getElementById("forgot-new-password").value;
 
+      const users = getUsers();
+      const user = users[email];
+
+      if (!user) {
+        alert("यह ईमेल एड्रेस सिस्टम में नहीं मिला!");
+        return;
+      }
+
+      if (user.question === question && user.answer === answer) {
+        user.password = newPassword;
+        users[email] = user;
+        localStorage.setItem("registeredUsers", JSON.stringify(users));
+        alert("पासवर्ड सफलतापूर्वक बदल गया है! अब नए पासवर्ड से लॉगिन करें।");
+        document.getElementById("forgot-form").reset();
+        showBox('login');
+      } else {
+        alert("सुरक्षा सवाल या जवाब मेल नहीं खा रहा है!");
+      }
+    });
+  </script>
+</body>
+</html>
