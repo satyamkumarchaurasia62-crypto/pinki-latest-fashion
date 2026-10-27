@@ -478,6 +478,80 @@ function loadUserOrders(email) {
       container.innerHTML = "<p style='color: red;'>ऑर्डर लोड नहीं हो सके: " + err.message + "</p>";
     });
 }
+   // Firebase Configuration & Initialization
+const firebaseConfig = {
+  apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
+  authDomain: "pinki-latest-fashion.firebaseapp.com",
+  projectId: "pinki-latest-fashion",
+  storageBucket: "pinki-latest-fashion.firebasestorage.app",
+  messagingSenderId: "432889531515",
+  appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
+// Buy Now Function
+function handleBuyNow(id) {
+  const loggedInRaw = localStorage.getItem("currentLoggedInUser");
+  if (!loggedInRaw) {
+    alert("कृपया ऑर्डर करने के लिए पहले लॉगिन करें!");
+    window.location.href = "account.html";
+    return;
+  }
+
+  const user = JSON.parse(loggedInRaw);
+  const item = PRODUCTS.find(p => p.id === id);
+  if (!item) return;
+
+  const sizeElem = document.getElementById(`size-${id}`);
+  const selectedSize = sizeElem ? sizeElem.value : "Free Size";
+
+  const qtyElem = document.getElementById(`qty-${id}`);
+  const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
+
+  const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
+  const paymentMethod = payElem ? payElem.value : "COD";
+
+  const totalAmount = item.price * quantity;
+  const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+
+  const confirmMsg = `सामान: ${item.title || item.name}\nसाइज़: ${selectedSize}\nमात्रा: ${quantity}\nकुल राशि: ₹${totalAmount}\nपेमेंट मोड: ${paymentMethod}\n\nक्या आप यह ऑर्डर कन्फ़र्म करना चाहते हैं?`;
+
+  if (!confirm(confirmMsg)) return;
+
+  db.collection("orders").doc(orderId).set({
+    orderId: orderId,
+    productId: item.id,
+    productName: item.title || item.name,
+    size: selectedSize,
+    quantity: quantity,
+    totalAmount: totalAmount,
+    paymentMethod: paymentMethod,
+    paymentStatus: (paymentMethod === "COD") ? "पेंडिंग (कैश ऑन डिलीवरी)" : "ऑनलाइन प्रोसेस में",
+    deliveryStatus: "पैकिंग जारी है",
+    userEmail: (user.email || "").toLowerCase(),
+    userName: user.name || "ग्राहक",
+    phone: user.phone || "",
+    shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
+    orderDate: new Date().toLocaleString("hi-IN")
+  }).then(() => {
+    alert(`बधाई हो! आपका ऑर्डर दर्ज हो गया है।\nऑर्डर आईडी: ${orderId}`);
+
+    if (paymentMethod === "Online UPI") {
+      const myUpiId = "8130748293@pthdfc";
+      const merchantName = "Pinki Latest Fashion";
+      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
+      window.location.href = upiUrl;
+    } else {
+      window.location.href = "account.html";
+    }
+  }).catch((err) => {
+    alert("ऑर्डर दर्ज करने में समस्या आई: " + err.message);
+  });
+}
 </script>
 </body>
 </html>
