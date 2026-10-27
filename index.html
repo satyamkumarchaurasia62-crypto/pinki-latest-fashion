@@ -282,18 +282,28 @@
                   </div>
                 </div>
               </div>
-<div class="order-controls" style="margin: 10px 0;">
-  <label>मात्रा (Qty): </label>
-  <input type="number" id="qty-box" value="1" min="1" max="10" style="width: 50px; text-align: center;">
-
-  <div style="margin-top: 8px;">
-    <label><strong>पेमेंट का प्रकार:</strong></label><br>
-    <label><input type="radio" name="payment-method" value="COD" checked> कैश ऑन डिलीवरी (COD)</label><br>
-    <label><input type="radio" name="payment-method" value="Online UPI"> ऑनलाइन UPI</label>
+<div class="p-4 pt-0 space-y-2">
+  <div class="flex items-center justify-between text-xs text-stone-600 mb-2">
+    <label>मात्रा (Qty):</label>
+    <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
   </div>
-</div>
+  
+  <div class="text-xs text-stone-600 space-y-1 mb-3">
+    <div class="font-semibold">पेमेंट का प्रकार:</div>
+    <label class="flex items-center gap-1.5 cursor-pointer">
+      <input type="radio" name="pay-${product.id}" value="COD" checked>
+      <span>कैश ऑन डिलीवरी (COD)</span>
+    </label>
+    <label class="flex items-center gap-1.5 cursor-pointer">
+      <input type="radio" name="pay-${product.id}" value="Online UPI">
+      <span>ऑनलाइन UPI</span>
+    </label>
+  </div>
 
-<button onclick="placeOrder('डिजाइनर कुर्ती', 799)">ऑर्डर कन्फर्म करें</button>
+  <button onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow">
+    BUY NOW / अभी खरीदें
+  </button>
+</div>
             </div>
           `;
           gridContainer.innerHTML += productCard;
@@ -305,6 +315,7 @@
 
     // नया और सही handleBuyNow फ़ंक्शन
 function handleBuyNow(id) {
+  // 1. चेक करें कि यूज़र लॉग इन है या नहीं
   const loggedInRaw = localStorage.getItem("currentLoggedInUser");
   if (!loggedInRaw) {
     alert("कृपया ऑर्डर करने के लिए पहले लॉगिन करें!");
@@ -316,24 +327,34 @@ function handleBuyNow(id) {
   const item = PRODUCTS.find(p => p.id === id);
   if (!item) return;
 
+  // साइज़, मात्रा और पेमेंट का प्रकार प्राप्त करें
   const sizeElem = document.getElementById(`size-${id}`);
   const selectedSize = sizeElem ? sizeElem.value : "Free Size";
 
-  const confirmMsg = `सामान: ${item.title || item.name}\nसाइज़: ${selectedSize}\nकीमत: ₹${item.price}\n\nडिलीवरी का पता:\n${user.address || "पता नहीं मिला"}, ${user.city || ""} - ${user.pincode || ""}\n\nक्या आप यह ऑर्डर कन्फ़र्म करना चाहते हैं?`;
+  const qtyElem = document.getElementById(`qty-${id}`);
+  const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
+
+  const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
+  const paymentMethod = payElem ? payElem.value : "COD";
+
+  const totalAmount = item.price * quantity;
+  const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+
+  // कन्फर्मेशन पॉपअप
+  const confirmMsg = `सामान: ${item.title || item.name}\nसाइज़: ${selectedSize}\nमात्रा: ${quantity}\nकुल राशि: ₹${totalAmount}\nपेमेंट मोड: ${paymentMethod}\n\nडिलीवरी का पता:\n${user.address || "पता उपलब्ध नहीं"}, ${user.city || ""} - ${user.pincode || ""}\n\nक्या आप यह ऑर्डर कन्फ़र्म करना चाहते हैं?`;
 
   if (!confirm(confirmMsg)) return;
 
-  const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-
-  // Firestore में ऑर्डर सेव करना
+  // 2. Firebase Firestore में ऑर्डर सेव करें
   db.collection("orders").doc(orderId).set({
     orderId: orderId,
     productId: item.id,
     productName: item.title || item.name,
     size: selectedSize,
-    totalAmount: item.price,
-    paymentMethod: "कैश ऑन डिलीवरी (COD)",
-    paymentStatus: "पेंडिंग",
+    quantity: quantity,
+    totalAmount: totalAmount,
+    paymentMethod: paymentMethod,
+    paymentStatus: (paymentMethod === "COD") ? "पेंडिंग (कैश ऑन डिलीवरी)" : "ऑनलाइन प्रोसेस में",
     deliveryStatus: "पैकिंग जारी है",
     userEmail: (user.email || "").toLowerCase(),
     userName: user.name || "ग्राहक",
@@ -342,7 +363,19 @@ function handleBuyNow(id) {
     orderDate: new Date().toLocaleString("hi-IN")
   }).then(() => {
     alert(`बधाई हो! आपका ऑर्डर दर्ज हो गया है।\nऑर्डर आईडी: ${orderId}`);
-    window.location.href = "account.html";
+
+    // 3. यदि ग्राहक ने 'Online UPI' चुना है तो सीधे UPI पेमेंट ऐप खोलें
+    if (paymentMethod === "Online UPI") {
+      const myUpiId = "8130748293@pthdfc"; // आपकी असली UPI ID
+      const merchantName = "Pinki Latest Fashion";
+      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
+
+      // UPI ऐप पर रीडायरेक्ट करें
+      window.location.href = upiUrl;
+    } else {
+      // COD के लिए सीधे अकाउंट पेज पर भेजें
+      window.location.href = "account.html";
+    }
   }).catch((err) => {
     alert("ऑर्डर दर्ज करने में समस्या आई: " + err.message);
   });
