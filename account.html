@@ -315,21 +315,18 @@ if (loginForm) {
             alert("यह ईमेल एड्रेस सिस्टम में नहीं मिला!");
             return;
           }
-
           if (user.question === question && user.answer === answer) {
-            user.password = newPassword;
-            users[email] = user;
-            localStorage.setItem("registeredUsers", JSON.stringify(users));
-            alert("पासवर्ड सफलतापूर्वक बदल गया है! अब नए पासवर्ड से लॉगिन करें।");
-            forgotForm.reset();
-            showBox('login');
-          } else {
-            alert("सुरक्षा सवाल या जवाब मेल नहीं खा रहा है!");
-          }
-        });
-      }
-    });
-
+      user.password = newPassword;
+      users[email] = user;
+      localStorage.setItem("registeredUsers", JSON.stringify(users));
+      alert("पासवर्ड सफलतापूर्वक बदल गया है! अब नए पासवर्ड से लॉगिन करें।");
+      forgotForm.reset();
+      showBox('login');
+    } else {
+      alert("सुरक्षा सवाल या जवाब मेल नहीं खा रहा है!");
+    }
+  });
+}
   </script>
 </body>
 </html>
