@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shopping Gateway - Account & Security</title>
@@ -94,6 +97,25 @@
           <label>Your Answer</label>
           <input type="text" id="signup-answer" placeholder="अपना गुप्त जवाब लिखें" required>
         </div>
+<div class="form-group">
+  <label>Phone Number</label>
+  <input type="tel" id="signup-phone" placeholder="10 अंकों का मोबाइल नंबर" required>
+</div>
+
+<div class="form-group">
+  <label>Full Address</label>
+  <input type="text" id="signup-address" placeholder="मकान नंबर, गली, इलाका" required>
+</div>
+
+<div class="form-group">
+  <label>City</label>
+  <input type="text" id="signup-city" placeholder="शहर का नाम" required>
+</div>
+
+<div class="form-group">
+  <label>Pincode</label>
+  <input type="text" id="signup-pincode" placeholder="पिनकोड" required>
+</div>     
         <button type="submit" class="btn-primary">Register & Create Account</button>
       </form>
       <p class="toggle-text">पहले से अकाउंट है? <a onclick="showBox('login')">लॉग इन करें (Sign In)</a></p>
@@ -145,6 +167,19 @@
   </div>
 
   <script>
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
+  authDomain: "pinki-latest-fashion.firebaseapp.com",
+  projectId: "pinki-latest-fashion",
+  storageBucket: "pinki-latest-fashion.firebasestorage.app",
+  messagingSenderId: "432889531515",
+  appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
+};
+
+// Initialize Firebase & Firestore
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
     // सेफ तरीके से स्क्रीन बदलने का फंक्शन (चेक करता है कि एलिमेंट मौजूद है या नहीं)
     function showBox(type) {
       const loginBox = document.getElementById("login-box");
@@ -170,76 +205,98 @@
       if (nameElem) nameElem.innerText = user.name;
       if (emailElem) emailElem.innerText = user.email;
     }
+ // 2. नया अकाउंट बनाना (Sign Up - Firebase)
+const signupForm = document.getElementById("signup-form");
+if (signupForm) {
+  signupForm.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-    function logout() {
-      localStorage.removeItem("currentLoggedInUser");
-      alert("आप सफलतापूर्वक लॉगआउट हो चुके हैं।");
-      showBox('login');
+    const nameEl = document.getElementById("signup-name");
+    const emailEl = document.getElementById("signup-email");
+    const passwordEl = document.getElementById("signup-password");
+    const questionEl = document.getElementById("signup-question");
+    const answerEl = document.getElementById("signup-answer");
+    const phoneEl = document.getElementById("signup-phone");
+    const addressEl = document.getElementById("signup-address");
+    const cityEl = document.getElementById("signup-city");
+    const pincodeEl = document.getElementById("signup-pincode");
+
+    const name = nameEl ? nameEl.value.trim() : "";
+    const email = emailEl ? emailEl.value.trim().toLowerCase() : "";
+    const password = passwordEl ? passwordEl.value : "";
+    const question = questionEl ? questionEl.value : "";
+    const answer = answerEl ? answerEl.value.trim().toLowerCase() : "";
+    const phone = phoneEl ? phoneEl.value.trim() : "";
+    const address = addressEl ? addressEl.value.trim() : "";
+    const city = cityEl ? cityEl.value.trim() : "";
+    const pincode = pincodeEl ? pincodeEl.value.trim() : "";
+
+    if (!email || !password) {
+      alert("कृपया ईमेल और पासवर्ड ज़रूर भरें!");
+      return;
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      // 1. चेक करें कि यूजर पहले से लॉग इन है या नहीं
-      const currentLoggedIn = localStorage.getItem("currentLoggedInUser");
-      if (currentLoggedIn) {
-        loadProfile(JSON.parse(currentLoggedIn));
+    // पहले चेक करें कि यह ईमेल Firebase में पहले से तो नहीं है
+    db.collection("users").doc(email).get().then((doc) => {
+      if (doc.exists) {
+        alert("यह ईमेल एड्रेस पहले से ही रजिस्टर्ड है!");
       } else {
-        showBox('login');
-      }
-
-      // 2. नया अकाउंट बनाना (Sign Up)
-      const signupForm = document.getElementById("signup-form");
-      if (signupForm) {
-        signupForm.addEventListener("submit", function(e) {
-          e.preventDefault();
-          const name = document.getElementById("signup-name").value;
-          const email = document.getElementById("signup-email").value.trim().toLowerCase();
-          const password = document.getElementById("signup-password").value;
-          const question = document.getElementById("signup-question").value;
-          const answer = document.getElementById("signup-answer").value.trim().toLowerCase();
-          const phone = document.getElementById("signup-phone").value.trim();
-          const address = document.getElementById("signup-address").value.trim();
-          const city = document.getElementById("signup-city").value.trim();
-          const pincode = document.getElementById("signup-pincode").value.trim();    
-          const users = getUsers();
-          if (users[email]) {
-            alert("यह ईमेल एड्रेस पहले से ही रजिस्टर्ड है!");
-            return;
-          }
-
-users[email] = { 
-  name, email, password, question, answer, 
-  phone, address, city, pincode, 
-  orders: [] 
-};
-          localStorage.setItem("registeredUsers", JSON.stringify(users));
-          
-          alert("अकाउंट सफलतापूर्वक बन गया है! अब आप लॉगिन कर सकते हैं।");
+        // नया यूज़र Firestore में सेव करें
+        return db.collection("users").doc(email).set({
+          name: name,
+          email: email,
+          password: password,
+          question: question,
+          answer: answer,
+          phone: phone,
+          address: address,
+          city: city,
+          pincode: pincode,
+          orders: [],
+          createdAt: new Date()
+        }).then(() => {
+          alert("अकाउंट सफलतापूर्वक बन गया! अब आप लॉगिन कर सकते हैं।");
           signupForm.reset();
           showBox('login');
         });
       }
+    }).catch((error) => {
+      alert("अकाउंट बनाने में समस्या आई: " + error.message);
+    });
+  });
+}
 
-      // 3. लॉग इन करना (Sign In)
-      const loginForm = document.getElementById("login-form");
-      if (loginForm) {
-        loginForm.addEventListener("submit", function(e) {
-          e.preventDefault();
-          const email = document.getElementById("login-email").value.trim().toLowerCase();
-          const password = document.getElementById("login-password").value;
+ // 3. लॉग इन करना (Sign In - Firebase)
+const loginForm = document.getElementById("login-form");
+if (loginForm) {
+  loginForm.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-          const users = getUsers();
-          const user = users[email];
+    const emailInput = document.getElementById("login-email");
+    const passwordInput = document.getElementById("login-password");
 
-          if (user && user.password === password) {
-            const sessionUser = { name: user.name, email: user.email };
-            localStorage.setItem("currentLoggedInUser", JSON.stringify(sessionUser));
-            loadProfile(sessionUser);
-            loginForm.reset();
-          } else {
-            alert("गलत ईमेल या पासवर्ड! कृपया दोबारा जाँचें।");
-          }
-        });
+    const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+    const password = passwordInput ? passwordInput.value : "";
+
+    if (!email || !password) {
+      alert("कृपया ईमेल और पासवर्ड भरें!");
+      return;
+    }
+
+    db.collection("users").doc(email).get().then((doc) => {
+      if (doc.exists && doc.data().password === password) {
+        const userData = doc.data();
+        localStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+        alert("लॉगिन सफल!");
+        loadProfile(userData);
+      } else {
+        alert("गलत ईमेल या पासवर्ड! कृपया दोबारा जाँचें।");
       }
+    }).catch((error) => {
+      alert("लॉगिन में समस्या आई: " + error.message);
+    });
+  });
+}
 
       // 4. पासवर्ड रीसेट (Forgot Password)
       const forgotForm = document.getElementById("forgot-form");
@@ -272,6 +329,7 @@ users[email] = {
         });
       }
     });
+
   </script>
 </body>
 </html>
