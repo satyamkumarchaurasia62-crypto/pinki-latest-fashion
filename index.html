@@ -361,22 +361,6 @@ function handleBuyNow(id) {
   const confirmMsg = `सामान: ${item.title || item.name}\nसाइज़: ${selectedSize}\nमात्रा: ${quantity}\nकुल राशि: ₹${totalAmount}\nपेमेंट मोड: ${paymentMethod}\n\nडिलीवरी का पता:\n${user.address || "पता उपलब्ध नहीं"}, ${user.city || ""} - ${user.pincode || ""}\n\nक्या आप यह ऑर्डर कन्फ़र्म करना चाहते हैं?`;
 
   if (!confirm(confirmMsg)) return;
-        // 3. यदि ग्राहक ने 'Online UPI' चुना है तो सीधे UPI पेमेंट ऐप खोलें
-    if (paymentMethod === "Online UPI") {
-      const myUpiId = "8130748293@pthdfc"; // आपकी असली UPI ID
-      const merchantName = "Pinki Latest Fashion";
-      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
-
-      // UPI ऐप पर रीडायरेक्ट करें
-      window.location.href = upiUrl;
-    } else {
-      // COD के लिए सीधे अकाउंट पेज पर भेजें
-      window.location.href = "account.html";
-    }
-  }).catch((err) => {
-    alert("ऑर्डर दर्ज करने में समस्या आई: " + err.message);
-  });
-}
   // 2. Firebase Firestore में ऑर्डर सेव करें
   db.collection("orders").doc(orderId).set({
     orderId: orderId,
@@ -395,12 +379,25 @@ function handleBuyNow(id) {
     orderDate: new Date().toLocaleString("hi-IN")
   }).then(() => {
     alert(`बधाई हो! आपका ऑर्डर दर्ज हो गया है।\nऑर्डर आईडी: ${orderId}`);
+      // 3. यदि ग्राहक ने 'Online UPI' चुना है तो सीधे UPI पेमेंट ऐप खोलें
+    if (paymentMethod === "Online UPI") {
+      const myUpiId = "8130748293@pthdfc"; // आपकी असली UPI ID
+      const merchantName = "Pinki Latest Fashion";
+      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
 
-
+      // UPI ऐप पर रीडायरेक्ट करें
+      window.location.href = upiUrl;
+    } else {
+    
+      // COD के लिए सीधे अकाउंट पेज पर भेजें
+      window.location.href = "account.html";
+    }
+  }).catch((err) => {
+    alert("ऑर्डर दर्ज करने में समस्या आई: " + err.message);
+  });
+}
 </script>
 
     </div>
-
-
 </body>
 </html>
