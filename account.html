@@ -478,21 +478,6 @@ function loadUserOrders(email) {
       container.innerHTML = "<p style='color: red;'>ऑर्डर लोड नहीं हो सके: " + err.message + "</p>";
     });
 }
-   // Firebase Configuration & Initialization
-const firebaseConfig = {
-  apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
-  authDomain: "pinki-latest-fashion.firebaseapp.com",
-  projectId: "pinki-latest-fashion",
-  storageBucket: "pinki-latest-fashion.firebasestorage.app",
-  messagingSenderId: "432889531515",
-  appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
-
 // Buy Now Function
 function handleBuyNow(id) {
   const loggedInRaw = localStorage.getItem("currentLoggedInUser");
