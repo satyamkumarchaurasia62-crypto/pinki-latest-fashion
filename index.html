@@ -312,7 +312,24 @@
         console.error("PRODUCTS array is missing or product.js failed to load.");
       }
     });
+  </script>
+<!-- Firebase Scripts & db initialization -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
+    authDomain: "pinki-latest-fashion.firebaseapp.com",
+    projectId: "pinki-latest-fashion",
+    storageBucket: "pinki-latest-fashion.firebasestorage.app",
+    messagingSenderId: "432889531515",
+    appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
+  };
 
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  window.db = firebase.firestore();
     // नया और सही handleBuyNow फ़ंक्शन
 function handleBuyNow(id) {
   // 1. चेक करें कि यूज़र लॉग इन है या नहीं
