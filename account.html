@@ -171,47 +171,7 @@
  <script>
 
 
-  // Firebase Firestore से यूज़र के ऑर्डर्स लाने का फ़ंक्शन
-  function loadUserOrders(email) {
-    const container = document.getElementById("orders-container");
-    if (!container) return;
 
-    if (!email) {
-      container.innerHTML = "<p style='color: #666;'>ईमेल उपलब्ध नहीं है।</p>";
-      return;
-    }
-
-    db.collection("orders")
-      .where("userEmail", "==", email.toLowerCase())
-      .get()
-      .then((snapshot) => {
-        if (snapshot.empty) {
-          container.innerHTML = "<p style='color: #777; padding: 10px; background: #fdf2f8; border-radius: 8px;'>आपने अभी तक कोई ऑर्डर नहीं दिया है।</p>";
-          return;
-        }
-
-        let html = "";
-        snapshot.forEach((doc) => {
-          const o = doc.data();
-          html += `
-            <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: left;">
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #e5e7eb; padding-bottom: 6px; margin-bottom: 8px;">
-                <span style="font-weight: bold; color: #1f2937;">ऑर्डर आईडी: #${o.orderId}</span>
-                <span style="font-size: 12px; color: #6b7280;">${o.orderDate || ""}</span>
-              </div>
-              <p style="margin: 4px 0; font-size: 14px;"><strong>सामान:</strong> ${o.productName} (साइज़: ${o.size || "Free Size"})</p>
-              <p style="margin: 4px 0; font-size: 14px;"><strong>कुल राशि:</strong> ₹${o.totalAmount} (${o.paymentMethod || "COD"})</p>
-              <p style="margin: 4px 0; font-size: 14px;"><strong>डिलीवरी पता:</strong> ${o.shippingAddress || "उपलब्ध नहीं"}</p>
-              <p style="margin: 6px 0 0 0; font-size: 13px;"><strong>स्थिति:</strong> <span style="color: #059669; font-weight: bold; background: #ecfdf5; padding: 2px 8px; border-radius: 4px;">${o.deliveryStatus || "कन्फ़र्म"}</span></p>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
-      })
-      .catch((err) => {
-        container.innerHTML = "<p style='color: red;'>ऑर्डर लोड नहीं हो सके: " + err.message + "</p>";
-      });
-  }
 // Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
