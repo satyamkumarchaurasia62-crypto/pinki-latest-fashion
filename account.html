@@ -250,18 +250,7 @@ const db = firebase.firestore();
       if (nameElem) nameElem.innerText = user.name;
       if (emailElem) emailElem.innerText = user.email;
     }
-   // पेज लोड होते ही यूज़र और ऑर्डर्स चेक करने का कोड
-  const currentUserData = JSON.parse(localStorage.getItem("currentLoggedInUser"));
-  if (currentUserData) {
-    showBox('profile');
-    const nameElem = document.getElementById("user-display-name");
-    const emailElem = document.getElementById("user-display-email");
-    if (nameElem) nameElem.innerText = currentUserData.name || "";
-    if (emailElem) emailElem.innerText = currentUserData.email || "";
 
-    // यूज़र के ऑर्डर्स लोड करें
-    loadUserOrders(currentUserData.email);
-  }
  // 2. नया अकाउंट बनाना (Sign Up - Firebase)
 const signupForm = document.getElementById("signup-form");
 if (signupForm) {
