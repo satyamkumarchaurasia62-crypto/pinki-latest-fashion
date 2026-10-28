@@ -165,6 +165,12 @@
   <div id="orders-container">ऑर्डर्स लोड हो रहे हैं...</div>
 </div>
       <button onclick="logout()" class="btn-danger">Logout (लॉगआउट करें)</button>
+<br><br>
+      <a href="./index.html" style="color: #2563eb; text-decoration: none; display: block; text-align: center; font-weight: 600;">← Back to Homepage</a>
+   
+
+    </div>
+  <script>
 function logout() {
   firebase.auth().signOut().then(() => {
     // साइन-आउट सफल होने पर
@@ -176,13 +182,6 @@ function logout() {
     alert("लॉगआउट नहीं हो सका। कृपया कंसोल (Console) चेक करें।");
   });
 }
-      <br><br>
-      <a href="./index.html" style="color: #2563eb; text-decoration: none; display: block; text-align: center; font-weight: 600;">← Back to Homepage</a>
-   
-
-    </div>
-  <script>
-
 
 
 // Firebase Configuration
