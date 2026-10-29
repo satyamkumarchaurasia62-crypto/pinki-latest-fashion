@@ -74,7 +74,8 @@
 
             try {
                 const snapshot = await db.collection("orders")
-                  .where('email', '==', userEmail)
+                  .where('userEmail', '==', userEmail)
+
                    .get();
 
                 loading.classList.add("hidden");
