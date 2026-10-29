@@ -368,7 +368,7 @@ function handleBuyNow(id) {
     totalAmount: totalAmount,
     paymentMethod: paymentMethod,
     paymentStatus: (paymentMethod === "COD") ? "पेंडिंग (कैश ऑन डिलीवरी)" : "ऑनलाइन प्रोसेस में",
-    deliveryStatus: "पैकिंग जारी है",
+    deliveryStatus: "packing",
     userEmail: (user.email || "").toLowerCase(),
     userName: user.name || "ग्राहक",
     phone: user.phone || "",
