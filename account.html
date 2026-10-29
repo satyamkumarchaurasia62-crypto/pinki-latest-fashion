@@ -290,12 +290,14 @@ if (loginForm) {
         loadProfile(userData);
       } else {
         alert("गलत ईमेल या पासवर्ड! कृपया दोबारा जाँचें।");
-      }
+      });
+  }
     }).catch((error) => {
       alert("लॉगिन में समस्या आई: " + error.message);
     });
-});
-      // 4. पासवर्ड रीसेट (Forgot Password)
+  });
+}
+  // 4. पासवर्ड रीसेट (Forgot Password)
       const forgotForm = document.getElementById("forgot-form");
       if (forgotForm) {
         forgotForm.addEventListener("submit", function(e) {
@@ -324,7 +326,7 @@ if (loginForm) {
     }
    });
   }
-</script>
+  </script>
 </body>
 </html>
 
