@@ -21,7 +21,7 @@
             <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl">
                 <i class="fa-solid fa-arrow-left mr-2"></i>होम पेज
             </a>
-            <h1 class="text-xl font-bold text-gray-800 border-l-2 pl-3">मेरे ऑर्डर्स (My Orders)</h1>
+            <h1 class="text-xl font-bold text-gray-800 border-l-2 pl-3"> (My Orders)</h1>
         </div>
         <div id="user-info" class="text-sm font-semibold text-gray-600"></div>
     </header>
@@ -29,13 +29,13 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 md:p-6">
         <div id="loading" class="text-center py-10 font-medium text-gray-500">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> ऑर्डर्स लोड हो रहे हैं...
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> Orders are loading...
         </div>
 
         <div id="no-orders" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
             <i class="fa-solid fa-box-open text-5xl text-gray-300 mb-3"></i>
-            <p class="text-lg font-semibold text-gray-600">आपका कोई पिछला ऑर्डर नहीं मिला।</p>
-            <a href="index.html" class="inline-block mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">शॉपिंग करें</a>
+            <p class="text-lg font-semibold text-gray-600">No previous orders found.</p>
+            <a href="index.html" class="inline-block mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">Shop Now</a>
         </div>
 
         <!-- Orders List Container -->
@@ -122,7 +122,7 @@ card.innerHTML = `
         </div>
         <h2 class="text-lg font-bold text-gray-800">${order.productName || "प्रोडक्ट"}</h2>
         <p class="text-sm text-gray-600">साइज: <span class="font-medium">${order.size || "Free Size"}</span> | मात्रा: <span class="font-medium">${order.quantity || 1}</span></p>
-        <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
+        <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
         <p class="text-sm">डिलीवरी स्टेटस: <span class="font-semibold text-blue-600">${order.deliveryStatus || "प्रोसेस में"}</span></p>
     </div>
 
