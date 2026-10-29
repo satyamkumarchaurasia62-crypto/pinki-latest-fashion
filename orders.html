@@ -74,7 +74,8 @@
 
             try {
                 const snapshot = await db.collection("orders")
-                  .where('userEmail', '==', userEmail)
+                  .where('email', '==', userEmail)
+
 
                    .get();
 
