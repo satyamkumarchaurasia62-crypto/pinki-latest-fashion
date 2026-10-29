@@ -336,6 +336,13 @@ if (loginForm) {
     }
    });
   }
+    // Page load hote hi check karein ki user logged in hai ya nahi
+const savedUser = localStorage.getItem("currentLoggedInUser");
+if (savedUser) {
+    const userData = JSON.parse(savedUser);
+    loadProfile(userData);
+}
+
   </script>
 </body>
 </html>
