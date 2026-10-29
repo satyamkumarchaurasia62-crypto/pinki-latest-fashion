@@ -72,20 +72,22 @@
       <div class="flex items-center gap-4">
         
         <!-- Live Profile Status Widget Button -->
-        <div class="live-profile-widget">
-          <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-4 py-2 rounded-full border border-stone-200 shadow-sm text-stone-700 text-sm font-semibold transition">
-            <div style="width: 28px; height: 24px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-2 text-xs" id="home-user-logo">
-              <i class="fa-solid fa-user text-[10px]"></i>
+       <div class="flex items-center gap-2 shrink-0">
+    <!-- Live Profile Status Widget Button -->
+    <div class="live-profile-widget">
+        <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 shadow-sm text-stone-700 text-xs font-semibold whitespace-nowrap">
+            <div style="width: 20px; height: 20px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-1.5 text-[10px]" id="home-user-logo">
+                <i class="fa-solid fa-user text-[10px]"></i>
             </div>
-            <span id="home-user-text">Account </span>
-          </a>
-        </div>
+            <span id="home-user-text" class="max-w-[90px] sm:max-w-none truncate">Account</span>
+        </a>
+    </div>
 
-     <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-3 py-1.5 bg-pink-100 text-pink-700 text-sm font-semibold rounded-lg hover:bg-pink-200 transition">
-    <i class="fa-solid fa-bag-shopping mr-1.5"></i> My orders
-</a>
-
-      </div>
+    <!-- My Orders Button -->
+    <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-2.5 py-1.5 bg-pink-100 text-pink-700 text-xs font-semibold rounded-full hover:bg-pink-200 transition whitespace-nowrap">
+        <i class="fa-solid fa-bag-shopping mr-1"></i> Orders
+    </a>
+</div>
     </div>
   </header>
 
@@ -389,7 +391,7 @@ function handleBuyNow(id) {
 
       // UPI ऐप पर रीडायरेक्ट करें
       window.location.href = upiUrl;
-    } else }
+    } else {
     
       // COD के लिए सीधे अकाउंट पेज पर भेजें
       window.location.href = "account.html";
