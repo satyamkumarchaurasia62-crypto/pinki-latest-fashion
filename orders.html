@@ -97,32 +97,53 @@
                     card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4";
 
                     card.innerHTML = `
-                        <div class="space-y-1">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded">ID: ${order.orderId || docId}</span>
-                                <span class="text-xs text-gray-500">${order.orderDate || ""}</span>
-                            </div>
-                            <h2 class="text-lg font-bold text-gray-800">${order.productName || "प्रोडक्ट"}</h2>
-                            <p class="text-sm text-gray-600">साइज: <span class="font-medium">${order.size || "Free Size"}</span> | मात्रा: <span class="font-medium">${order.quantity || 1}</span></p>
-                            <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
-                            <p class="text-sm">डिलीवरी स्टेटस: <span class="font-semibold text-blue-600">${order.deliveryStatus || "प्रोसेस में"}</span></p>
-                        </div>
+const isDelivered = (order.deliveryStatus === "डिलीवर हो गया" || order.deliveryStatus === "Delivered");
 
-                        <div class="flex md:flex-col justify-end gap-2 shrink-0">
-                            ${!isCancelled && !isReturned ? `
-                                <button onclick="cancelOrder('${docId}')" class="px-4 py-2 border border-red-500 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-50 transition">
-                                    <i class="fa-solid fa-xmark mr-1"></i> कैंसिल करें
-                                </button>
-                                <button onclick="returnOrder('${docId}')" class="px-4 py-2 border border-amber-500 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition">
-                                    <i class="fa-solid fa-rotate-left mr-1"></i> रिटर्न करें
-                                </button>
-                            ` : `
-                                <span class="text-sm font-bold text-gray-500 self-center">
-                                    ${isCancelled ? "ऑर्डर कैंसिल हो चुका है" : "रिटर्न प्रक्रिया में है"}
-                                </span>
-                            `}
-                        </div>
-                    `;
+let isReturnWindowOpen = false;
+if (isDelivered && (order.deliveredAt || order.orderDate)) {
+    const deliveryDateStr = order.deliveredAt || order.orderDate;
+    const orderTime = new Date(deliveryDateStr).getTime();
+    const currentTime = new Date().getTime();
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    
+    if ((currentTime - orderTime) <= sevenDaysMs) {
+        isReturnWindowOpen = true;
+    }
+}
+
+const isCancelled = order.deliveryStatus === "कैंसिल किया गया";
+const isReturned = order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
+
+card.innerHTML = `
+    <div class="space-y-1">
+        <div class="flex items-center space-x-2">
+            <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded">ID: ${order.orderId || docId}</span>
+            <span class="text-xs text-gray-500">${order.orderDate || ""}</span>
+        </div>
+        <h2 class="text-lg font-bold text-gray-800">${order.productName || "प्रोडक्ट"}</h2>
+        <p class="text-sm text-gray-600">साइज: <span class="font-medium">${order.size || "Free Size"}</span> | मात्रा: <span class="font-medium">${order.quantity || 1}</span></p>
+        <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
+        <p class="text-sm">डिलीवरी स्टेटस: <span class="font-semibold text-blue-600">${order.deliveryStatus || "प्रोसेस में"}</span></p>
+    </div>
+
+    <div class="flex md:flex-col justify-end gap-2 shrink-0">
+        ${!isCancelled && !isReturned ? `
+            <button onclick="cancelOrder('${docId}')" class="px-4 py-2 border border-red-500 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-50 transition">
+                <i class="fa-solid fa-xmark mr-1"></i> कैंसिल करें
+            </button>
+            
+            ${isReturnWindowOpen ? `
+                <button onclick="openReturnModal('${docId}')" class="px-4 py-2 border border-amber-500 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> रिटर्न करें
+                </button>
+            ` : (isDelivered ? `<span class="text-xs text-gray-400 text-center self-center">रिटर्न अवधि समाप्त (7 दिन)</span>` : ``)}
+        ` : `
+            <span class="text-sm font-bold text-gray-500 self-center">
+                ${isCancelled ? "ऑर्डर कैंसिल हो चुका है" : "रिटर्न प्रक्रिया में है"}
+            </span>
+        `}
+    </div>
+`;
 
                     ordersList.appendChild(card);
                 });
@@ -150,26 +171,59 @@
             }
         }
 
-        // 5. ऑर्डर रिटर्न फ़ंक्शन
-        async function returnOrder(docId) {
-            const reason = prompt("प्रोडक्ट रिटर्न करने का कारण दर्ज करें:");
-            if (!reason) {
-                alert("रिटर्न के लिए कारण दर्ज करना आवश्यक है।");
-                return;
-            }
+// 5. फोटो और कारण के साथ रिटर्न रिक्वेस्ट भेजने का फंक्शन
+let selectedDocId = "";
 
-            try {
-                await db.collection("orders").doc(docId).update({
-                    deliveryStatus: "रिटर्न रिक्वेस्ट दर्ज",
-                    returnReason: reason,
-                    returnedAt: new Date().toLocaleString("hi-IN")
-                });
-                alert("आपकी रिटर्न रिक्वेस्ट दर्ज कर ली गई है। हमारी टीम जल्द संपर्क करेगी।");
-                loadUserOrders();
-            } catch (err) {
-                alert("समस्या आई: " + err.message);
-            }
+function openReturnModal(docId) {
+    selectedDocId = docId;
+    document.getElementById("return-doc-id").value = docId;
+    document.getElementById("return-reason-text").value = "";
+    document.getElementById("return-image-file").value = "";
+    document.getElementById("return-modal").classList.remove("hidden");
+}
+
+function closeReturnModal() {
+    document.getElementById("return-modal").classList.add("hidden");
+}
+
+async function submitReturnRequest() {
+    const reason = document.getElementById("return-reason-text").value.trim();
+    const fileInput = document.getElementById("return-image-file");
+
+    if (!reason) {
+        alert("कृपया रिटर्न का कारण लिखना अनिवार्य है।");
+        return;
+    }
+
+    if (fileInput.files.length === 0) {
+        alert("कृपया खराब प्रोडक्ट की फोटो अपलोड करें।");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async function(event) {
+        const base64Image = event.target.result;
+
+        try {
+            await db.collection("orders").doc(selectedDocId).update({
+                deliveryStatus: "रिटर्न रिक्वेस्ट दर्ज",
+                returnReason: reason,
+                returnImage: base64Image,
+                returnedAt: new Date().toLocaleString("hi-IN")
+            });
+
+            alert("आपकी रिटर्न रिक्वेस्ट और फोटो सफलतापूर्वक दर्ज कर ली गई है!");
+            closeReturnModal();
+            loadUserOrders();
+        } catch (err) {
+            alert("समस्या आई: " + err.message);
         }
+    };
+
+    reader.readAsDataURL(file);
+}
 
         // लोड होने पर चलाएं
         loadUserOrders();
