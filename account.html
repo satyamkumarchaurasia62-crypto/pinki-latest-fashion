@@ -159,17 +159,6 @@
       <div class="profile-view">
         <p><strong>Name:</strong> <span id="user-display-name"></span></p>
         <p><strong>Email:</strong> <span id="user-display-email"></span></p>
-      </div>
-      <!-- ग्राहक के सभी ऑर्डर्स दिखाने का कंटेनर -->
-<div style="margin-top: 25px; text-align: left; border-top: 1px solid #eee; padding-top: 15px;">
-  <h3 style="color: #db2777; margin-bottom: 12px; font-size: 18px;">🛍️ मेरे सभी ऑर्डर्स (My Orders)</h3>
-  <div id="orders-container">ऑर्डर्स लोड हो रहे हैं...</div>
-</div>
-      <button onclick="logout()" class="btn-danger">Logout (लॉगआउट करें)</button>
-<br><br>
-      <a href="./index.html" style="color: #2563eb; text-decoration: none; display: block; text-align: center; font-weight: 600;">← Back to Homepage</a>
-   
-
     </div>
   <script>
 // Firebase Configuration
@@ -210,13 +199,10 @@ const db = firebase.firestore();
       if (nameElem) nameElem.innerText = user.name;
       if (emailElem) emailElem.innerText = user.email;
     }
-function logout() {
-  firebase.auth().signOut().then(() => {
+    function logout() {
+    localStorage.removeItem("currentLoggedInUser");
     alert("आप सफलतापूर्वक लॉगआउट हो गए हैं!");
     window.location.href = "index.html";
-  }).catch((error) => {
-    console.error("लॉगआउट में त्रुटि:", error);
-  });
 }
 
  // 2. नया अकाउंट बनाना (Sign Up - Firebase)
@@ -309,7 +295,6 @@ if (loginForm) {
     }).catch((error) => {
       alert("लॉगिन में समस्या आई: " + error.message);
     });
-  });
 }
 
       // 4. पासवर्ड रीसेट (Forgot Password)
@@ -341,67 +326,6 @@ if (loginForm) {
     }
    });
   }
-
-
-// Buy Now Function
-function handleBuyNow(id) {
-  const loggedInRaw = localStorage.getItem("currentLoggedInUser");
-  if (!loggedInRaw) {
-    alert("कृपया ऑर्डर करने के लिए पहले लॉगिन करें!");
-    window.location.href = "account.html";
-    return;
-  }
-
-  const user = JSON.parse(loggedInRaw);
-  const item = PRODUCTS.find(p => p.id === id);
-  if (!item) return;
-
-  const sizeElem = document.getElementById(`size-${id}`);
-  const selectedSize = sizeElem ? sizeElem.value : "Free Size";
-
-  const qtyElem = document.getElementById(`qty-${id}`);
-  const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
-
-  const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
-  const paymentMethod = payElem ? payElem.value : "COD";
-
-  const totalAmount = item.price * quantity;
-  const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-
-  const confirmMsg = `सामान: ${item.title || item.name}\nसाइज़: ${selectedSize}\nमात्रा: ${quantity}\nकुल राशि: ₹${totalAmount}\nपेमेंट मोड: ${paymentMethod}\n\nक्या आप यह ऑर्डर कन्फ़र्म करना चाहते हैं?`;
-
-  if (!confirm(confirmMsg)) return;
-
-  db.collection("orders").doc(orderId).set({
-    orderId: orderId,
-    productId: item.id,
-    productName: item.title || item.name,
-    size: selectedSize,
-    quantity: quantity,
-    totalAmount: totalAmount,
-    paymentMethod: paymentMethod,
-    paymentStatus: (paymentMethod === "COD") ? "पेंडिंग (कैश ऑन डिलीवरी)" : "ऑनलाइन प्रोसेस में",
-    deliveryStatus: "पैकिंग जारी है",
-    userEmail: (user.email || "").toLowerCase(),
-    userName: user.name || "ग्राहक",
-    phone: user.phone || "",
-    shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
-    orderDate: new Date().toLocaleString("hi-IN")
-  }).then(() => {
-    alert(`बधाई हो! आपका ऑर्डर दर्ज हो गया है।\nऑर्डर आईडी: ${orderId}`);
-
-    if (paymentMethod === "Online UPI") {
-      const myUpiId = "8130748293@pthdfc";
-      const merchantName = "Pinki Latest Fashion";
-      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
-      window.location.href = upiUrl;
-    } else {
-      window.location.href = "account.html";
-    }
-  }).catch((err) => {
-    alert("ऑर्डर दर्ज करने में समस्या आई: " + err.message);
-  });
-}
 </script>
 </body>
 </html>
