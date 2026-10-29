@@ -117,7 +117,7 @@ if (isDelivered && (order.deliveredAt || order.orderDate)) {
 const isCancelled = order.deliveryStatus === "कैंसिल किया गया";
 const isReturned = order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
 
-card.innerHTML = `;
+card.innerHTML = `
     <div class="space-y-1">
         <div class="flex items-center space-x-2">
             <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded">ID: ${order.orderId || docId}</span>
