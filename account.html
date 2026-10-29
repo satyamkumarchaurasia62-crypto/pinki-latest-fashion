@@ -282,7 +282,6 @@ if (loginForm) {
       alert("कृपया ईमेल और पासवर्ड भरें!");
       return;
     }
-
     db.collection("users").doc(email).get().then((doc) => {
       if (doc.exists && doc.data().password === password) {
         const userData = doc.data();
