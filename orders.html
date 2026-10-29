@@ -98,7 +98,8 @@
                     const card = document.createElement("div");
                     card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4";
 
-                    card.innerHTML = `
+                    card.innerHTML = `;
+
 const isDelivered = (order.deliveryStatus === "डिलीवर हो गया" || order.deliveryStatus === "Delivered");
 
 let isReturnWindowOpen = false;
@@ -116,7 +117,7 @@ if (isDelivered && (order.deliveredAt || order.orderDate)) {
 const isCancelled = order.deliveryStatus === "कैंसिल किया गया";
 const isReturned = order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
 
-card.innerHTML = `
+card.innerHTML = `;
     <div class="space-y-1">
         <div class="flex items-center space-x-2">
             <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded">ID: ${order.orderId || docId}</span>
@@ -129,13 +130,15 @@ card.innerHTML = `
     </div>
     
     <div class="flex md:flex-col justify-end gap-2 shrink-0">
-        ${(!isCancelled && !isReturned) ? `
+        ${(!isCancelled && !isReturned) ? `;
+
             <button onclick="cancelOrder('${docId}')" class="px-4 py-2 border border-red-500 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-50 transition">
                 <i class="fa-solid fa-xmark mr-1"></i> ऑर्डर रद्द करें
             </button>
         ` : ""}
 
-        ${isReturnWindowOpen ? `
+        ${isReturnWindowOpen ? `;
+
             <button onclick="openReturnModal('${docId}')" class="px-4 py-2 border border-amber-500 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition">
                 <i class="fa-solid fa-rotate-left mr-1"></i> रिटर्न करें
             </button>
