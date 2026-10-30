@@ -74,10 +74,9 @@
 
             try {
                 // 💡 फिक्स 1: यहाँ 'userEmail' फील्ड को आपके डेटाबेस के नाम 'email' से बदल दिया है
-                const snapshot = await db.collection("orders")
-                    .where("email", "==", userEmail)
-                    .get();
-
+                const snapshot = await db.collection("orders").where("email", "==", userEmail).get();
+        
+             
                 loading.classList.add("hidden");
 
                 if (snapshot.empty) {
