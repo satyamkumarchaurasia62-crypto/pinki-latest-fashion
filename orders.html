@@ -8,81 +8,42 @@
     <script src="https://tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cloudflare.com">
+    
     <!-- Firebase SDKs -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
-    <style>
-        .hidden { display: none !important; }
-    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen pb-24">
+<body class="bg-gray-50 text-gray-800 min-h-screen">
 
-    <!-- Header Navigation (शानदार गुलाबी थीम) -->
+    <!-- Header Navigation -->
     <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
-            <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl flex items-center">
+            <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl">
                 <i class="fa-solid fa-arrow-left mr-2"></i>होम पेज
             </a>
-            <h1 class="text-xl font-bold text-gray-800 border-l-2 border-pink-500 pl-3">मेरे ऑर्डर्स (My Orders)</h1>
+            <h1 class="text-xl font-bold text-gray-800 border-l-2 pl-3">मेरे ऑर्डर्स (My Orders)</h1>
         </div>
-        <div class="flex items-center space-x-4">
-            <div id="user-info" class="text-sm font-semibold text-gray-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-100"></div>
-            <!-- एडमिन मोड चालू/बंद करने का बटन -->
-            <button onclick="toggleAdminMode()" class="px-3 py-1.5 bg-gray-800 text-white text-xs font-bold rounded-lg hover:bg-gray-900 transition shadow-sm">
-                <i class="fa-solid fa-lock mr-1"></i> एडमिन मोड (Toggle)
-            </button>
-        </div>
+        <div id="user-info" class="text-sm font-semibold text-gray-600"></div>
     </header>
 
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 md:p-6">
-        <!-- लोड होने वाला सुंदर बॉक्स -->
-        <div id="loading" class="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 my-4">
-            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-pink-600 block"></i> 
-            <span class="text-gray-500 font-medium">आपके ऑर्डर्स लोड हो रहे हैं...</span>
+        <div id="loading" class="text-center py-10 font-medium text-gray-500">
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> ऑर्डर्स लोड हो रहे हैं...
         </div>
 
-        <!-- ऑर्डर न मिलने पर दिखने वाला बॉक्स -->
-        <div id="no-orders" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100 my-4">
-            <i class="fa-solid fa-box-open text-6xl text-pink-200 mb-4"></i>
-            <p class="text-lg font-bold text-gray-600">कोई पुराने ऑर्डर्स नहीं मिले।</p>
-            <a href="index.html" class="inline-block mt-4 px-6 py-2.5 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition shadow-md shadow-pink-100">अभी शॉपिंग करें</a>
+        <div id="no-orders" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
+            <i class="fa-solid fa-box-open text-5xl text-gray-300 mb-3"></i>
+            <p class="text-lg font-semibold text-gray-600">आपका कोई पिछला ऑर्डर नहीं मिला।</p>
+            <a href="index.html" class="inline-block mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">शॉपिंग करें</a>
         </div>
 
         <!-- Orders List Container -->
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 📋 कस्टमर के लिए रिटर्न पॉप-अप फॉर्म (सुंदर Modal) -->
-    <div id="return-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-gray-100">
-            <div class="flex items-center space-x-2 border-b pb-3 border-gray-100">
-                <i class="fa-solid fa-rotate-left text-2xl text-amber-500"></i>
-                <h3 class="text-lg font-bold text-gray-800">प्रोडक्ट रिटर्न रिक्वेस्ट दर्ज करें</h3>
-            </div>
-            
-            <!-- हिडन इनपुट डॉक आईडी सुरक्षित रखने के लिए -->
-            <input type="hidden" id="return-doc-id">
-            
-            <div>
-                <label class="block text-sm font-bold text-gray-600 mb-1">रिटर्न करने का कारण लिखें (अनिवार्य):</label>
-                <textarea id="return-reason-text" rows="3" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition" placeholder="कृपया खराब प्रोडक्ट या साइज की समस्या के बारे में विस्तार से लिखें..."></textarea>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-bold text-gray-600 mb-1">खराब प्रोडक्ट की फोटो अपलोड करें (अनिवार्य):</label>
-                <input type="file" id="return-image-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 file:cursor-pointer transition">
-            </div>
-            
-            <div class="flex justify-end space-x-2 pt-3 border-t border-gray-100">
-                <button onclick="closeReturnModal()" class="px-5 py-2 border border-gray-300 text-gray-600 rounded-xl text-sm font-semibold hover:bg-gray-50 transition">बंद करें</button>
-                <button onclick="submitReturnRequest()" class="px-5 py-2 bg-pink-600 text-white rounded-xl text-sm font-semibold hover:bg-pink-700 transition shadow-md shadow-pink-100">रिक्वेस्ट भेजें</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // 1. Firebase कॉन्फ़िगरेशन
+        // 1. Firebase कॉन्फ़िगरेशन (index.html वाली config डालें)
         const firebaseConfig = {
             apiKey: "AlreadyObtainRealKeyFromFirebaseConsole",
             authDomain: "://firebaseapp.com",
@@ -95,8 +56,6 @@
         }
         const db = firebase.firestore();
 
-        let isAdminMode = false;
-
         // 2. लॉग-इन यूज़र चेक करें
         const loggedInRaw = localStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
@@ -106,14 +65,7 @@
         const currentUser = JSON.parse(loggedInRaw);
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
-        // एडमिन मोड टॉगल फंक्शन
-        function toggleAdminMode() {
-            isAdminMode = !isAdminMode;
-            alert(isAdminMode ? "👑 एडमिन मोड चालू! अब आप ऑर्डर्स को Approve या Reject कर सकते हैं।" : "👋 एडमिन मोड बंद। आप कस्टमर मोड में वापस आ गए हैं।");
-            loadUserOrders();
-        }
-
-        // 3. यूज़र के ऑर्डर्स लाएँ
+        // 3. यूज़र के ऑर्डर्स Firestore से लाएँ
         async function loadUserOrders() {
             const userEmail = (currentUser.email || "").toLowerCase();
             const ordersList = document.getElementById("orders-list");
@@ -121,7 +73,7 @@
             const noOrders = document.getElementById("no-orders");
 
             try {
-                // 💡 ध्यान रखें: डेटाबेस के सही फील्ड नेम 'email' का इस्तेमाल कर रहे हैं
+                // 💡 फिक्स 1: यहाँ 'userEmail' फील्ड को आपके डेटाबेस के नाम 'email' से बदल दिया है
                 const snapshot = await db.collection("orders")
                     .where("email", "==", userEmail)
                     .get();
@@ -130,54 +82,97 @@
 
                 if (snapshot.empty) {
                     noOrders.classList.remove("hidden");
-                    ordersList.innerHTML = "";
+                    ordersList.innerHTML = ""; // फिक्स: पुरानी लिस्ट साफ करने के लिए
                     return;
                 }
 
-                noOrders.classList.add("hidden");
+                noOrders.classList.add("hidden"); // फिक्स: नए ऑर्डर्स मिलने पर नो-ऑर्डर छिपाने के लिए
                 ordersList.innerHTML = "";
-                
+
                 snapshot.forEach(doc => {
                     const order = doc.data();
                     const docId = doc.id;
-                    
+
                     const isCancelled = order.deliveryStatus === "कैंसिल किया गया";
                     const isReturned = order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
-                    const isApproved = order.deliveryStatus === "रिटर्न स्वीकृत (Approved)";
-                    const isRejected = order.deliveryStatus === "रिटर्न अस्वीकृत (Rejected)";
-                    const isDelivered = (order.deliveryStatus === "डिलीवर हो गया" || order.deliveryStatus === "Delivered" || order.deliveryStatus === "delivered");
-                    
-                    let isReturnWindowOpen = false;
-
-                    // 💡 तारीख पार्सिंग फिक्स (DD/MM/YYYY फॉर्मेट को सपोर्ट करने के लिए)
-                    if (isDelivered && (order.deliveredAt || order.orderDate)) {
-                        let deliveryDateStr = order.deliveredAt || order.orderDate;
-                        if (deliveryDateStr.includes("/")) {
-                            const mainPart = deliveryDateStr.split(",");
-                            const datePart = mainPart[0].trim(); // "30/10/2026" निकालेगा
-                            const parts = datePart.split("/");
-                            if (parts.length === 3) {
-                                // जावास्क्रिप्ट के समझने लायक YYYY-MM-DD फॉर्मेट सेट करें
-                                deliveryDateStr = `${parts[2].trim()}-${parts[1].trim()}-${parts[0].trim()}`;
-                            }
-                        }
-                        const orderTime = new Date(deliveryDateStr).getTime();
-                        const currentTime = new Date().getTime();
-                        const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-
-                        if (!isNaN(orderTime) && (currentTime - orderTime) <= sevenDaysMs) {
-                            isReturnWindowOpen = true;
-                        }
-                    }
 
                     const card = document.createElement("div");
-                    card.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center transition hover:shadow-md";
+                    card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4";
 
-                    // स्टेटस बैज की कलर कोडिंग
-                    let statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700">प्रोसेसिंग में</span>`;
-                    if (isDelivered) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700"><i class="fa-solid fa-circle-check mr-1"></i>Delivered</span>`;
+                    card.innerHTML = `
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded">ID: ${order.orderId || docId}</span>
+                                <span class="text-xs text-gray-500">${order.orderDate || ""}</span>
+                            </div>
+                            <h2 class="text-lg font-bold text-gray-800">${order.productName || "प्रोडक्ट"}</h2>
+                            <p class="text-sm text-gray-600">साइज: <span class="font-medium">${order.size || "Free Size"}</span> | मात्रा: <span class="font-medium">${order.quantity || 1}</span></p>
+                            <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
+                            <p class="text-sm">डिलीवरी स्टेटस: <span class="font-semibold text-blue-600">${order.deliveryStatus || "प्रोसेस में"}</span></p>
+                        </div>
 
-        // ... ऊपर के सारे फंक्शन्स ...
+                        <div class="flex md:flex-col justify-end gap-2 shrink-0">
+                            ${!isCancelled && !isReturned ? `
+                                <button onclick="cancelOrder('${docId}')" class="px-4 py-2 border border-red-500 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-50 transition">
+                                    <i class="fa-solid fa-xmark mr-1"></i> कैंसिल करें
+                                </button>
+                                <button onclick="returnOrder('${docId}')" class="px-4 py-2 border border-amber-500 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i> रिटर्न करें
+                                </button>
+                            ` : `
+                                <span class="text-sm font-bold text-gray-500 self-center">
+                                    ${isCancelled ? "ऑर्डर कैंसिल हो चुका है" : "रिटर्न प्रक्रिया में है"}
+                                </span>
+                            `}
+                        </div>
+                    `;
+
+                    ordersList.appendChild(card);
+                });
+
+            } catch (err) {
+                loading.innerText = "ऑर्डर्स लोड करने में समस्या आई: " + err.message;
+            }
+        }
+
+        // 4. ऑर्डर कैंसिल फ़ंक्शन
+        async function cancelOrder(docId) {
+            const reason = prompt("ऑर्डर कैंसिल करने का कारण दर्ज करें (वैकल्पिक):");
+            if (reason === null) return;
+
+            try {
+                await db.collection("orders").doc(docId).update({
+                    deliveryStatus: "कैंसिल किया गया",
+                    cancelReason: reason || "ग्राहक द्वारा कैंसिल",
+                    cancelledAt: new Date().toLocaleString("hi-IN")
+                });
+                alert("आपका ऑर्डर सफलतापूर्वक कैंसिल कर दिया गया है।");
+                loadUserOrders();
+            } catch (err) {
+                alert("समस्या आई: " + err.message);
+            }
+        }
+
+        // 5. ऑर्डर रिटर्न फ़ंक्शन
+        async function returnOrder(docId) {
+            const reason = prompt("प्रोडक्ट रिटर्न करने का कारण दर्ज करें:");
+            if (!reason) {
+                alert("रिटर्न के लिए कारण दर्ज करना आवश्यक है।");
+                return;
+            }
+
+            try {
+                await db.collection("orders").doc(docId).update({
+                    deliveryStatus: "रिटर्न रिक्वेस्ट दर्ज",
+                    returnReason: reason,
+                    returnedAt: new Date().toLocaleString("hi-IN")
+                });
+                alert("आपकी रिटर्न रिक्वेस्ट दर्ज कर ली गई है। हमारी team जल्द संपर्क करेगी।");
+                loadUserOrders();
+            } catch (err) {
+                alert("समस्या आई: " + err.message);
+            }
+        }
 
         // लोड होने पर चलाएं
         loadUserOrders();
