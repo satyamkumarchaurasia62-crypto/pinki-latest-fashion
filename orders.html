@@ -73,7 +73,6 @@ async function loadUserOrders() {
     const noOrders = document.getElementById("no-orders");
 
     try {
-        // ध्यान रखें: Firestore में ईमेल lowercase में ही सेव होना चाहिए, तभी यह मैच करेगा
         const snapshot = await db.collection("orders")
             .where('email', '==', userEmail)
             .get();
@@ -82,37 +81,36 @@ async function loadUserOrders() {
 
         if (snapshot.empty) {
             noOrders.classList.remove("hidden");
-            ordersList.innerHTML = "";
             return;
         }
 
         ordersList.innerHTML = "";
-        
+
         snapshot.forEach(doc => {
             const order = doc.data();
             const docId = doc.id;
             
+            // 1. ये दोनों वेरिएबल्स सिर्फ यहीं ऊपर रहेंगे
             const isCancelled = order.deliveryStatus === "कैंसिल किया गया";
             const isReturned = order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
             const isDelivered = (order.deliveryStatus === "डिलीवर हो गया" || order.deliveryStatus === "Delivered");
             
             let isReturnWindowOpen = false;
-
             if (isDelivered && (order.deliveredAt || order.orderDate)) {
                 const deliveryDateStr = order.deliveredAt || order.orderDate;
                 const orderTime = new Date(deliveryDateStr).getTime();
                 const currentTime = new Date().getTime();
                 const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-
                 if ((currentTime - orderTime) <= sevenDaysMs) {
                     isReturnWindowOpen = true;
                 }
             }
 
+            // ⚠️ (नोट: जो दो लाइनें यहाँ नीचे दोबारा लिखी थीं, उन्हें यहाँ से हटा दिया गया है)
+
             const card = document.createElement("div");
             card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4";
-
-            // यहाँ पर बटन के आगे से फालतू सेमीकॉलन (;) हटा दिए गए हैं
+            
             card.innerHTML = `
                 <div class="space-y-1">
                     <div class="flex items-center space-x-2">
@@ -130,23 +128,21 @@ async function loadUserOrders() {
                         <i class="fa-solid fa-xmark mr-1"></i> ऑर्डर रद्द करें
                     </button>
                     ` : ""}
-                    
                     ${isReturnWindowOpen ? `
                     <button onclick="openReturnModal('${docId}')" class="px-4 py-2 border border-amber-500 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition">
                         <i class="fa-solid fa-rotate-left mr-1"></i> रिटर्न करें
                     </button>
                     ` : (isDelivered ? `<span class="text-xs text-gray-400 text-center self-center">रिटर्न अवधि समाप्त (7 दिन)</span>` : "")}
-                    
-                    ${isCancelled ? `<span class="text-sm font-bold text-gray-500 self-center">ऑर्डर कैंसिल हो चुका है</span>` : ""}
+                    ${isCancelled ? `<span class="text-sm font-bold text-gray-500 self-center">ऑर्डर कैंसिल हो चुका है : रिटर्न प्रक्रिया बंद</span>` : ""}
                 </div>
             `;
             ordersList.appendChild(card);
         });
     } catch (err) {
         loading.innerText = "ऑर्डर्स लोड करने में समस्या आई: " + err.message;
-        console.error(err);
     }
 }
+
 
 // 4. ऑर्डर कैंसिल फ़ंक्शन
 async function cancelOrder(docId) {
