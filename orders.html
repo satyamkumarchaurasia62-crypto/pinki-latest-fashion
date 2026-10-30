@@ -73,9 +73,8 @@ async function loadUserOrders() {
     const noOrders = document.getElementById("no-orders");
 
     try {
-        const snapshot = await db.collection("orders")
-            .where('email', '==', userEmail)
-            .get();
+     const snapshot = await db.collection("orders").get();
+
 
         loading.classList.add("hidden");
 
