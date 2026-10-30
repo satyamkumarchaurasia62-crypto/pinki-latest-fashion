@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashion</title>
-    
-    <!-- 💡 फालबैक CSS: अगर ऑनलाइन डिज़ाइन लोड न हो, तो भी कोड क्रैश नहीं होगा -->
-    <style>
-        .hidden { display: none !important; }
-        body { font-family: sans-serif; background-color: #f3f4f6; padding: 10px; }
-    </style>
-
     <!-- Tailwind CSS CDN -->
     <script src="https://tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -18,60 +11,69 @@
     <!-- Firebase SDKs -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
+    <style>
+        .hidden { display: none !important; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen pb-24">
+<body class="bg-gray-50 text-gray-800 min-h-screen">
 
-    <!-- Header Navigation -->
-    <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50 rounded-xl mb-4">
+    <!-- Header Navigation (खूबसूरत गुलाबी थीम) -->
+    <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
-            <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl">
+            <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl flex items-center">
                 <i class="fa-solid fa-arrow-left mr-2"></i>होम पेज
             </a>
-            <h1 class="text-xl font-bold text-gray-800 border-l-2 pl-3">मेरे ऑर्डर्स (My Orders)</h1>
+            <h1 class="text-xl font-bold text-gray-800 border-l-2 border-pink-500 pl-3">मेरे ऑर्डर्स (My Orders)</h1>
         </div>
         <div class="flex items-center space-x-4">
-            <div id="user-info" class="text-sm font-semibold text-gray-600"></div>
-            <!-- एडमिन मोड चालू करने का बटन -->
-            <button onclick="toggleAdminMode()" class="px-3 py-1 bg-gray-800 text-white text-xs rounded hover:bg-gray-900 transition">
-                <i class="fa-solid fa-lock mr-1"></i> एडमिन मोड (Toggle)
+            <div id="user-info" class="text-sm font-semibold text-gray-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-100"></div>
+            <!-- एडमिन मोड बटन -->
+            <button onclick="toggleAdminMode()" class="px-3 py-1.5 bg-gray-800 text-white text-xs font-bold rounded-lg hover:bg-gray-900 transition shadow-sm">
+                <i class="fa-solid fa-lock mr-1"></i> एडमिन मोड
             </button>
         </div>
     </header>
 
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 md:p-6">
-        <div id="loading" class="text-center py-10 font-medium text-gray-500 bg-white rounded-xl shadow-sm border p-5">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> ऑर्डर्स लोड हो रहे हैं...
+        <!-- लोड होने वाला सुंदर एनीमेशन -->
+        <div id="loading" class="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 my-4">
+            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-pink-600 block"></i> 
+            <span class="text-gray-500 font-medium">आपके ऑर्डर्स लोड हो रहे हैं...</span>
         </div>
 
-        <div id="no-orders" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
-            <i class="fa-solid fa-box-open text-5xl text-gray-300 mb-3"></i>
-            <p class="text-lg font-semibold text-gray-600">कोई ऑर्डर नहीं मिला।</p>
-            <a href="index.html" class="inline-block mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">अभी शॉपिंग करें</a>
+        <!-- ऑर्डर न मिलने पर दिखने वाला सुंदर बॉक्स -->
+        <div id="no-orders" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100 my-4">
+            <i class="fa-solid fa-box-open text-6xl text-pink-200 mb-4"></i>
+            <p class="text-lg font-bold text-gray-600">कोई पुराने ऑर्डर्स नहीं मिले।</p>
+            <a href="index.html" class="inline-block mt-4 px-6 py-2.5 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition shadow-md shadow-pink-100">अभी शॉपिंग करें</a>
         </div>
 
         <!-- Orders List Container -->
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 📋 कस्टमर के लिए रिटर्न पॉप-अप फॉर्म (Modal) -->
+    <!-- 📋 कस्टमर के लिए रिटर्न पॉप-अप फॉर्म (सुंदर Modal डिज़ाइन) -->
     <div id="return-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-lg space-y-4">
-            <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-rotate-left text-amber-500 mr-2"></i>प्रोडक्ट रिटर्न रिक्वेस्ट</h3>
-            
-            <div>
-                <label class="block text-sm font-semibold text-gray-600 mb-1">रिटर्न करने का कारण लिखें (अनिवार्य):</label>
-                <textarea id="return-reason-text" rows="3" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="खराब प्रोडक्ट या साइज की समस्या के बारे में लिखें..."></textarea>
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-gray-100">
+            <div class="flex items-center space-x-2 border-b pb-3 border-gray-100">
+                <i class="fa-solid fa-rotate-left text-2xl text-amber-500"></i>
+                <h3 class="text-lg font-bold text-gray-800">प्रोडक्ट रिटर्न रिक्वेस्ट दर्ज करें</h3>
             </div>
             
             <div>
-                <label class="block text-sm font-semibold text-gray-600 mb-1">खराब प्रोडक्ट की फोटो अपलोड करें (अनिवार्य):</label>
-                <input type="file" id="return-image-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100">
+                <label class="block text-sm font-bold text-gray-600 mb-1">रिटर्न करने का कारण लिखें (अनिवार्य):</label>
+                <textarea id="return-reason-text" rows="3" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition" placeholder="कृपया खराब प्रोडक्ट या साइज की समस्या के बारे में विस्तार से लिखें..."></textarea>
             </div>
             
-            <div class="flex justify-end space-x-2 pt-2">
-                <button onclick="closeReturnModal()" class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">बंद करें</button>
-                <button onclick="submitReturnRequest()" class="px-4 py-2 bg-pink-600 text-white rounded-lg text-sm font-semibold hover:bg-pink-700 transition">रिक्वेस्ट सबमिट करें</button>
+            <div>
+                <label class="block text-sm font-bold text-gray-600 mb-1">खराब प्रोडक्ट की फोटो अपलोड करें (अनिवार्य):</label>
+                <input type="file" id="return-image-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 file:cursor-pointer transition">
+            </div>
+            
+            <div class="flex justify-end space-x-2 pt-3 border-t border-gray-100">
+                <button onclick="closeReturnModal()" class="px-5 py-2 border border-gray-300 text-gray-600 rounded-xl text-sm font-semibold hover:bg-gray-50 transition">बंद करें</button>
+                <button onclick="submitReturnRequest()" class="px-5 py-2 bg-pink-600 text-white rounded-xl text-sm font-semibold hover:bg-pink-700 transition shadow-md shadow-pink-100">रिक्वेस्ट भेजें</button>
             </div>
         </div>
     </div>
@@ -101,20 +103,21 @@
         const currentUser = JSON.parse(loggedInRaw);
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
+        // एडमिन मोड टॉगल फंक्शन
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
-            alert(isAdminMode ? "एडमिन मोड ऑन हो गया! अब आप किसी भी रिटर्न को Approve/Reject कर सकते हैं।" : "एडमिन मोड बंद। अब आप कस्टमर व्यू में हैं।");
+            alert(isAdminMode ? "👑 एड敏 मोड चालू! अब आप ऑर्डर्स को Approve या Reject कर सकते हैं।" : "👋 एडमिन मोड बंद। आप कस्टमर मोड में वापस आ गए हैं।");
             loadUserOrders();
         }
 
         // 3. यूज़र के ऑर्डर्स लाएँ
         async function loadUserOrders() {
-            const userEmail = (currentUser.email || "").toLowerCase();
             const ordersList = document.getElementById("orders-list");
             const loading = document.getElementById("loading");
             const noOrders = document.getElementById("no-orders");
 
             try {
+                // बिना शर्त के सभी ऑर्डर्स लोड कर रहे हैं
                 const snapshot = await db.collection("orders").get();
                 loading.classList.add("hidden");
 
@@ -138,14 +141,16 @@
                     
                     let isReturnWindowOpen = false;
 
+                    // 🛠️ तारीख का बिल्कुल सही और फ़िक्स कोड (No crash)
                     if (isDelivered && (order.deliveredAt || order.orderDate)) {
                         let deliveryDateStr = order.deliveredAt || order.orderDate;
                         if (deliveryDateStr.includes("/")) {
                             const mainPart = deliveryDateStr.split(",");
-                            const datePart = mainPart[0].trim();
+                            const datePart = mainPart[0].trim(); // "30/10/2026"
                             const parts = datePart.split("/");
                             if (parts.length === 3) {
-                                deliveryDateStr = `${parts[2].trim()}-${parts[1].trim()}-${parts[0].trim()}`;
+                                // YYYY-MM-DD फॉर्मेट तैयार करें
+                                deliveryDateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
                             }
                         }
                         const orderTime = new Date(deliveryDateStr).getTime();
@@ -158,25 +163,13 @@
                     }
 
                     const card = document.createElement("div");
-                    card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4 mt-4";
+                    card.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center transition hover:shadow-md";
 
-                    let statusColor = "text-blue-600";
-                    if (isCancelled || isRejected) statusColor = "text-red-600";
-                    if (isReturned) statusColor = "text-amber-600";
-                    if (isApproved) statusColor = "text-green-600";
-
-                    card.innerHTML = `
-                        <div class="space-y-1">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded">ID: ${order.orderId || docId}</span>
-                                <span class="text-xs text-gray-500">${order.orderDate || ""}</span>
-                            </div>
-                            <h2 class="text-lg font-bold text-gray-800">${order.productName || "प्रोडक्ट"}</h2>
-                            <p class="text-sm text-gray-600">साइज: <span class="font-medium">${order.size || "Free Size"}</span> | मात्रा: <span class="font-bold">${order.quantity || 1}</span></p>
-                            <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
-                            <p class="text-sm text-gray-600">स्टेटस: <span class="font-semibold ${statusColor}">${order.deliveryStatus || "प्रोसेसिंग में"}</span></p>
-                            
-
+                    // स्टेटस के हिसाब से रंगों का चुनाव (कलरिंग लेआउट)
+                    let statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700">प्रोसेसिंग में</span>`;
+                    if (isDelivered) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700"><i class="fa-solid fa-circle-check mr-1"></i>Delivered</span>`;
+                    if (isCancelled) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700">कैंसिल किया गया</span>`;
+                    if (isReturned) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700">रिटर्न रिक्वेस्ट दर्ज</span>`;
         // ... ऊपर के सारे फंक्शन्स ...
 
         // लोड होने पर चलाएं
