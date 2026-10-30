@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashion</title>
+    
+    <!-- 💡 फालबैक CSS: अगर ऑनलाइन डिज़ाइन लोड न हो, तो भी कोड क्रैश नहीं होगा -->
+    <style>
+        .hidden { display: none !important; }
+        body { font-family: sans-serif; background-color: #f3f4f6; padding: 10px; }
+    </style>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -15,7 +22,7 @@
 <body class="bg-gray-50 text-gray-800 min-h-screen pb-24">
 
     <!-- Header Navigation -->
-    <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50 rounded-xl mb-4">
         <div class="flex items-center space-x-3">
             <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl">
                 <i class="fa-solid fa-arrow-left mr-2"></i>होम पेज
@@ -33,7 +40,7 @@
 
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 md:p-6">
-        <div id="loading" class="text-center py-10 font-medium text-gray-500">
+        <div id="loading" class="text-center py-10 font-medium text-gray-500 bg-white rounded-xl shadow-sm border p-5">
             <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> ऑर्डर्स लोड हो रहे हैं...
         </div>
 
@@ -83,7 +90,6 @@
         }
         const db = firebase.firestore();
 
-        // एडमिन मोड ट्रैक करने का वेरिएबल
         let isAdminMode = false;
 
         // 2. लॉग-इन यूज़र चेक करें
@@ -95,7 +101,6 @@
         const currentUser = JSON.parse(loggedInRaw);
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
-        // एडमिन मोड ऑन-ऑफ करने का फंक्शन
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
             alert(isAdminMode ? "एडमिन मोड ऑन हो गया! अब आप किसी भी रिटर्न को Approve/Reject कर सकते हैं।" : "एडमिन मोड बंद। अब आप कस्टमर व्यू में हैं।");
@@ -110,7 +115,6 @@
             const noOrders = document.getElementById("no-orders");
 
             try {
-                // अभी सारे ऑर्डर्स उठा रहे हैं ताकि आप टेस्ट कर सकें
                 const snapshot = await db.collection("orders").get();
                 loading.classList.add("hidden");
 
@@ -134,12 +138,12 @@
                     
                     let isReturnWindowOpen = false;
 
-                    // डिलीवरी डेट की सही पार्सिंग (Fix)
                     if (isDelivered && (order.deliveredAt || order.orderDate)) {
                         let deliveryDateStr = order.deliveredAt || order.orderDate;
                         if (deliveryDateStr.includes("/")) {
                             const mainPart = deliveryDateStr.split(",");
-                            const parts = mainPart[0].trim().split("/");
+                            const datePart = mainPart[0].trim();
+                            const parts = datePart.split("/");
                             if (parts.length === 3) {
                                 deliveryDateStr = `${parts[2].trim()}-${parts[1].trim()}-${parts[0].trim()}`;
                             }
@@ -154,9 +158,8 @@
                     }
 
                     const card = document.createElement("div");
-                    card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4";
+                    card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between gap-4 mt-4";
 
-                    // डिलीवरी स्टेटस के हिसाब से रंग तय करना
                     let statusColor = "text-blue-600";
                     if (isCancelled || isRejected) statusColor = "text-red-600";
                     if (isReturned) statusColor = "text-amber-600";
@@ -173,7 +176,7 @@
                             <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
                             <p class="text-sm text-gray-600">स्टेटस: <span class="font-semibold ${statusColor}">${order.deliveryStatus || "प्रोसेसिंग में"}</span></p>
                             
-                            ${order.returnReason ? `<p class="text-xs bg-amber-50 text-amber-800 p-2 rounded mt-1"><b>रिटर्न का कारण:</b> ${order.returnReason}</p>` : ""}
+
         // ... ऊपर के सारे फंक्शन्स ...
 
         // लोड होने पर चलाएं
