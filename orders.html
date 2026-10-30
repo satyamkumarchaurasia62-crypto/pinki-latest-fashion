@@ -15,9 +15,9 @@
         .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen">
+<body class="bg-gray-50 text-gray-800 min-h-screen pb-24">
 
-    <!-- Header Navigation (खूबसूरत गुलाबी थीम) -->
+    <!-- Header Navigation (शानदार गुलाबी थीम) -->
     <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl flex items-center">
@@ -27,22 +27,22 @@
         </div>
         <div class="flex items-center space-x-4">
             <div id="user-info" class="text-sm font-semibold text-gray-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-100"></div>
-            <!-- एडमिन मोड बटन -->
+            <!-- एडमिन मोड चालू/बंद करने का बटन -->
             <button onclick="toggleAdminMode()" class="px-3 py-1.5 bg-gray-800 text-white text-xs font-bold rounded-lg hover:bg-gray-900 transition shadow-sm">
-                <i class="fa-solid fa-lock mr-1"></i> एडमिन मोड
+                <i class="fa-solid fa-lock mr-1"></i> एडमिन मोड (Toggle)
             </button>
         </div>
     </header>
 
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 md:p-6">
-        <!-- लोड होने वाला सुंदर एनीमेशन -->
+        <!-- लोड होने वाला सुंदर बॉक्स -->
         <div id="loading" class="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 my-4">
             <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-pink-600 block"></i> 
             <span class="text-gray-500 font-medium">आपके ऑर्डर्स लोड हो रहे हैं...</span>
         </div>
 
-        <!-- ऑर्डर न मिलने पर दिखने वाला सुंदर बॉक्स -->
+        <!-- ऑर्डर न मिलने पर दिखने वाला बॉक्स -->
         <div id="no-orders" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100 my-4">
             <i class="fa-solid fa-box-open text-6xl text-pink-200 mb-4"></i>
             <p class="text-lg font-bold text-gray-600">कोई पुराने ऑर्डर्स नहीं मिले।</p>
@@ -53,13 +53,16 @@
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 📋 कस्टमर के लिए रिटर्न पॉप-अप फॉर्म (सुंदर Modal डिज़ाइन) -->
+    <!-- 📋 कस्टमर के लिए रिटर्न पॉप-अप फॉर्म (सुंदर Modal) -->
     <div id="return-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-gray-100">
             <div class="flex items-center space-x-2 border-b pb-3 border-gray-100">
                 <i class="fa-solid fa-rotate-left text-2xl text-amber-500"></i>
                 <h3 class="text-lg font-bold text-gray-800">प्रोडक्ट रिटर्न रिक्वेस्ट दर्ज करें</h3>
             </div>
+            
+            <!-- हिडन इनपुट डॉक आईडी सुरक्षित रखने के लिए -->
+            <input type="hidden" id="return-doc-id">
             
             <div>
                 <label class="block text-sm font-bold text-gray-600 mb-1">रिटर्न करने का कारण लिखें (अनिवार्य):</label>
@@ -106,19 +109,23 @@
         // एडमिन मोड टॉगल फंक्शन
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
-            alert(isAdminMode ? "👑 एड敏 मोड चालू! अब आप ऑर्डर्स को Approve या Reject कर सकते हैं।" : "👋 एडमिन मोड बंद। आप कस्टमर मोड में वापस आ गए हैं।");
+            alert(isAdminMode ? "👑 एडमिन मोड चालू! अब आप ऑर्डर्स को Approve या Reject कर सकते हैं।" : "👋 एडमिन मोड बंद। आप कस्टमर मोड में वापस आ गए हैं।");
             loadUserOrders();
         }
 
         // 3. यूज़र के ऑर्डर्स लाएँ
         async function loadUserOrders() {
+            const userEmail = (currentUser.email || "").toLowerCase();
             const ordersList = document.getElementById("orders-list");
             const loading = document.getElementById("loading");
             const noOrders = document.getElementById("no-orders");
 
             try {
-                // बिना शर्त के सभी ऑर्डर्स लोड कर रहे हैं
-                const snapshot = await db.collection("orders").get();
+                // 💡 ध्यान रखें: डेटाबेस के सही फील्ड नेम 'email' का इस्तेमाल कर रहे हैं
+                const snapshot = await db.collection("orders")
+                    .where("email", "==", userEmail)
+                    .get();
+
                 loading.classList.add("hidden");
 
                 if (snapshot.empty) {
@@ -127,6 +134,7 @@
                     return;
                 }
 
+                noOrders.classList.add("hidden");
                 ordersList.innerHTML = "";
                 
                 snapshot.forEach(doc => {
@@ -141,16 +149,16 @@
                     
                     let isReturnWindowOpen = false;
 
-                    // 🛠️ तारीख का बिल्कुल सही और फ़िक्स कोड (No crash)
+                    // 💡 तारीख पार्सिंग फिक्स (DD/MM/YYYY फॉर्मेट को सपोर्ट करने के लिए)
                     if (isDelivered && (order.deliveredAt || order.orderDate)) {
                         let deliveryDateStr = order.deliveredAt || order.orderDate;
                         if (deliveryDateStr.includes("/")) {
                             const mainPart = deliveryDateStr.split(",");
-                            const datePart = mainPart[0].trim(); // "30/10/2026"
+                            const datePart = mainPart[0].trim(); // "30/10/2026" निकालेगा
                             const parts = datePart.split("/");
                             if (parts.length === 3) {
-                                // YYYY-MM-DD फॉर्मेट तैयार करें
-                                deliveryDateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                                // जावास्क्रिप्ट के समझने लायक YYYY-MM-DD फॉर्मेट सेट करें
+                                deliveryDateStr = `${parts[2].trim()}-${parts[1].trim()}-${parts[0].trim()}`;
                             }
                         }
                         const orderTime = new Date(deliveryDateStr).getTime();
@@ -165,11 +173,10 @@
                     const card = document.createElement("div");
                     card.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center transition hover:shadow-md";
 
-                    // स्टेटस के हिसाब से रंगों का चुनाव (कलरिंग लेआउट)
+                    // स्टेटस बैज की कलर कोडिंग
                     let statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700">प्रोसेसिंग में</span>`;
                     if (isDelivered) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700"><i class="fa-solid fa-circle-check mr-1"></i>Delivered</span>`;
-                    if (isCancelled) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700">कैंसिल किया गया</span>`;
-                    if (isReturned) statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700">रिटर्न रिक्वेस्ट दर्ज</span>`;
+
         // ... ऊपर के सारे फंक्शन्स ...
 
         // लोड होने पर चलाएं
