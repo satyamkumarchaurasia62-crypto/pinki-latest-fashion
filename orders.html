@@ -91,7 +91,7 @@
         }
         const db = firebase.firestore();
 
-        const loggedInRaw = localStorage.getItem("currentLoggedInUser");
+        const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
             alert("ऑर्डर्स देखने के लिए पहले लॉग-इन करें।");
             window.location.href = "account.html";
