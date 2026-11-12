@@ -4,20 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashion</title>
-    
-    <!-- 1. सही Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 2. सही Font Awesome Icons CDN -->
+    <script src="https://tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cloudflare.com">
     
-    <!-- 3. सही Firebase SDKs (Compat Version) -->
+    <!-- Firebase SDKs (वही वर्जन जो आपके index.html में है) -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen">
 
-    <!-- Header Navigation -->
     <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl">
@@ -28,7 +23,6 @@
         <div id="user-info" class="text-sm font-semibold text-gray-600"></div>
     </header>
 
-    <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 md:p-6">
         <div id="loading" class="text-center py-10 font-medium text-gray-500">
             <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> ऑर्डर्स लोड हो रहे हैं...
@@ -40,17 +34,18 @@
             <a href="index.html" class="inline-block mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">शॉपिंग करें</a>
         </div>
 
-        <!-- Orders List Container -->
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
     <script>
-        // 1. Firebase कॉन्फ़िगरेशन (यहाँ अपनी असली apiKey डालें)
+        // यहाँ अपनी index.html वाली असली apiKey डालें
         const firebaseConfig = {
-            apiKey: "AlreadyObtainRealKeyFromFirebaseConsole",
-            authDomain: "pinki-latest-fashion.firebaseapp.com",
+            apiKey: "YAHAN_APNI_ASLI_API_KEY_DALEIN",
+            authDomain: "://firebaseapp.com",
             projectId: "pinki-latest-fashion",
-            storageBucket: "pinki-latest-fashion.firebasestorage.app"
+            storageBucket: "pinki-latest-fashion.firebasestorage.app",
+            messagingSenderId: "432889531515",
+            appId: "1:432889531515:web:e0d4e5f9e04369051ae6de"
         };
 
         if (!firebase.apps.length) {
@@ -58,7 +53,6 @@
         }
         const db = firebase.firestore();
 
-        // 2. लॉग-इन यूज़र चेक करें
         const loggedInRaw = localStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
             alert("ऑर्डर्स देखने के लिए पहले लॉग-इन करें।");
@@ -68,7 +62,6 @@
         const currentUser = loggedInRaw ? JSON.parse(loggedInRaw) : {};
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
-        // 3. यूज़र के ऑर्डर्स Firestore से लाएँ
         async function loadUserOrders() {
             if (!currentUser.email) return;
 
@@ -136,7 +129,6 @@
             }
         }
 
-        // 4. ऑर्डर कैंसिल फ़ंक्शन
         async function cancelOrder(docId) {
             const reason = prompt("ऑर्डर कैंसिल करने का कारण दर्ज करें (वैकल्पिक):");
             if (reason === null) return;
@@ -154,7 +146,6 @@
             }
         }
 
-        // 5. ऑर्डर रिटर्न फ़ंक्शन (पूरा किया गया)
         async function returnOrder(docId) {
             const reason = prompt("प्रोडक्ट रिटर्न करने का कारण दर्ज करें:");
             if (!reason) {
@@ -175,25 +166,7 @@
             }
         }
 
-        // 6. पेज लोड होते ही ऑर्डर्स लाने के लिए फ़ंक्शन कॉल करें
         loadUserOrders();
-<!-- Firebase Scripts & db Initialization -->
-<script src="https://gstatic.com"></script>
-<script src="https://gstatic.com"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AlreadyObtainRealKeyFromFirebaseConsole",
-    authDomain: "://firebaseapp.com",
-    projectId: "pinki-latest-fashion",
-    storageBucket: "pinki-latest-fashion.firebasestorage.app",
-    messagingSenderId: "432889531515",
-    appId: "1:432889531515:web:e0d4e5f9e04369051ae6de"
-  };
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
- </script>
+    </script>
 </body>
 </html>
-
