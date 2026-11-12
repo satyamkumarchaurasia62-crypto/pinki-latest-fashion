@@ -17,7 +17,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen">
 
-    <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <header class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center space-x-3">
             <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-xl">
                 <i class="fa-solid fa-arrow-left mr-2"></i>होम पेज
@@ -40,6 +40,40 @@
 
         <div id="orders-list" class="space-y-4"></div>
     </main>
+
+    <!-- रिटर्न रिक्वेस्ट पॉपअप (Return Modal with Photo Upload) -->
+    <div id="return-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-rotate-left text-amber-500 mr-2"></i>प्रोडक्ट रिटर्न करें</h3>
+                <button onclick="closeReturnModal()" class="text-gray-400 hover:text-gray-700 text-xl">&times;</button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">रिटर्न करने का कारण *</label>
+                    <textarea id="return-reason" rows="3" placeholder="जैसे: साइज छोटा है, प्रोडक्ट डैमेज है आदि..." class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">प्रोडक्ट की फोटो अपलोड करें *</label>
+                    <input type="file" id="return-photo" accept="image/*" onchange="previewReturnImage(event)" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 cursor-pointer">
+                    
+                    <!-- फोटो प्रिव्यू -->
+                    <div id="photo-preview-box" class="hidden mt-3 relative">
+                        <img id="photo-preview" src="" alt="Preview" class="w-full h-40 object-contain rounded-lg border bg-gray-100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2 border-t">
+                <button onclick="closeReturnModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-300 transition">रद्द करें</button>
+                <button id="submit-return-btn" onclick="submitReturnRequest()" class="px-5 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 shadow transition">
+                    रिटर्न सबमिट करें
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // यहाँ अपनी index.html वाली असली apiKey जरूर डालें
@@ -66,6 +100,9 @@
         const currentUser = loggedInRaw ? JSON.parse(loggedInRaw) : {};
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
+        let selectedReturnDocId = null;
+        let compressedBase64Image = "";
+
         async function loadUserOrders() {
             const ordersList = document.getElementById("orders-list");
             const loading = document.getElementById("loading");
@@ -77,11 +114,9 @@
                 return;
             }
 
-            // लॉग-इन यूजर का ईमेल (छोटे अक्षरों में और बिना स्पेस के)
             const loggedEmail = currentUser.email.trim().toLowerCase();
 
             try {
-                // सभी ऑर्डर्स लाकर ईमेल को सही तरीके से मैच करना (ताकि Capital/Small अक्षरों की समस्या न हो)
                 const snapshot = await db.collection("orders").get();
                 loading.classList.add("hidden");
 
@@ -89,7 +124,6 @@
 
                 snapshot.forEach(doc => {
                     const order = doc.data();
-                    // डेटाबेस में email या userEmail जो भी फील्ड हो, उसे चेक करेगा
                     const dbEmail = (order.email || order.userEmail || "").trim().toLowerCase();
                     
                     if (dbEmail === loggedEmail) {
@@ -123,19 +157,25 @@
                             <h2 class="text-lg font-bold text-gray-800">${order.productName || "प्रोडक्ट"}</h2>
                             <p class="text-sm text-gray-600">साइज: <span class="font-medium">${order.size || "Free Size"}</span> | मात्रा: <span class="font-medium">${order.quantity || 1}</span></p>
                             <p class="text-sm text-gray-600">कुल राशि: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
-                            <p class="text-sm">डिलीवरी स्टेटस: <span class="font-semibold text-blue-600">${order.deliveryStatus || "प्रोसेस में"}</span></p>
+                            <p class="text-sm">डिलीवरी स्टेटस: 
+                                <span class="font-semibold ${isCancelled ? 'text-red-600' : isReturned ? 'text-amber-600' : 'text-blue-600'}">
+                                    ${order.deliveryStatus || "प्रोसेस में"}
+                                </span>
+                            </p>
                         </div>
 
                         <div class="flex md:flex-col justify-end gap-2 shrink-0">
                             ${!isCancelled && !isReturned ? `
-                                <button onclick="cancelOrder('${docId}')" class="px-4 py-2 border border-red-500 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-50 transition">
+                                <!-- लाल रंग का कैंसिल बटन और काले रंग का टेक्स्ट -->
+                                <button onclick="cancelOrder('${docId}')" class="px-4 py-2 bg-red-600 text-black font-bold rounded-lg text-sm hover:bg-red-700 shadow-sm transition">
                                     <i class="fa-solid fa-xmark mr-1"></i> कैंसिल करें
                                 </button>
-                                <button onclick="returnOrder('${docId}')" class="px-4 py-2 border border-amber-500 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition">
+                                <!-- कलर्ड रिटर्न बटन -->
+                                <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-lg text-sm hover:bg-amber-600 shadow-sm transition">
                                     <i class="fa-solid fa-rotate-left mr-1"></i> रिटर्न करें
                                 </button>
                             ` : `
-                                <span class="text-sm font-bold text-gray-500 self-center">
+                                <span class="text-sm font-bold px-3 py-1.5 rounded-lg ${isCancelled ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800'} self-center">
                                     ${isCancelled ? "ऑर्डर कैंसिल हो चुका है" : "रिटर्न प्रक्रिया में है"}
                                 </span>
                             `}
@@ -160,30 +200,89 @@
                     cancelReason: reason || "ग्राहक द्वारा कैंसिल",
                     cancelledAt: new Date().toLocaleString("hi-IN")
                 });
-                alert("आपका ऑर्डर सफलतापूर्वक कैंसिल कर दिया गया है।");
+                alert("Your order has been successfully cancelled ");
                 loadUserOrders();
             } catch (err) {
                 alert("समस्या आई: " + err.message);
             }
         }
 
-        async function returnOrder(docId) {
-            const reason = prompt("प्रोडक्ट रिटर्न करने का कारण दर्ज करें:");
+        // रिटर्न पॉपअप खोलना
+        function openReturnModal(docId) {
+            selectedReturnDocId = docId;
+            compressedBase64Image = "";
+            document.getElementById("return-reason").value = "";
+            document.getElementById("return-photo").value = "";
+            document.getElementById("photo-preview-box").classList.add("hidden");
+            document.getElementById("return-modal").classList.remove("hidden");
+        }
+
+        // रिटर्न पॉपअप बंद करना
+        function closeReturnModal() {
+            document.getElementById("return-modal").classList.add("hidden");
+            selectedReturnDocId = null;
+        }
+
+        // फोटो प्रिव्यू और ऑटो-कम्प्रेशन (ताकि Firestore में आसानी से सेव हो सके)
+        function previewReturnImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 600; // साइज छोटा रखने के लिए
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    compressedBase64Image = canvas.toDataURL("image/jpeg", 0.7);
+                    document.getElementById("photo-preview").src = compressedBase64Image;
+                    document.getElementById("photo-preview-box").classList.remove("hidden");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // रिटर्न रिक्वेस्ट डेटाबेस में सेव करना
+        async function submitReturnRequest() {
+            const reason = document.getElementById("return-reason").value.trim();
+            const submitBtn = document.getElementById("submit-return-btn");
+
             if (!reason) {
-                alert("रिटर्न के लिए कारण दर्ज करना आवश्यक है।");
+                alert("कृपया रिटर्न करने का कारण लिखें।");
+                return;
+            }
+            if (!compressedBase64Image) {
+                alert("कृपया प्रोडक्ट की एक फोटो अपलोड करें।");
                 return;
             }
 
+            submitBtn.disabled = true;
+            submitBtn.innerText = "सबमिट हो रहा है...";
+
             try {
-                await db.collection("orders").doc(docId).update({
+                await db.collection("orders").doc(selectedReturnDocId).update({
                     deliveryStatus: "रिटर्न रिक्वेस्ट दर्ज",
                     returnReason: reason,
+                    returnImage: compressedBase64Image, // The uploaded photo will be saved here. 
                     returnedAt: new Date().toLocaleString("hi-IN")
                 });
-                alert("आपकी रिटर्न रिक्वेस्ट दर्ज कर ली गई है।");
+                
+                alert("Your return request and photo have been successfully registered. ");
+                closeReturnModal();
                 loadUserOrders();
             } catch (err) {
-                alert("समस्या आई: " + err.message);
+                alert("problem occurred : " + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "return submit";
             }
         }
 
