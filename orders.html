@@ -177,11 +177,23 @@
 
         // 6. पेज लोड होते ही ऑर्डर्स लाने के लिए फ़ंक्शन कॉल करें
         loadUserOrders();
-        <!-- gstatic की जगह इन लिंक्स को लगाएं -->
-<script src="https://jsdelivr.net"></script>
-<script src="https://jsdelivr.net"></script>
+<!-- Firebase Scripts & db Initialization -->
+<script src="https://gstatic.com"></script>
+<script src="https://gstatic.com"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AlreadyObtainRealKeyFromFirebaseConsole",
+    authDomain: "://firebaseapp.com",
+    projectId: "pinki-latest-fashion",
+    storageBucket: "pinki-latest-fashion.firebasestorage.app",
+    messagingSenderId: "432889531515",
+    appId: "1:432889531515:web:e0d4e5f9e04369051ae6de"
+  };
 
-    </script>
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+ </script>
 </body>
 </html>
 
