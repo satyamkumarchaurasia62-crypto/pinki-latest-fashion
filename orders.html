@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashion</title>
-    <script src="https://tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cloudflare.com">
     
-    <!-- Firebase SDKs (वही वर्जन जो आपके index.html में है) -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
+    <!-- 1. Tailwind CSS का सही लिंक -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Font Awesome Icons का सही लिंक -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- 3. Firebase SDKs (Compat वर्जन ताकि आपका कोड बिना बदले काम करे) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen">
 
@@ -38,10 +42,10 @@
     </main>
 
     <script>
-        // यहाँ अपनी index.html वाली असली apiKey डालें
+        // यहाँ अपनी index.html वाली असली apiKey जरूर डालें
         const firebaseConfig = {
             apiKey: "YAHAN_APNI_ASLI_API_KEY_DALEIN",
-            authDomain: "://firebaseapp.com",
+            authDomain: "pinki-latest-fashion.firebaseapp.com", // इसे ठीक कर दिया गया है
             projectId: "pinki-latest-fashion",
             storageBucket: "pinki-latest-fashion.firebasestorage.app",
             messagingSenderId: "432889531515",
