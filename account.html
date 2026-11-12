@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://gstatic.com"></script>
+  <script src="https://gstatic.com"></script>g
   <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -199,7 +199,7 @@ const db = firebase.firestore();
     }
 
     function getUsers() {
-      const users = localStorage.getItem("registeredUsers");
+      const users = sessionStorage.getItem("registeredUsers");
       return users ? JSON.parse(users) : {};
     }
 
@@ -211,7 +211,7 @@ const db = firebase.firestore();
       if (emailElem) emailElem.innerText = user.email;
     }
     function logout() {
-    localStorage.removeItem("currentLoggedInUser");
+    sessionStorage.removeItem("currentLoggedInUser");
     alert("आप सफलतापूर्वक लॉगआउट हो गए हैं!");
     window.location.href = "index.html";
 }
@@ -296,7 +296,7 @@ if (loginForm) {
     db.collection("users").doc(email).get().then((doc) => {
       if (doc.exists && doc.data().password === password) {
         const userData = doc.data();
-        localStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+        sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
         alert("लॉगिन सफल!");
         loadProfile(userData);
       } else {
@@ -327,7 +327,7 @@ if (loginForm) {
           if (user.question === question && user.answer === answer) {
       user.password = newPassword;
       users[email] = user;
-      localStorage.setItem("registeredUsers", JSON.stringify(users));
+      sessionStorage.setItem("registeredUsers", JSON.stringify(users));
       alert("पासवर्ड सफलतापूर्वक बदल गया है! अब नए पासवर्ड से लॉगिन करें।");
       forgotForm.reset();
       showBox('login');
@@ -337,7 +337,7 @@ if (loginForm) {
    });
   }
     // Page load hote hi check karein ki user logged in hai ya nahi
-const savedUser = localStorage.getItem("currentLoggedInUser");
+const savedUser = sessionStorage.getItem("currentLoggedInUser");
 if (savedUser) {
     const userData = JSON.parse(savedUser);
     loadProfile(userData);
