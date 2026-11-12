@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashion</title>
     
-    <!-- 1. Tailwind CSS का सही लिंक -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. Font Awesome Icons का सही लिंक -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- 3. Firebase SDKs (Compat वर्जन ताकि आपका कोड बिना बदले काम करे) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
@@ -45,7 +45,7 @@
         // यहाँ अपनी index.html वाली असली apiKey जरूर डालें
         const firebaseConfig = {
             apiKey: "YAHAN_APNI_ASLI_API_KEY_DALEIN",
-            authDomain: "pinki-latest-fashion.firebaseapp.com", // इसे ठीक कर दिया गया है
+            authDomain: "pinki-latest-fashion.firebaseapp.com",
             projectId: "pinki-latest-fashion",
             storageBucket: "pinki-latest-fashion.firebasestorage.app",
             messagingSenderId: "432889531515",
@@ -67,18 +67,37 @@
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
         async function loadUserOrders() {
-            if (!currentUser.email) return;
-
-            const userEmail = currentUser.email.toLowerCase();
             const ordersList = document.getElementById("orders-list");
             const loading = document.getElementById("loading");
             const noOrders = document.getElementById("no-orders");
 
+            if (!currentUser.email) {
+                loading.classList.add("hidden");
+                noOrders.classList.remove("hidden");
+                return;
+            }
+
+            // लॉग-इन यूजर का ईमेल (छोटे अक्षरों में और बिना स्पेस के)
+            const loggedEmail = currentUser.email.trim().toLowerCase();
+
             try {
-                const snapshot = await db.collection("orders").where("email", "==", userEmail).get();
+                // सभी ऑर्डर्स लाकर ईमेल को सही तरीके से मैच करना (ताकि Capital/Small अक्षरों की समस्या न हो)
+                const snapshot = await db.collection("orders").get();
                 loading.classList.add("hidden");
 
-                if (snapshot.empty) {
+                const matchedOrders = [];
+
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    // डेटाबेस में email या userEmail जो भी फील्ड हो, उसे चेक करेगा
+                    const dbEmail = (order.email || order.userEmail || "").trim().toLowerCase();
+                    
+                    if (dbEmail === loggedEmail) {
+                        matchedOrders.push({ id: doc.id, ...order });
+                    }
+                });
+
+                if (matchedOrders.length === 0) {
                     noOrders.classList.remove("hidden");
                     ordersList.innerHTML = "";
                     return;
@@ -87,10 +106,8 @@
                 noOrders.classList.add("hidden");
                 ordersList.innerHTML = "";
 
-                snapshot.forEach(doc => {
-                    const order = doc.data();
-                    const docId = doc.id;
-
+                matchedOrders.forEach(order => {
+                    const docId = order.id;
                     const isCancelled = order.deliveryStatus === "कैंसिल किया गया";
                     const isReturned = order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
 
