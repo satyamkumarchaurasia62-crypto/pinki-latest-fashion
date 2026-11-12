@@ -227,7 +227,7 @@
   <script>
     // Page Session Init Check Validation Toggling
     document.addEventListener("DOMContentLoaded", function() {
-      const loggedInUser = localStorage.getItem("currentLoggedInUser");
+      const loggedInUser = sessionStorage.getItem("currentLoggedInUser");
       if (loggedInUser) {
         const user = JSON.parse(loggedInUser);
         // Sync real name configurations inside the homepage widget structure
@@ -242,7 +242,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       // 1. लोकल स्टोरेज से सेशन सिंक करना
-      const loggedInUser = localStorage.getItem("currentLoggedInUser");
+      const loggedInUser = sessionStorage.getItem("currentLoggedInUser");
       if (loggedInUser) {
         const user = JSON.parse(loggedInUser);
         document.getElementById("home-user-text").innerText = "Hi, " + user.name;
@@ -330,7 +330,7 @@
     // नया और सही handleBuyNow फ़ंक्शन
 function handleBuyNow(id) {
   // 1. चेक करें कि यूज़र लॉग इन है या नहीं
-  const loggedInRaw = localStorage.getItem("currentLoggedInUser");
+  const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
   if (!loggedInRaw) {
     alert("कृपया ऑर्डर करने के लिए पहले लॉगिन करें!");
     window.location.href = "account.html";
