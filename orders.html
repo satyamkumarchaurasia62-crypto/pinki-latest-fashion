@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashion</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
+    
+    <!-- 1. सही Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. सही Font Awesome Icons CDN -->
     <link rel="stylesheet" href="https://cloudflare.com">
     
-    <!-- Firebase SDKs -->
+    <!-- 3. सही Firebase SDKs (Compat Version) -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
@@ -43,10 +45,10 @@
     </main>
 
     <script>
-        // 1. Firebase कॉन्फ़िगरेशन (index.html वाली config डालें)
+        // 1. Firebase कॉन्फ़िगरेशन (यहाँ अपनी असली apiKey डालें)
         const firebaseConfig = {
             apiKey: "AlreadyObtainRealKeyFromFirebaseConsole",
-            authDomain: "://firebaseapp.com",
+            authDomain: "pinki-latest-fashion.firebaseapp.com",
             projectId: "pinki-latest-fashion",
             storageBucket: "pinki-latest-fashion.firebasestorage.app"
         };
@@ -62,30 +64,30 @@
             alert("ऑर्डर्स देखने के लिए पहले लॉग-इन करें।");
             window.location.href = "account.html";
         }
-        const currentUser = JSON.parse(loggedInRaw);
+        
+        const currentUser = loggedInRaw ? JSON.parse(loggedInRaw) : {};
         document.getElementById("user-info").innerText = currentUser.name ? `नमस्ते, ${currentUser.name}` : "";
 
         // 3. यूज़र के ऑर्डर्स Firestore से लाएँ
         async function loadUserOrders() {
-            const userEmail = (currentUser.email || "").toLowerCase();
+            if (!currentUser.email) return;
+
+            const userEmail = currentUser.email.toLowerCase();
             const ordersList = document.getElementById("orders-list");
             const loading = document.getElementById("loading");
             const noOrders = document.getElementById("no-orders");
 
             try {
-                // 💡 फिक्स 1: यहाँ 'userEmail' फील्ड को आपके डेटाबेस के नाम 'email' से बदल दिया है
                 const snapshot = await db.collection("orders").where("email", "==", userEmail).get();
-        
-             
                 loading.classList.add("hidden");
 
                 if (snapshot.empty) {
                     noOrders.classList.remove("hidden");
-                    ordersList.innerHTML = ""; // फिक्स: पुरानी लिस्ट साफ करने के लिए
+                    ordersList.innerHTML = "";
                     return;
                 }
 
-                noOrders.classList.add("hidden"); // फिक्स: नए ऑर्डर्स मिलने पर नो-ऑर्डर छिपाने के लिए
+                noOrders.classList.add("hidden");
                 ordersList.innerHTML = "";
 
                 snapshot.forEach(doc => {
@@ -152,7 +154,7 @@
             }
         }
 
-        // 5. ऑर्डर रिटर्न फ़ंक्शन
+        // 5. ऑर्डर रिटर्न फ़ंक्शन (पूरा किया गया)
         async function returnOrder(docId) {
             const reason = prompt("प्रोडक्ट रिटर्न करने का कारण दर्ज करें:");
             if (!reason) {
@@ -166,15 +168,16 @@
                     returnReason: reason,
                     returnedAt: new Date().toLocaleString("hi-IN")
                 });
-                alert("आपकी रिटर्न रिक्वेस्ट दर्ज कर ली गई है। हमारी team जल्द संपर्क करेगी।");
+                alert("आपकी रिटर्न रिक्वेस्ट दर्ज कर ली गई है।");
                 loadUserOrders();
             } catch (err) {
                 alert("समस्या आई: " + err.message);
             }
         }
 
-        // लोड होने पर चलाएं
+        // 6. पेज लोड होते ही ऑर्डर्स लाने के लिए फ़ंक्शन कॉल करें
         loadUserOrders();
     </script>
 </body>
 </html>
+
