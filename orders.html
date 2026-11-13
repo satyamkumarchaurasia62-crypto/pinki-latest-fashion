@@ -122,8 +122,8 @@
         </div>
     </div>
 
-    <!-- 2. Rate Product Modal (Minimum 2-3 Photos: Front, Back, Right, Left) -->
-    <div id="ratingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); justify-content:center; align-items:center; z-index:9999; padding:16px; overflow-y:auto;">
+    <!-- 2. Rate Product Modal (Using Tailwind 'hidden' just like Return Modal) -->
+    <div id="ratingModal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="text-lg font-bold text-stone-800">★ Rate This Outfit</h3>
@@ -259,7 +259,7 @@
             });
         };
 
-        // Custom Prompt Function (for Cancel Reason)
+        // Custom Prompt Function
         window.showPrompt = function(message, title = "Cancel Order") {
             return new Promise((resolve) => {
                 const overlay = document.getElementById("customPopupOverlay");
@@ -316,7 +316,7 @@
         window.returnPhotos = { front: "", back: "", right: "", left: "" };
         window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
 
-        // Shared Multi-Angle Camera & Upload Handler (for both Return and Rating)
+        // Shared Multi-Angle Camera & Upload Handler
         function handleAnglePhoto(event, angle, mode) {
             const file = event.target.files[0];
             if (!file) return;
@@ -422,7 +422,7 @@
                     } else if (isDelivered) {
                         if (!order.isRated) {
                             actionButtonsHTML += `
-                                <button onclick="openRatingModal('${docId}', '${order.productId}')" class="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-sm hover:bg-pink-700 shadow-sm transition">
+                                <button onclick="openRatingModal('${docId}', '${order.productId || 1}')" class="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-sm hover:bg-pink-700 shadow-sm transition">
                                     ★ Rate Product
                                 </button>`;
                         } else {
@@ -488,6 +488,7 @@
             }
         }
 
+        // --- RETURN MODAL LOGIC ---
         function openReturnModal(docId) {
             selectedReturnDocId = docId;
             window.returnPhotos = { front: "", back: "", right: "", left: "" };
@@ -546,9 +547,100 @@
             }
         }
 
+        // --- RATING & REVIEW MODAL LOGIC (DIRECTLY INSIDE ORDERS.HTML) ---
+        let selectedRating = 5;
+        let currentReviewOrderId = "";
+        let currentReviewProductId = "";
+
+        function openRatingModal(orderId, productId) {
+            currentReviewOrderId = orderId;
+            currentReviewProductId = (productId && productId !== "undefined") ? productId : "1";
+            selectedRating = 5;
+            updateStarsUI(5);
+            
+            document.getElementById("reviewComment").value = "";
+            window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
+            ['front', 'back', 'right', 'left'].forEach(angle => {
+                const img = document.getElementById(`review-preview-${angle}`);
+                img.src = "";
+                img.classList.add("hidden");
+            });
+            updateAnglePhotoCount("review", 2);
+            document.getElementById("ratingModal").classList.remove("hidden");
+        }
+
+        function closeRatingModal() {
+            document.getElementById("ratingModal").classList.add("hidden");
+        }
+
+        function selectStar(star) {
+            selectedRating = star;
+            updateStarsUI(star);
+        }
+
+        function updateStarsUI(star) {
+            const stars = document.querySelectorAll(".star-btn");
+            stars.forEach((s, index) => {
+                s.style.color = index < star ? "#f59e0b" : "#d1d5db";
+            });
+        }
+
+        async function submitReview() {
+            const comment = document.getElementById("reviewComment").value.trim();
+            const submitBtn = document.getElementById("submitReviewBtn");
+
+            const anglePhotosObj = window.reviewAnglePhotos || {};
+            const photoBase64List = Object.values(anglePhotosObj).filter(val => val !== "");
+
+            if (!comment) {
+                await showAlert("Please write a short review about the outfit!", "Review Required", "error");
+                return;
+            }
+
+            if (photoBase64List.length < 2) {
+                await showAlert(`Please capture or upload at least 2 photos (Front, Back, Right/Left). Currently uploaded: ${photoBase64List.length}`, "Minimum 2 Photos Required", "error");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
+            try {
+                let firstName = "Verified Buyer";
+                const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+                if (loggedInRaw) {
+                    const userObj = JSON.parse(loggedInRaw);
+                    if (userObj.name && userObj.name.trim()) {
+                        firstName = userObj.name.trim().split(" ")[0];
+                    }
+                }
+
+                await db.collection("reviews").add({
+                    productId: String(currentReviewProductId),
+                    orderId: currentReviewOrderId,
+                    buyerName: firstName,
+                    rating: selectedRating,
+                    comment: comment,
+                    photos: photoBase64List,
+                    createdAt: new Date().toISOString()
+                });
+
+                await db.collection("orders").doc(currentReviewOrderId).update({
+                    isRated: true
+                });
+
+                closeRatingModal();
+                await showAlert("Thank you! Your review and photos have been published.", "Review Submitted", "success");
+                loadUserOrders();
+            } catch (err) {
+                await showAlert("Error submitting review: " + err.message, "Error", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Review";
+            }
+        }
+
         loadUserOrders();
     </script>
-
-    <script src="review.js"></script>
 </body>
 </html>
