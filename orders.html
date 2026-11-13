@@ -47,26 +47,87 @@
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 1. Return Modal (Minimum 3 Photos: Front, Back, Right, Left) -->
-    <div id="return-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <!-- 1. Return Modal (Reason + Strict Same-Name Refund UPI/Bank + Minimum 3 Photos) -->
+    <div id="return-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-stone-800"><i class="fa-solid fa-rotate-left text-amber-500 mr-2"></i>Return Product</h3>
+                <h3 class="text-lg font-bold text-stone-800"><i class="fa-solid fa-rotate-left text-amber-500 mr-2"></i>Return Product & Refund Details</h3>
                 <button onclick="closeReturnModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
             </div>
 
             <div class="space-y-4">
+                <!-- Reason -->
                 <div>
-                    <label class="block text-sm font-semibold text-stone-700 mb-1">Reason for Return *</label>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1">1. Reason for Return *</label>
                     <textarea id="return-reason" rows="2" placeholder="e.g., Size issue, fabric defect, wrong item..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
+                </div>
+
+                <!-- Refund Account / UPI Details Box (Strict Name Match Rule) -->
+                <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 space-y-3">
+                    <div class="space-y-1">
+                        <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved"></i> 2. Refund Account Details (Same Name Policy) *
+                        </div>
+                        <p class="text-[11px] text-emerald-800 bg-emerald-100/80 px-2.5 py-1.5 rounded-lg border border-emerald-300/70">
+                            <i class="fa-solid fa-circle-info mr-1"></i> Security Rule: Refund will ONLY be transferred to an account/UPI registered under <strong id="required-holder-name-badge" class="underline">your order name</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Refund Mode Selector -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <label class="flex items-center gap-2 bg-white border border-emerald-300 rounded-lg p-2 cursor-pointer font-semibold">
+                            <input type="radio" name="refund-method" value="UPI" checked onchange="toggleRefundFields()">
+                            <span>UPI ID (Fastest)</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-white border border-emerald-300 rounded-lg p-2 cursor-pointer font-semibold">
+                            <input type="radio" name="refund-method" value="Bank Account" onchange="toggleRefundFields()">
+                            <span>Bank Account</span>
+                        </label>
+                    </div>
+
+                    <!-- UPI Input Field -->
+                    <div id="refund-upi-box" class="space-y-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-0.5">Registered Account Holder Name (Locked)</label>
+                            <input type="text" id="refund-upi-holder" readonly class="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-xs bg-stone-100 text-stone-700 font-bold cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-0.5">Enter Your UPI ID *</label>
+                            <input type="text" id="refund-upi-id" placeholder="e.g., 9876543210@ybl or name@okicici" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-emerald-600">
+                        </div>
+                    </div>
+
+                    <!-- Bank Account Input Fields -->
+                    <div id="refund-bank-box" class="hidden space-y-2 text-xs">
+                        <div>
+                            <label class="block font-semibold text-stone-700 mb-0.5">Account Holder Name (Must Match Order Name) *</label>
+                            <input type="text" id="refund-acc-name" readonly class="w-full border border-stone-200 rounded-lg px-3 py-2 bg-stone-100 text-stone-800 font-bold cursor-not-allowed">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">Bank Account Number *</label>
+                                <input type="text" id="refund-acc-number" placeholder="Enter Account Number" class="w-full border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-emerald-600">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">IFSC Code *</label>
+                                <input type="text" id="refund-ifsc" placeholder="e.g., SBIN0001234" class="w-full uppercase border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-emerald-600">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mandatory Confirmation Checkbox -->
+                    <label class="flex items-start gap-2 text-[11px] text-stone-700 pt-1 cursor-pointer select-none">
+                        <input type="checkbox" id="refund-name-confirm" class="mt-0.5 rounded border-stone-400 text-emerald-600">
+                        <span>I confirm this UPI / Bank Account belongs to <strong id="confirm-holder-text">me</strong>. Refund will be rejected if the bank name does not match.</span>
+                    </label>
                 </div>
 
                 <!-- Return Photo Instructions -->
                 <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
                     <div class="font-bold flex items-center gap-1.5 text-amber-800">
-                        <i class="fa-solid fa-camera"></i> Photo Instructions (Minimum 3 Photos Required):
+                        <i class="fa-solid fa-camera"></i> 3. Photo Instructions (Minimum 3 Photos Required):
                     </div>
-                    <p class="leading-relaxed">Please capture clear photos from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides with the tag intact. Use your camera or gallery.</p>
+                    <p class="leading-relaxed">Please capture clear photos from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides with the tag intact.</p>
                 </div>
 
                 <!-- 4 Angle Camera/Upload Slots for Return -->
@@ -122,7 +183,7 @@
         </div>
     </div>
 
-    <!-- 2. Rate Product Modal (Using Tailwind 'hidden' just like Return Modal) -->
+    <!-- 2. Rate Product Modal -->
     <div id="ratingModal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
@@ -130,7 +191,6 @@
                 <button onclick="closeRatingModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
             </div>
             
-            <!-- Star Selector -->
             <div class="flex items-center gap-2">
                 <span class="text-sm font-semibold text-stone-700">Your Rating:</span>
                 <div style="font-size:28px; cursor:pointer; user-select:none; line-height:1;">
@@ -147,7 +207,6 @@
                 <textarea id="reviewComment" rows="2" placeholder="Share your experience (fabric, fitting, quality)..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
             </div>
 
-            <!-- Review Photo Instructions -->
             <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-xs text-pink-900 space-y-1">
                 <div class="font-bold flex items-center gap-1.5 text-pink-800">
                     <i class="fa-solid fa-camera"></i> Outfit Photo Instructions (Minimum 2 to 3 Photos Required):
@@ -155,7 +214,6 @@
                 <p class="leading-relaxed">Please capture or upload clear photos of the outfit from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides so other buyers can see the real fitting & look.</p>
             </div>
 
-            <!-- 4 Angle Camera/Upload Slots for Rating -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
                     <div class="text-xs font-bold text-stone-700">1. Front Side (आगे)</div>
@@ -210,27 +268,18 @@
     <!-- 3. Custom Smooth White Alert & Prompt Modal -->
     <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
         <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
-            
-            <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#fce7f3; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
-                !
-            </div>
-
+            <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#fce7f3; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
             <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
             <p id="customPopupMessage" style="margin:0 0 16px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
-
-            <!-- Optional Input for Cancel Reason -->
             <input type="text" id="customPopupInput" placeholder="Write reason here..." style="display:none; width:100%; padding:10px 12px; margin-bottom:16px; border:1px solid #d6d3d1; border-radius:10px; font-size:14px; box-sizing:border-box;">
-
             <div style="display:flex; gap:10px; justify-content:center;">
                 <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Close</button>
                 <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
             </div>
-
         </div>
     </div>
 
     <script>
-        // Custom Alert Function
         window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
             return new Promise((resolve) => {
                 const overlay = document.getElementById("customPopupOverlay");
@@ -259,7 +308,6 @@
             });
         };
 
-        // Custom Prompt Function
         window.showPrompt = function(message, title = "Cancel Order") {
             return new Promise((resolve) => {
                 const overlay = document.getElementById("customPopupOverlay");
@@ -290,6 +338,12 @@
             });
         };
 
+        function copyTrackingId(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showAlert("Tracking ID copied: " + code, "Copied", "success");
+            });
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
             authDomain: "pinki-latest-fashion.firebaseapp.com",
@@ -313,10 +367,25 @@
         document.getElementById("user-info").innerText = currentUser.name ? `Hello, ${currentUser.name}` : "";
 
         let selectedReturnDocId = null;
+        let selectedReturnOrderName = "";
+        let loadedOrdersMap = {};
         window.returnPhotos = { front: "", back: "", right: "", left: "" };
         window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
 
-        // Shared Multi-Angle Camera & Upload Handler
+        function toggleRefundFields() {
+            const selectedMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
+            const upiBox = document.getElementById("refund-upi-box");
+            const bankBox = document.getElementById("refund-bank-box");
+
+            if (selectedMethod === "UPI") {
+                upiBox.classList.remove("hidden");
+                bankBox.classList.add("hidden");
+            } else {
+                upiBox.classList.add("hidden");
+                bankBox.classList.remove("hidden");
+            }
+        }
+
         function handleAnglePhoto(event, angle, mode) {
             const file = event.target.files[0];
             if (!file) return;
@@ -387,13 +456,16 @@
                 loading.classList.add("hidden");
 
                 const matchedOrders = [];
+                loadedOrdersMap = {};
 
                 snapshot.forEach(doc => {
                     const order = doc.data();
                     const dbEmail = (order.email || order.userEmail || "").trim().toLowerCase();
                     
                     if (dbEmail === loggedEmail) {
-                        matchedOrders.push({ id: doc.id, ...order });
+                        const item = { id: doc.id, ...order };
+                        matchedOrders.push(item);
+                        loadedOrdersMap[doc.id] = item;
                     }
                 });
 
@@ -410,16 +482,65 @@
                     const docId = order.id;
                     const statusRaw = (order.deliveryStatus || order.status || "packing").toLowerCase();
                     const isCancelled = statusRaw === "cancelled" || order.deliveryStatus === "कैंसिल किया गया";
-                    const isReturned = statusRaw === "return request placed" || order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज";
+                    const isReturnRejected = statusRaw === "return rejected";
+                    const isReturnFlow = !isReturnRejected && (
+                        statusRaw.includes("return") || 
+                        statusRaw.includes("pickup") || 
+                        statusRaw.includes("picked") || 
+                        order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज"
+                    );
                     const isDelivered = statusRaw === "delivered";
 
-                    let actionButtonsHTML = "";
+                    let trackingBoxHTML = "";
+                    if (order.trackingId || order.courierName || order.expectedDelivery) {
+                        trackingBoxHTML = `
+                            <div class="mt-2.5 bg-blue-50/80 border border-blue-200 rounded-xl p-2.5 text-xs space-y-1">
+                                <div class="font-bold text-blue-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-truck-fast"></i> Shipment & Tracking Details
+                                </div>
+                                ${order.courierName ? `<div class="text-stone-700">Courier Partner: <b>${order.courierName}</b></div>` : ''}
+                                ${order.trackingId ? `
+                                    <div class="flex items-center gap-2 text-stone-700">
+                                        <span>Tracking / AWB ID: <b class="font-mono text-blue-800">${order.trackingId}</b></span>
+                                        <button onclick="copyTrackingId('${order.trackingId}')" class="px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-bold hover:bg-blue-700">
+                                            <i class="fa-regular fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                ` : ''}
+                                ${order.expectedDelivery ? `<div class="text-emerald-700 font-semibold">Expected Delivery: ${order.expectedDelivery}</div>` : ''}
+                            </div>
+                        `;
+                    }
 
+                    let returnStatusBoxHTML = "";
+                    if (isReturnRejected) {
+                        returnStatusBoxHTML = `
+                            <div class="mt-2.5 bg-red-50 border border-red-200 rounded-xl p-2.5 text-xs space-y-1">
+                                <div class="font-bold text-red-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-xmark"></i> Return Request Rejected
+                                </div>
+                                <div class="text-red-800">Reason: <b>${order.returnRejectionReason || order.rejectionReason || "Did not meet return policy guidelines."}</b></div>
+                            </div>
+                        `;
+                    } else if (isReturnFlow) {
+                        returnStatusBoxHTML = `
+                            <div class="mt-2.5 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs space-y-1">
+                                <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-rotate-left"></i> Return & Reverse Pickup Status: <span class="underline">${order.deliveryStatus}</span>
+                                </div>
+                                ${order.refundAccountSummary ? `<div class="text-stone-700">Refund To: <b>${order.refundAccountSummary}</b></div>` : ''}
+                                ${order.pickupTrackingId ? `<div class="text-stone-700">Pickup Tracking ID: <b class="font-mono">${order.pickupTrackingId}</b></div>` : ''}
+                                ${order.paymentStatus && order.paymentStatus.toLowerCase().includes("refund") ? `<div class="text-emerald-700 font-bold">✓ ${order.paymentStatus}</div>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    let actionButtonsHTML = "";
                     if (isCancelled) {
                         actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-red-100 text-red-700 self-center">Order Cancelled</span>`;
-                    } else if (isReturned) {
-                        actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 self-center">Return in Progress</span>`;
-                    } else if (isDelivered) {
+                    } else if (isReturnFlow) {
+                        actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 self-center">${order.deliveryStatus}</span>`;
+                    } else if (isDelivered || isReturnRejected) {
                         if (!order.isRated) {
                             actionButtonsHTML += `
                                 <button onclick="openRatingModal('${docId}', '${order.productId || 1}')" class="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-sm hover:bg-pink-700 shadow-sm transition">
@@ -428,10 +549,12 @@
                         } else {
                             actionButtonsHTML += `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-center">✓ Rated</span>`;
                         }
-                        actionButtonsHTML += `
-                            <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
-                                <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
-                            </button>`;
+                        if (!isReturnRejected) {
+                            actionButtonsHTML += `
+                                <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
+                                </button>`;
+                        }
                     } else {
                         actionButtonsHTML = `
                             <button onclick="cancelOrder('${docId}')" class="px-4 py-2 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 shadow-sm transition">
@@ -443,19 +566,21 @@
                     card.className = "bg-white p-5 rounded-2xl shadow-sm border border-stone-200 flex flex-col md:flex-row justify-between gap-4";
 
                     card.innerHTML = `
-                        <div class="space-y-1">
-                            <div class="flex items-center space-x-2">
+                        <div class="space-y-1 flex-grow">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full">ID: ${order.orderId || docId}</span>
                                 <span class="text-xs text-stone-500">${order.orderDate || ""}</span>
                             </div>
                             <h2 class="text-lg font-bold text-stone-800">${order.productName || "Product"}</h2>
                             <p class="text-sm text-stone-600">Size: <span class="font-medium">${order.size || "Free Size"}</span> | Qty: <span class="font-medium">${order.quantity || 1}</span></p>
-                            <p class="text-sm text-stone-600">Total Amount: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"})</p>
-                            <p class="text-sm">Delivery Status: 
-                                <span class="font-semibold capitalize ${isCancelled ? 'text-red-600' : isReturned ? 'text-amber-600' : isDelivered ? 'text-emerald-600' : 'text-blue-600'}">
+                            <p class="text-sm text-stone-600">Total Amount: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"} - <span class="text-xs font-semibold">${order.paymentStatus || "Pending"}</span>)</p>
+                            <p class="text-sm">Order Status: 
+                                <span class="font-bold capitalize ${isCancelled || isReturnRejected ? 'text-red-600' : isReturnFlow ? 'text-amber-600' : isDelivered ? 'text-emerald-600' : 'text-blue-600'}">
                                     ${order.deliveryStatus || "Processing"}
                                 </span>
                             </p>
+                            ${trackingBoxHTML}
+                            ${returnStatusBoxHTML}
                         </div>
 
                         <div class="flex md:flex-col justify-end gap-2 shrink-0">
@@ -488,11 +613,29 @@
             }
         }
 
-        // --- RETURN MODAL LOGIC ---
+        // --- RETURN MODAL LOGIC WITH STRICT NAME MATCH ---
         function openReturnModal(docId) {
             selectedReturnDocId = docId;
+            const orderObj = loadedOrdersMap[docId] || {};
+            const registeredName = (orderObj.userName || currentUser.name || "").trim();
+            selectedReturnOrderName = registeredName;
+
             window.returnPhotos = { front: "", back: "", right: "", left: "" };
             document.getElementById("return-reason").value = "";
+            document.getElementById("refund-upi-id").value = "";
+            document.getElementById("refund-acc-number").value = "";
+            document.getElementById("refund-ifsc").value = "";
+            document.getElementById("refund-name-confirm").checked = false;
+
+            // Lock Account Holder Name strictly to the Order's Registered Name
+            document.getElementById("required-holder-name-badge").innerText = registeredName || "your registered name";
+            document.getElementById("confirm-holder-text").innerText = registeredName || "me";
+            document.getElementById("refund-upi-holder").value = registeredName;
+            document.getElementById("refund-acc-name").value = registeredName;
+
+            const upiRadio = document.querySelector('input[name="refund-method"][value="UPI"]');
+            if (upiRadio) upiRadio.checked = true;
+            toggleRefundFields();
             
             ['front', 'back', 'right', 'left'].forEach(angle => {
                 const img = document.getElementById(`return-preview-${angle}`);
@@ -506,10 +649,13 @@
         function closeReturnModal() {
             document.getElementById("return-modal").classList.add("hidden");
             selectedReturnDocId = null;
+            selectedReturnOrderName = "";
         }
 
         async function submitReturnRequest() {
             const reason = document.getElementById("return-reason").value.trim();
+            const refundMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
+            const isNameConfirmed = document.getElementById("refund-name-confirm").checked;
             const submitBtn = document.getElementById("submit-return-btn");
             const uploadedPhotosList = Object.entries(window.returnPhotos)
                 .filter(([_, data]) => data !== "")
@@ -519,6 +665,52 @@
                 await showAlert("Please write the reason for return.", "Reason Required", "error");
                 return;
             }
+
+            const expectedName = (selectedReturnOrderName || currentUser.name || "").trim();
+            let refundDetailsObj = {
+                method: refundMethod,
+                verifiedAccountHolder: expectedName
+            };
+            let refundSummaryText = "";
+
+            if (refundMethod === "UPI") {
+                const upiId = document.getElementById("refund-upi-id").value.trim();
+                const holderInput = document.getElementById("refund-upi-holder").value.trim();
+
+                if (holderInput.toLowerCase() !== expectedName.toLowerCase()) {
+                    await showAlert(`Account holder name must match your order name (${expectedName}).`, "Name Mismatch", "error");
+                    return;
+                }
+                if (!upiId || !upiId.includes("@")) {
+                    await showAlert("Please enter a valid UPI ID (e.g., name@okicici) for your refund.", "Valid UPI ID Required", "error");
+                    return;
+                }
+                refundDetailsObj.upiId = upiId;
+                refundSummaryText = `UPI: ${upiId} (Holder: ${expectedName})`;
+            } else {
+                const accName = document.getElementById("refund-acc-name").value.trim();
+                const accNum = document.getElementById("refund-acc-number").value.trim();
+                const ifsc = document.getElementById("refund-ifsc").value.trim().toUpperCase();
+
+                if (accName.toLowerCase() !== expectedName.toLowerCase()) {
+                    await showAlert(`Bank Account Holder Name must exactly match your registered order name (${expectedName}).`, "Name Mismatch", "error");
+                    return;
+                }
+                if (!accNum || ifsc.length < 8) {
+                    await showAlert("Please enter valid Bank Account Number and IFSC Code.", "Bank Details Required", "error");
+                    return;
+                }
+                refundDetailsObj.accountHolder = expectedName;
+                refundDetailsObj.accountNumber = accNum;
+                refundDetailsObj.ifscCode = ifsc;
+                refundSummaryText = `${expectedName} | A/C: ${accNum} | IFSC: ${ifsc}`;
+            }
+
+            if (!isNameConfirmed) {
+                await showAlert(`Please tick the confirmation box verifying that this account belongs to ${expectedName}.`, "Confirmation Required", "error");
+                return;
+            }
+
             if (uploadedPhotosList.length < 3) {
                 await showAlert(`Please capture or upload at least 3 photos (Front, Back, Right/Left). Currently uploaded: ${uploadedPhotosList.length}`, "Minimum 3 Photos Required", "error");
                 return;
@@ -531,12 +723,14 @@
                 await db.collection("orders").doc(selectedReturnDocId).update({
                     deliveryStatus: "Return Request Placed",
                     returnReason: reason,
+                    refundDetails: refundDetailsObj,
+                    refundAccountSummary: refundSummaryText,
                     returnImages: uploadedPhotosList,
                     returnImage: uploadedPhotosList[0].image,
                     returnedAt: new Date().toLocaleString()
                 });
                 
-                await showAlert("Your return request and product photos have been successfully registered.", "Return Submitted", "success");
+                await showAlert(`Return registered! Refund will be processed only to ${expectedName}'s account after pickup verification.`, "Return Submitted", "success");
                 closeReturnModal();
                 loadUserOrders();
             } catch (err) {
@@ -547,7 +741,7 @@
             }
         }
 
-        // --- RATING & REVIEW MODAL LOGIC (DIRECTLY INSIDE ORDERS.HTML) ---
+        // --- RATING & REVIEW MODAL LOGIC ---
         let selectedRating = 5;
         let currentReviewOrderId = "";
         let currentReviewProductId = "";
