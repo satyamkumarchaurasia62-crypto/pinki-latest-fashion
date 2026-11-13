@@ -42,7 +42,7 @@
 <body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-stone-900">
 
 <div class="bg-stone-900 text-stone-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide">
-  Free Delivery on orders above ₹999 | Special Coupon Discounts on 3+ Outfits!
+  Free Local Delivery above ₹999 | Pan-India Shipping & Special Coupon Discounts on 3+ Outfits!
 </div>
 
   <!-- Minimalist Sticky Header -->
@@ -98,7 +98,7 @@
       </h1>
       
       <p class="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-        Add single or multiple outfits to your cart, apply your promo code at checkout, and pay via Cash on Delivery or Instant UPI.
+        Add single or multiple outfits to your cart, check delivery charges by your Pincode, apply your promo code, and pay via Cash on Delivery or Instant UPI.
       </p>
     </div>
   </section>
@@ -160,7 +160,7 @@
           <ul class="text-stone-600 text-xs space-y-2">
             <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>100% Ready-to-wear with inner lining</span></li>
             <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Online UPI & Cash on Delivery</span></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Free Delivery above ₹999</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Free Local Delivery above ₹999</span></li>
           </ul>
         </div>
       </div>
@@ -176,8 +176,16 @@
     </div>
   </footer>
 
+  <!-- FULLSCREEN IMAGE PREVIEW MODAL -->
+  <div id="productZoomModal" onclick="closeProductZoom()" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 cursor-zoom-out">
+    <div class="relative max-w-xl w-full flex flex-col items-center">
+      <button onclick="closeProductZoom()" class="self-end mb-2 bg-white text-stone-900 px-3 py-1 rounded-full text-xs font-bold shadow">✕ Close</button>
+      <img id="productZoomImg" src="" alt="Outfit Preview" class="max-h-[82vh] w-auto rounded-2xl border-2 border-white shadow-2xl object-contain bg-white">
+    </div>
+  </div>
+
   <!-- ===================================================================== -->
-  <!-- SHOPPING CART & BILL CHECKOUT MODAL (With Delivery Charge & Coupon)   -->
+  <!-- SHOPPING CART & BILL CHECKOUT MODAL (With Pincode Distance Delivery)  -->
   <!-- ===================================================================== -->
   <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
@@ -201,7 +209,19 @@
       <div id="filled-cart-view" class="space-y-4">
         
         <!-- Cart Items List -->
-        <div id="cart-items-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1"></div>
+        <div id="cart-items-list" class="space-y-2.5 max-h-52 overflow-y-auto pr-1"></div>
+
+        <!-- Delivery Pincode Distance Checker -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3 space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold text-blue-900"><i class="fa-solid fa-truck-fast mr-1"></i> Delivery Pincode (For Distance Charge):</label>
+            <span id="delivery-zone-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">Enter 6-digit Pincode</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="cart-pincode-input" maxlength="6" oninput="renderCartModal()" placeholder="e.g. 201310" class="w-full text-xs font-bold border border-blue-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:border-blue-600">
+          </div>
+          <div id="delivery-free-hint" class="text-[11px] text-blue-800 font-medium"></div>
+        </div>
 
         <!-- Coupon Code Section (Applies to Total Cart Bill) -->
         <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
@@ -222,7 +242,7 @@
             <span id="bill-subtotal" class="font-semibold text-stone-800">₹0</span>
           </div>
           <div class="flex justify-between text-stone-600">
-            <span>Delivery Charges <span class="text-[10px] text-stone-400">(Free above ₹999)</span>:</span>
+            <span>Delivery Charges <span id="bill-zone-label" class="text-[10px] text-stone-500"></span>:</span>
             <span id="bill-delivery" class="font-semibold text-stone-800">₹0</span>
           </div>
           <div id="bill-discount-row" class="hidden flex justify-between text-emerald-700 font-bold">
@@ -349,6 +369,28 @@
         };
       });
     };
+
+    // Switch product card image when thumbnail is clicked
+    function switchCardPhoto(productId, imgUrl, btnElem) {
+      const mainImg = document.getElementById(`main-img-${productId}`);
+      if (mainImg) mainImg.src = imgUrl;
+      const parent = btnElem.parentElement;
+      if (parent) {
+        Array.from(parent.children).forEach(b => b.classList.remove("ring-2", "ring-pink-600"));
+        btnElem.classList.add("ring-2", "ring-pink-600");
+      }
+    }
+
+    function openProductZoom(productId) {
+      const mainImg = document.getElementById(`main-img-${productId}`);
+      if (!mainImg) return;
+      document.getElementById("productZoomImg").src = mainImg.src;
+      document.getElementById("productZoomModal").classList.remove("hidden");
+    }
+
+    function closeProductZoom() {
+      document.getElementById("productZoomModal").classList.add("hidden");
+    }
   </script>
 
   <!-- Core Product Catalog -->
@@ -360,7 +402,10 @@
         const user = JSON.parse(loggedInUser);
         document.getElementById("home-user-text").innerText = "Hi, " + user.name;
         document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase();
-        document.getElementById("home-user-logo").style.background = "#10b981"; 
+        document.getElementById("home-user-logo").style.background = "#10b981";
+        if (user.pincode) {
+          document.getElementById("cart-pincode-input").value = user.pincode;
+        }
       }
       const ordersBtn = document.getElementById("my-orders-btn");
       if (ordersBtn) ordersBtn.classList.remove("hidden");
@@ -378,12 +423,25 @@
             discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
           }
 
+          // Multiple Photos Thumbnails
+          const allPhotos = (Array.isArray(product.images) && product.images.length > 0) ? product.images : [product.image];
+          const thumbsHtml = allPhotos.length > 1 ? `
+            <div class="absolute bottom-2 inset-x-2 flex justify-center gap-1.5 z-10">
+              ${allPhotos.map((url, idx) => `
+                <button type="button" onclick="event.stopPropagation(); switchCardPhoto(${product.id}, '${url}', this)" class="w-8 h-9 rounded-md overflow-hidden border border-white bg-white shadow ${idx === 0 ? 'ring-2 ring-pink-600' : 'opacity-85 hover:opacity-100'}">
+                  <img src="${url}" class="w-full h-full object-cover">
+                </button>
+              `).join('')}
+            </div>
+          ` : '';
+
           const productCard = `
             <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
               <div>
-                <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
-                  <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
+                <div onclick="openProductZoom(${product.id})" class="relative pt-[125%] bg-stone-50 overflow-hidden cursor-zoom-in group">
+                  <img id="main-img-${product.id}" src="${allPhotos[0]}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-300">
                   ${discountPercent > 0 ? `<span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">${discountPercent}% OFF</span>` : ''}
+                  ${thumbsHtml}
                 </div>
                 <div class="p-4">
                   <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
@@ -454,13 +512,58 @@
     window.db = firebase.firestore();
 
     // =========================================================================
-    // SHOPPING CART STATE & DELIVERY RULES
+    // DISTANCE-BASED DELIVERY CHARGE CALCULATOR (Origin: Greater Noida 201310)
     // =========================================================================
-    const FREE_DELIVERY_MIN_AMOUNT = 999; // ₹999 या उससे ऊपर Free Delivery
-    const STANDARD_DELIVERY_CHARGE = 60;  // ₹999 से कम पर ₹60 Delivery Charge
+    function calculateDeliveryByPincode(pincodeRaw, subtotal) {
+      const pin = (pincodeRaw || "").replace(/\D/g, "");
+
+      // Default if pincode not entered yet
+      if (pin.length < 3) {
+        return {
+          zoneName: "Standard",
+          fee: subtotal >= 1499 ? 0 : 60,
+          freeLimit: 1499,
+          hint: "Enter 6-digit Pincode for exact distance delivery rate"
+        };
+      }
+
+      const prefix3 = pin.slice(0, 3);
+
+      // Zone 1: Local (Greater Noida, Noida, Ghaziabad - 201xxx)
+      if (prefix3 === "201") {
+        const freeLimit = 999;
+        return {
+          zoneName: "Local (Noida/G.Noida)",
+          fee: subtotal >= freeLimit ? 0 : 40,
+          freeLimit: freeLimit,
+          hint: subtotal >= freeLimit ? "🎉 Free Local Delivery unlocked!" : `Add ₹${freeLimit - subtotal} more for FREE Local Delivery (₹40 fee)`
+        };
+      }
+
+      // Zone 2: Delhi NCR & Nearby UP (110, 121, 122, 202, 203, 250)
+      const ncrPrefixes = ["110", "121", "122", "202", "203", "250"];
+      if (ncrPrefixes.includes(prefix3)) {
+        const freeLimit = 1499;
+        return {
+          zoneName: "Delhi NCR & Nearby",
+          fee: subtotal >= freeLimit ? 0 : 60,
+          freeLimit: freeLimit,
+          hint: subtotal >= freeLimit ? "🎉 Free NCR Delivery unlocked!" : `Add ₹${freeLimit - subtotal} more for FREE NCR Delivery (₹60 fee)`
+        };
+      }
+
+      // Zone 3: Rest of India (Pan-India Long Distance)
+      const freeLimit = 1999;
+      return {
+        zoneName: "Pan-India Shipping",
+        fee: subtotal >= freeLimit ? 0 : 90,
+        freeLimit: freeLimit,
+        hint: subtotal >= freeLimit ? "🎉 Free Pan-India Delivery unlocked!" : `Add ₹${freeLimit - subtotal} more for FREE Pan-India Delivery (₹90 fee)`
+      };
+    }
 
     let shoppingCart = JSON.parse(localStorage.getItem("pinki_fashion_cart") || "[]");
-    let activeCartCoupon = null; // { code, discount, minQty }
+    let activeCartCoupon = null;
 
     function saveCartToStorage() {
       localStorage.setItem("pinki_fashion_cart", JSON.stringify(shoppingCart));
@@ -489,12 +592,10 @@
         return;
       }
 
-      // Check existing qty of same product + size in cart
       const existingIndex = shoppingCart.findIndex(c => c.productId === item.id && c.size === selectedSize);
       const alreadyInCartQty = existingIndex > -1 ? shoppingCart[existingIndex].quantity : 0;
       const totalRequestedQty = alreadyInCartQty + addQty;
 
-      // Live Stock Validation
       const avail = window.liveRemainingStock?.[String(item.id)]?.[selectedSize];
       if (avail !== undefined && avail <= 0) {
         await showAlert(`Sorry, Size ${selectedSize} is currently Out of Stock!`, "Out of Stock", "error");
@@ -551,6 +652,14 @@
     }
 
     function openCartModal() {
+      const pinInput = document.getElementById("cart-pincode-input");
+      if (pinInput && !pinInput.value) {
+        const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+        if (loggedInRaw) {
+          const u = JSON.parse(loggedInRaw);
+          if (u.pincode) pinInput.value = u.pincode;
+        }
+      }
       renderCartModal();
       document.getElementById("cartModal").classList.remove("hidden");
     }
@@ -559,7 +668,7 @@
       document.getElementById("cartModal").classList.add("hidden");
     }
 
-    // 3. Render Cart Items & Calculate Subtotal + Delivery + Coupon
+    // 3. Render Cart Items & Calculate Subtotal + Distance Delivery + Coupon
     function renderCartModal() {
       const emptyView = document.getElementById("empty-cart-view");
       const filledView = document.getElementById("filled-cart-view");
@@ -604,10 +713,16 @@
         `;
       });
 
-      // Delivery Charge Logic
-      const deliveryCharge = (subtotal >= FREE_DELIVERY_MIN_AMOUNT) ? 0 : STANDARD_DELIVERY_CHARGE;
+      // Distance Delivery Charge Calculation
+      const enteredPin = document.getElementById("cart-pincode-input")?.value || "";
+      const deliveryInfo = calculateDeliveryByPincode(enteredPin, subtotal);
+      const deliveryCharge = deliveryInfo.fee;
 
-      // Check if applied coupon still meets minimum total cart quantity
+      document.getElementById("delivery-zone-badge").innerText = deliveryInfo.zoneName;
+      document.getElementById("delivery-free-hint").innerText = deliveryInfo.hint;
+      document.getElementById("bill-zone-label").innerText = `(${deliveryInfo.zoneName})`;
+
+      // Coupon Check
       let discountAmount = 0;
       const discountRow = document.getElementById("bill-discount-row");
       const msgEl = document.getElementById("cart-coupon-msg");
@@ -705,10 +820,16 @@
       }
 
       const user = JSON.parse(loggedInRaw);
+      const enteredPin = (document.getElementById("cart-pincode-input")?.value || user.pincode || "").trim();
+      if (enteredPin.length < 6) {
+        await showAlert("Please enter a valid 6-digit Delivery Pincode to calculate delivery charges.", "Pincode Required", "error");
+        document.getElementById("cart-pincode-input")?.focus();
+        return;
+      }
+
       const payElem = document.querySelector('input[name="cart-payment-mode"]:checked');
       const paymentMethod = payElem ? payElem.value : "COD";
 
-      // Re-verify stock for every item in cart
       let subtotal = 0;
       let totalQty = 0;
       for (const cItem of shoppingCart) {
@@ -721,7 +842,8 @@
         totalQty += cItem.quantity;
       }
 
-      const deliveryCharge = (subtotal >= FREE_DELIVERY_MIN_AMOUNT) ? 0 : STANDARD_DELIVERY_CHARGE;
+      const deliveryInfo = calculateDeliveryByPincode(enteredPin, subtotal);
+      const deliveryCharge = deliveryInfo.fee;
       let discountAmount = 0;
       let appliedCode = "";
 
@@ -744,7 +866,7 @@
       const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);
       const summaryLines = shoppingCart.map(i => `• ${i.title} (${i.size}) x${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
 
-      const confirmMsg = `${summaryLines}\n\nSubtotal: ₹${subtotal}\nDelivery: ${deliveryCharge === 0 ? 'FREE' : '₹' + deliveryCharge}${discountAmount > 0 ? `\nCoupon (${appliedCode}): -₹${discountAmount}` : ''}\nGrand Total Payable: ₹${grandTotal}\nPayment Mode: ${paymentMethod}\n\nConfirm this order?`;
+      const confirmMsg = `${summaryLines}\n\nSubtotal: ₹${subtotal}\nDelivery (${deliveryInfo.zoneName} - ${enteredPin}): ${deliveryCharge === 0 ? 'FREE' : '₹' + deliveryCharge}${discountAmount > 0 ? `\nCoupon (${appliedCode}): -₹${discountAmount}` : ''}\nGrand Total Payable: ₹${grandTotal}\nPayment Mode: ${paymentMethod}\n\nConfirm this order?`;
 
       const isConfirmed = await showConfirm(confirmMsg, "Confirm Cart Checkout");
       if (!isConfirmed) return;
@@ -756,13 +878,11 @@
       const batchOrderGroup = "GRP-" + Math.floor(100000 + Math.random() * 900000);
 
       try {
-        // Save each item in Firestore 'orders' so individual Return & Rating works smoothly in orders.html
         for (let i = 0; i < shoppingCart.length; i++) {
           const cItem = shoppingCart[i];
           const singleOrderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
           const itemAmount = cItem.price * cItem.quantity;
 
-          // Distribute delivery & discount proportionally or record on first item
           const isFirst = (i === 0);
           const netItemPayable = isFirst ? Math.max(0, itemAmount + deliveryCharge - discountAmount) : itemAmount;
 
@@ -771,10 +891,12 @@
             groupOrderId: batchOrderGroup,
             productId: cItem.productId,
             productName: cItem.title,
+            productImage: cItem.image || "",
             size: cItem.size,
             quantity: cItem.quantity,
             subtotal: itemAmount,
             deliveryCharge: isFirst ? deliveryCharge : 0,
+            deliveryZone: deliveryInfo.zoneName,
             couponUsed: isFirst ? (appliedCode || "None") : (appliedCode ? `Included in ${batchOrderGroup}` : "None"),
             discountGiven: isFirst ? discountAmount : 0,
             totalAmount: netItemPayable,
@@ -785,12 +907,11 @@
             userEmail: (user.email || "").toLowerCase(),
             userName: user.name || "Customer",
             phone: user.phone || "",
-            shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
+            shippingAddress: `${user.address || ""}, ${user.city || ""}, ${enteredPin}`,
             orderDate: new Date().toLocaleString()
           });
         }
 
-        // Expire coupon after one-time use
         if (appliedCode) {
           await db.collection("coupons").doc(appliedCode).update({
             isUsed: true,
@@ -800,7 +921,6 @@
           });
         }
 
-        // Clear cart & update live stock
         shoppingCart = [];
         activeCartCoupon = null;
         saveCartToStorage();
