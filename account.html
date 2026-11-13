@@ -1,348 +1,335 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://gstatic.com"></script>g
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shopping Gateway - Account & Security</title>
-<style>
-body {
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-background-color: #f3f4f6;
-display: flex;
-justify-content: center;
-align-items: center;
-min-height: 100vh;
-margin: 0;
-}
-.auth-container {
-background: #ffffff;
-padding: 35px;
-border-radius: 12px;
-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-width: 100%;
-max-width: 420px;
-box-sizing: border-box;
-}
-h2 { margin: 0 0 10px 0; color: #1f2937; font-size: 24px; }
-.subtitle { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
-.form-group { margin-bottom: 16px; }
-label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #374151; }
-input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
-input:focus, select:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
-.btn-primary { background-color: #2563eb; }
-.btn-primary:hover { background-color: #1d4ed8; }
-.btn-danger { background-color: #ef4444; }
-.btn-danger:hover { background-color: #dc2626; }
-.toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
-.toggle-text a { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
-.toggle-text a:hover { text-decoration: underline; }
-.profile-view { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
-.profile-view p { margin: 8px 0; color: #374151; }
-.forgot-link { display: block; text-align: right; font-size: 12px; color: #2563eb; text-decoration: none; margin-top: 4px; cursor: pointer; }
-</style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://gstatic.com"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Gateway - Account & Security</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .auth-container {
+      background: #ffffff;
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 420px;
+      box-sizing: border-box;
+    }
+    h2 { margin: 0 0 10px 0; color: #1f2937; font-size: 24px; }
+    .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #374151; }
+    input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
+    input:focus, select:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
+    .btn-primary { background-color: #2563eb; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-danger { background-color: #ef4444; }
+    .btn-danger:hover { background-color: #dc2626; }
+    .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
+    .toggle-text a { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
+    .toggle-text a:hover { text-decoration: underline; }
+    .profile-view { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
+    .profile-view p { margin: 8px 0; color: #374151; }
+    .forgot-link { display: block; text-align: right; font-size: 12px; color: #2563eb; text-decoration: none; margin-top: 4px; cursor: pointer; }
+  </style>
 </head>
 <body>
 
-<div class="auth-container">
+  <div class="auth-container">
+    
+    <!-- 1. Login Box -->
+    <div id="login-box">
+      <h2>Sign In</h2>
+      <p class="subtitle">Login with your email and password</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+          <a class="forgot-link" onclick="showBox('forgot')">Forgot Password?</a>
+        </div>
+        <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Login</button>
+      </form>
+      <p class="toggle-text">Don't have an account? <a onclick="showBox('signup')">Sign Up</a></p>
+    </div>
 
-<!-- 1. Login Box -->
-<div id="login-box">
-<h2>Sign In</h2>
-<p class="subtitle">Login with your email and password</p>
-<form id="login-form">
-<div class="form-group">
-<label>Email Address</label>
-<input type="email" id="login-email" placeholder="example@mail.com" required>
-</div>
-<div class="form-group">
-<label>Password</label>
-<input type="password" id="login-password" placeholder="••••••••" required>
-<a class="forgot-link" onclick="showBox('forgot')">Forgot Password? (Forgot your password?)</a>
-</div>
-<button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Login</button>
-</form>
-<p class="toggle-text">Don't have an account? Sign Up <a onclick="showBox('signup')">New Account (Sign Up)</a></p>
-</div>
+    <!-- 2. Registration Box -->
+    <div id="signup-box" style="display: none;">
+      <h2>Create Account</h2>
+      <p class="subtitle">Fill in your details to start shopping.</p>
+      <form id="signup-form">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signup-email" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
+        </div>
+        <div class="form-group">
+          <label>Security Question</label>
+          <select id="signup-question" required>
+            <option value="pet">What was the name of your first pet?</option>
+            <option value="school">What was the name of your first school?</option>
+            <option value="city">What city were you born in?</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Your Answer</label>
+          <input type="text" id="signup-answer" placeholder="Enter your secret answer" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="signup-phone" placeholder="10 digit mobile number" required>
+        </div>
+        <div class="form-group">
+          <label>Full Address</label>
+          <input type="text" id="signup-address" placeholder="House number, street, area" required>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" id="signup-city" placeholder="City name" required>
+        </div>
+        <div class="form-group">
+          <label>Pincode</label>
+          <input type="text" id="signup-pincode" placeholder="Pincode" required>
+        </div>     
+        <button type="submit" class="btn-primary">Register & Create Account</button>
+      </form>
+      <p class="toggle-text">Already have an account? <a onclick="showBox('login')">Sign In</a></p>
+    </div>
 
-<!-- 2. Registration Box -->
-<div id="signup-box" style="display: none;">
-<h2>Create Account</h2>
-<p class="subtitle">Fill in your details to start shopping.</p>
-<form id="signup-form">
-<div class="form-group">
-<label>Full Name</label>
-<input type="text" id="signup-name" placeholder="John Doe" required>
-</div>
-<div class="form-group">
-<label>Email Address</label>
-<input type="email" id="signup-email" placeholder="example@mail.com" required>
-</div>
-<div class="form-group">
-<label>Password</label>
-<input type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
-</div>
-<div class="form-group">
-<label>Security Question</label>
-<select id="signup-question" required>
-<option value="pet">What was the name of your first pet?</option>
-<option value="school">What was the name of your first school?</option>
-<option value="city">What city were you born in?</option>
-</select>
-</div>
-<div class="form-group">
-<label>Your Answer</label>
-<input type="text" id="signup-answer" placeholder="Enter your secret answer" required>
-</div>
-<div class="form-group">
-<label>Phone Number</label>
-<input type="tel" id="signup-phone" placeholder="10 digit mobile number" required>
-</div>
+    <!-- 3. Password Reset Box -->
+    <div id="forgot-box" style="display: none;">
+      <h2>Reset Password</h2>
+      <p class="subtitle">Fill in the details to recover your account.</p>
+      <form id="forgot-form">
+        <div class="form-group">
+          <label>Registered Email Address</label>
+          <input type="email" id="forgot-email" placeholder="Enter your registered email" required>
+        </div>
+        <div class="form-group">
+          <label>Select Your Security Question</label>
+          <select id="forgot-question" required>
+            <option value="pet">What was the name of your first pet?</option>
+            <option value="school">What was the name of your first school?</option>
+            <option value="city">What city were you born in?</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Your Answer</label>
+          <input type="text" id="forgot-answer" placeholder="Type your correct answer" required>
+        </div>
+        <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
+          <label>New Password</label>
+          <input type="password" id="forgot-new-password" placeholder="Set new password" minlength="8" required>
+        </div>
+        <button type="submit" class="btn-primary">Update & Save Password</button>
+      </form>
+      <p class="toggle-text"><a onclick="showBox('login')">← Back to Login</a></p>
+    </div>
 
-<div class="form-group">
-<label>Full Address</label>
-<input type="text" id="signup-address" placeholder="House Number, Street, Area" required>
-</div>
+    <!-- 4. Profile Box -->    
+    <div id="profile-box" style="display: none;">  
+      <h2>Welcome Back!</h2>
+      <p class="subtitle">You are successfully logged into your account.</p>
+      <div class="profile-view">
+        <p><strong>Name:</strong> <span id="user-display-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-display-email"></span></p>
+      </div>
 
-<div class="form-group">
-<label>City</label>
-<input type="text" id="signup-city" placeholder="city name" required>
-</div>
+      <div class="mt-6 flex flex-col sm:flex-row gap-3">
+        <a href="index.html" class="flex-1 text-center py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <i class="fa-solid fa-house mr-2"></i>Home
+        </a>
+        <button onclick="logout()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
+          <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
+        </button>
+      </div>
+    </div>
 
-<div class="form-group">
-<label>Pincode</label>
-<input type="text" id="signup-pincode" placeholder="pincode" required>
-</div>
- <button type="submit" class="btn-primary">Register & Create Account</button>
-</form>
-<p class="toggle-text">Already have an account? <a onclick="showBox('login')">Sign In</a></p>
-</div>
- 
-<!-- 3. Password Reset Box -->
-<div id="forgot-box" style="display: none;">
-<h2>Reset Password</h2>
-<p class="subtitle">Fill in the details to recover your account.</p>
-<form id="forgot-form">
-<div class="form-group">
-<label>Registered Email Address</label>
-<input type="email" id="forgot-email" placeholder="Enter your registered email" required>
-</div>
-<div class="form-group">
-<label>Select Your Security Question</label>
-<select id="forgot-question" required>
-<option value="pet">What was the name of your first pet?</option>
-<option value="school">What was the name of your first school?</option>
-<option value="city">What city were you born in? Was?</option>
-</select>
-</div>
-<div class="form-group">
-<label>Your Answer</label>
-<input type="text" id="forgot-answer" placeholder="Type your correct answer" required>
-</div>
-<div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
-<label>New Password</label>
-<input type="password" id="forgot-new-password" placeholder="Set New Password" minlength="8" required>
-</div>
-<button type="submit" class="btn-primary">Update & Save Password</button>
-</form>
-<p class="toggle-text"><a onclick="showBox('login')"> ← Back to Login Go to:</a></p>
-</div>
+  </div>
 
-<!-- 4. Profile Box -->
-<div id="profile-box" style="display: none;" class="...">
-<h2>Welcome Back!</h2>
-<p class="subtitle">You are successfully logged into your account.</p>
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
+      authDomain: "pinki-latest-fashion.firebaseapp.com",
+      projectId: "pinki-latest-fashion",
+      storageBucket: "pinki-latest-fashion.firebasestorage.app",
+      messagingSenderId: "432889531515",
+      appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
+    };
 
-<div class="profile-view">
-<p><strong>Name:</strong> <span id="user-display-name"></span></p>
-<p><strong>Email:</strong> <span id="user-display-email"></span></p>
-</div>
+    // Initialize Firebase & Firestore
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-<!-- Add 'Go Home' and 'Log Out' buttons here -->
-<div class="mt-6 flex flex-col sm:flex-row gap-3">
-<a href="index.html" class="flex-1 text-center py-2.5 bg-blue-600 text-gray-700 font-semibold rounded-lg hover:bg-blue-700 transition">
-<i class="fa-solid fa-house mr-2"></i>Home
-</a>
-<button onclick="logout()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
-<i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
-</button>
-</div>
-<script>
-// Firebase Configuration
-const firebaseConfig = {
-apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
-authDomain: "pinki-latest-fashion.firebaseapp.com",
-projectId: "pinki-latest-fashion",
-storageBucket: "pinki-latest-fashion.firebasestorage.app",
-messagingSenderId: "432889531515",
-appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
-};
+    function showBox(type) {
+      const loginBox = document.getElementById("login-box");
+      const signupBox = document.getElementById("signup-box");
+      const forgotBox = document.getElementById("forgot-box");
+      const profileBox = document.getElementById("profile-box");
 
-// Initialize Firebase & Firestore
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-// Function to safely change the screen (checks if the element exists)
-function showBox(type) {
-const loginBox = document.getElementById("login-box");
-const signupBox = document.getElementById("signup-box");
-const forgotBox = document.getElementById("forgot-box");
-const profileBox = document.getElementById("profile-box");
+      if (loginBox) loginBox.style.display = (type === 'login') ? 'block' : 'none';
+      if (signupBox) signupBox.style.display = (type === 'signup') ? 'block' : 'none';
+      if (forgotBox) forgotBox.style.display = (type === 'forgot') ? 'block' : 'none';
+      if (profileBox) profileBox.style.display = (type === 'profile') ? 'block' : 'none';
+    }
 
-if (loginBox) loginBox.style.display = (type === 'login') ? 'block' : 'none';
-if (signupBox) signupBox.style.display = (type === 'signup') ? 'block' : 'none';
-if (profileBox) profileBox.style.display = (type === 'profile') ? 'block' : 'none';
-}
+    function loadProfile(user) {
+      showBox('profile');
+      const nameElem = document.getElementById("user-display-name");
+      const emailElem = document.getElementById("user-display-email");
+      if (nameElem) nameElem.innerText = user.name;
+      if (emailElem) emailElem.innerText = user.email;
+    }
 
-function getUsers() {
-const users = sessionStorage.getItem("registeredUsers");
-return users? JSON.parse(users) : {};
-}
+    function logout() {
+      sessionStorage.removeItem("currentLoggedInUser");
+      alert("You have been successfully logged out!");
+      window.location.href = "index.html";
+    }
 
-function loadProfile(user) {
-showBox('profile');
-const nameElem = document.getElementById("user-display-name");
-const emailElem = document.getElementById("user-display-email");
-if (nameElem) nameElem.innerText = user.name;
-if (emailElem) emailElem.innerText = user.email;
-}
-function logout() {
-sessionStorage.removeItem("currentLoggedInUser");
-alert("You have been successfully logged out!");
-window.location.href = "index.html";
-}
+    // 2. Sign Up (Firebase)
+    const signupForm = document.getElementById("signup-form");
+    if (signupForm) {
+      signupForm.addEventListener("submit", function(e) {
+        e.preventDefault();
 
-// 2. Creating a New Account (Sign Up - Firebase)
-const signupForm = document.getElementById("signup-form");
-if (signupForm) {
-signupForm.addEventListener("submit", function(e) {
-e.preventDefault();
+        const name = document.getElementById("signup-name").value.trim();
+        const email = document.getElementById("signup-email").value.trim().toLowerCase();
+        const password = document.getElementById("signup-password").value;
+        const question = document.getElementById("signup-question").value;
+        const answer = document.getElementById("signup-answer").value.trim().toLowerCase();
+        const phone = document.getElementById("signup-phone").value.trim();
+        const address = document.getElementById("signup-address").value.trim();
+        const city = document.getElementById("signup-city").value.trim();
+        const pincode = document.getElementById("signup-pincode").value.trim();
 
-const nameEl = document.getElementById("signup-name");
-const emailEl = document.getElementById("signup-email");
-const passwordEl = document.getElementById("signup-password");
-const questionEl = document.getElementById("signup-question");
-const answerEl = document.getElementById("signup-answer");
-const phoneEl = document.getElementById("signup-phone");
-const addressEl = document.getElementById("signup-address");
-const cityEl = document.getElementById("signup-city");
-const pincodeEl = document.getElementById("signup-pincode");
+        if (!email || !password) {
+          alert("Please fill in email and password!");
+          return;
+        }
 
-const name = nameEl ? nameEl.value.trim() : "";
-const email = emailEl ? emailEl.value.trim().toLowerCase() : "";
-const password = passwordEl ? passwordEl.value : "";
-const question = questionEl ? questionEl.value : "";
-const answer = answerEl ? answerEl.value.trim().toLowerCase() : "";
-const phone = phoneEl ? phoneEl.value.trim() : "";
-const address = addressEl ? addressEl.value.trim() : "";
-const city = cityEl ? cityEl.value.trim() : "";
-const pincode = pincodeEl ? pincodeEl.value.trim() : "";
+        db.collection("users").doc(email).get().then((doc) => {
+          if (doc.exists) {
+            alert("This email address is already registered!");
+          } else {
+            return db.collection("users").doc(email).set({
+              name: name,
+              email: email,
+              password: password,
+              question: question,
+              answer: answer,
+              phone: phone,
+              address: address,
+              city: city,
+              pincode: pincode,
+              orders: [],
+              createdAt: new Date()
+            }).then(() => {
+              alert("Account created successfully! You can now log in.");
+              signupForm.reset();
+              showBox('login');
+            });
+          }
+        }).catch((error) => {
+          alert("Error creating account: " + error.message);
+        });
+      });
+    }
 
-if (!email || !password) {
-alert("Please ensure email and password Fill in!");
-return;
-}
+    // 3. Sign In (Firebase)
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.addEventListener("submit", function(e) {
+        e.preventDefault();
 
-// First check if this email is already in Firebase 
-db.collection("users").doc(email).get().then((doc) => {
-if (doc.exists) {
-alert("This email address is already registered!");
-} else {
-// Save the new user to Firestore
-return db.collection("users").doc(email).set({
-name: name,
-email: email,
-password: password,
-question: question,
-answer: answer,
-phone: phone,
-address: address,
-city: city,
-pincode: pincode,
-orders: [],
-createdAt: new Date()
-}).then(() => {
-alert("Account created successfully! You can now login.");
-signupForm.reset();
-showBox('login');
-});
-}
-}).catch((error) => {
-alert("There was a problem creating the account: " + error.message);
-});
-});
-}
+        const email = document.getElementById("login-email").value.trim().toLowerCase();
+        const password = document.getElementById("login-password").value;
 
-// 3. Logging in (Sign In - Firebase)
-const loginForm = document.getElementById("login-form");
-if (loginForm) {
-loginForm.addEventListener("submit", function(e) {
-e.preventDefault();
+        if (!email || !password) {
+          alert("Please enter email and password!");
+          return;
+        }
 
-const emailInput = document.getElementById("login-email");
-const passwordInput = document.getElementById("login-password");
+        db.collection("users").doc(email).get().then((doc) => {
+          if (doc.exists && doc.data().password === password) {
+            const userData = doc.data();
+            sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+            alert("Login successful!");
+            loadProfile(userData);
+          } else {
+            alert("Incorrect email or password! Please check again.");
+          }
+        }).catch((error) => {
+          alert("Login error: " + error.message);
+        });
+      });
+    }
 
-const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
-const password = passwordInput ? passwordInput.value : "";
+    // 4. Forgot Password (Firebase)
+    const forgotForm = document.getElementById("forgot-form");
+    if (forgotForm) {
+      forgotForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const email = document.getElementById("forgot-email").value.trim().toLowerCase();
+        const question = document.getElementById("forgot-question").value;
+        const answer = document.getElementById("forgot-answer").value.trim().toLowerCase();
+        const newPassword = document.getElementById("forgot-new-password").value;
 
-if (!email || !password) {
-alert("Please enter email and password!");
-return;
-}
-db.collection("users").doc(email).get().then((doc) => {
-if (doc.exists && doc.data().password === password) {
-const userData = doc.data();
-sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
-alert("Login successful!");
-loadProfile(userData);
-} else {
-alert("Incorrect email or password! Please double-check.");
-}
-}).catch((error) => {
-alert("Login occurred: " + error.message);
-});
-});
-} 
-// 4. Forgot Password
-const forgotForm = document.getElementById("forgot-form");
-if (forgotForm) {
-forgottenForm.addEventListener("submit", function(e) {
-e.preventDefault();
-const email = document.getElementById("forgot-email").value.trim().toLowerCase();
-const question = document.getElementById("forgot-question").value;
-const answer = document.getElementById("forgot-answer").value.trim().toLowerCase();
-const newPassword = document.getElementById("forgot-new-password").value;
+        db.collection("users").doc(email).get().then((doc) => {
+          if (!doc.exists) {
+            alert("This email address was not found in the system!");
+            return;
+          }
+          
+          const user = doc.data();
+          if (user.question === question && user.answer === answer) {
+            db.collection("users").doc(email).update({
+              password: newPassword
+            }).then(() => {
+              alert("Password changed successfully! Log in with your new password.");
+              forgotForm.reset();
+              showBox('login');
+            });
+          } else {
+            alert("Security question or answer does not match!");
+          }
+        }).catch((error) => {
+          alert("Error: " + error.message);
+        });
+      });
+    }
 
-const users = getUsers();
-const user = users[email];
-
-if (!user) {
-alert("This email address was not found in the system!");
-return;
-}
-if (user.question === question && user.answer === answer) {
-user.password = newPassword;
-users[email] = users;
-sessionStorage.setItem("registeredUsers", JSON.stringify(users));
-alert("Password changed successfully! Log in now with the new password.");
-forgottenForm.reset();
-showBox('login');
-} else {
-alert("The security question or answer does not match!");
-} 
-}) ;
-}
-// When the page is loaded, check whether the user is logged in or not.
-const savedUser = sessionStorage.getItem("currentLoggedInUser");
-if (savedUser) {
-const userData = JSON.parse(savedUser);
-loadProfile(userData);
-}
-
-</script>
+    // Check login state on page load
+    const savedUser = sessionStorage.getItem("currentLoggedInUser");
+    if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        loadProfile(userData);
+    }
+  </script>
 </body>
 </html>
