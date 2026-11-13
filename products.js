@@ -1,8 +1,9 @@
-// product.js - Pinki Latest Fashion Products Catalog & Live Stock Engine
+// product.js - Pinki Latest Fashion Products Catalog, Live Stock & Auto Discount
 const PRODUCTS = [
   {
     id: 1,
     title: "Royal Pink Anarkali Kurti",
+    mrp: 1999,
     price: 1299,
     image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80",
     sizes: ["S", "M", "L", "XL"],
@@ -11,6 +12,7 @@ const PRODUCTS = [
   {
     id: 2,
     title: "Designer Ethnic Party Gown",
+    mrp: 2799,
     price: 1899,
     image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&auto=format&fit=crop&q=80",
     sizes: ["M", "L", "XL", "XXL"],
@@ -19,6 +21,7 @@ const PRODUCTS = [
   {
     id: 3,
     title: "Floral Printed Cotton Suit Set",
+    mrp: 1599,
     price: 999,
     image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&auto=format&fit=crop&q=80",
     sizes: ["S", "M", "L"],
@@ -27,6 +30,7 @@ const PRODUCTS = [
   {
     id: 4,
     title: "Traditional Silk Festive Kurta",
+    mrp: 2199,
     price: 1499,
     image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80",
     sizes: ["M", "L", "XL"],
@@ -46,7 +50,6 @@ async function syncProductsAndLiveStock() {
     const database = window.db || firebase.firestore();
     const ordersSnap = await database.collection("orders").get();
 
-    // Firebase se sabhi active (non-cancelled) orders ginein
     const soldCount = {};
     ordersSnap.forEach(doc => {
       const ord = doc.data();
@@ -60,7 +63,6 @@ async function syncProductsAndLiveStock() {
       }
     });
 
-    // Har product aur size ka bacha hua asli stock nikaalein
     PRODUCTS.forEach(product => {
       const pid = String(product.id);
       const stockObj = product.stock || {};
