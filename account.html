@@ -2,49 +2,56 @@
 <html lang="en">
 <head>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://gstatic.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Gateway - Account & Security</title>
+  <title>Pinki Latest Fashion - Account & Security</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f3f4f6;
+      background-color: #fcfaf9;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 16px;
     }
     .auth-container {
       background: #ffffff;
       padding: 35px;
-      border-radius: 12px;
+      border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e7e5e4;
       width: 100%;
       max-width: 420px;
       box-sizing: border-box;
     }
-    h2 { margin: 0 0 10px 0; color: #1f2937; font-size: 24px; }
+    h2 { margin: 0 0 10px 0; color: #1f2937; font-size: 24px; font-weight: 700; }
     .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
     .form-group { margin-bottom: 16px; }
     label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #374151; }
-    input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
-    input:focus, select:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-    button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
-    .btn-primary { background-color: #2563eb; }
-    .btn-primary:hover { background-color: #1d4ed8; }
+    input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
+    input:focus, select:focus { outline: none; border-color: #db2777; background: #fff; box-shadow: 0 0 0 3px rgba(219,39,119,0.15); }
+    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
+    .btn-primary { background-color: #db2777; }
+    .btn-primary:hover { background-color: #be185d; }
     .btn-danger { background-color: #ef4444; }
     .btn-danger:hover { background-color: #dc2626; }
     .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
-    .toggle-text a { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
+    .toggle-text a { color: #db2777; text-decoration: none; font-weight: 600; cursor: pointer; }
     .toggle-text a:hover { text-decoration: underline; }
-    .profile-view { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
-    .profile-view p { margin: 8px 0; color: #374151; }
-    .forgot-link { display: block; text-align: right; font-size: 12px; color: #2563eb; text-decoration: none; margin-top: 4px; cursor: pointer; }
+    .profile-view { background: #f9fafb; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
+    .profile-view p { margin: 8px 0; color: #374151; font-size: 14px; }
+    .forgot-link { display: block; text-align: right; font-size: 12px; color: #db2777; text-decoration: none; margin-top: 4px; cursor: pointer; }
+    @keyframes popScale {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -65,7 +72,7 @@
           <input type="password" id="login-password" placeholder="••••••••" required>
           <a class="forgot-link" onclick="showBox('forgot')">Forgot Password?</a>
         </div>
-        <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Login</button>
+        <button type="submit" class="w-full py-3 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition">Login</button>
       </form>
       <p class="toggle-text">Don't have an account? <a onclick="showBox('signup')">Sign Up</a></p>
     </div>
@@ -77,7 +84,7 @@
       <form id="signup-form">
         <div class="form-group">
           <label>Full Name</label>
-          <input type="text" id="signup-name" placeholder="John Doe" required>
+          <input type="text" id="signup-name" placeholder="Anjali Sharma" required>
         </div>
         <div class="form-group">
           <label>Email Address</label>
@@ -157,13 +164,14 @@
       <div class="profile-view">
         <p><strong>Name:</strong> <span id="user-display-name"></span></p>
         <p><strong>Email:</strong> <span id="user-display-email"></span></p>
+        <p><strong>Address:</strong> <span id="user-display-address"></span></p>
       </div>
 
       <div class="mt-6 flex flex-col sm:flex-row gap-3">
-        <a href="index.html" class="flex-1 text-center py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+        <a href="index.html" class="flex-1 text-center py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition flex items-center justify-center" style="margin-top: 10px;">
           <i class="fa-solid fa-house mr-2"></i>Home
         </a>
-        <button onclick="logout()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
+        <button onclick="logout()" class="flex-1 py-2.5 bg-stone-800 text-white font-semibold rounded-lg hover:bg-stone-900 transition">
           <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
         </button>
       </div>
@@ -171,7 +179,54 @@
 
   </div>
 
+  <!-- Custom Smooth White Alert & Confirm Modal -->
+  <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px; transition:opacity 0.2s ease;">
+    <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
+      
+      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
+        !
+      </div>
+
+      <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
+      <p id="customPopupMessage" style="margin:0 0 20px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
+
+      <div id="customPopupButtons" style="display:flex; gap:10px; justify-content:center;">
+        <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; margin-top:0;">Cancel</button>
+        <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25); margin-top:0;">OK</button>
+      </div>
+
+    </div>
+  </div>
+
   <script>
+    // Custom Alert Function
+    window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("customPopupOverlay");
+        const icon = document.getElementById("customPopupIcon");
+        document.getElementById("customPopupTitle").innerText = title;
+        document.getElementById("customPopupMessage").innerText = message;
+        
+        if (type === "error") {
+          icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
+        } else if (type === "success") {
+          icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
+        } else {
+          icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
+        }
+
+        document.getElementById("customPopupCancelBtn").style.display = "none";
+        const okBtn = document.getElementById("customPopupOkBtn");
+        okBtn.innerText = "OK";
+        overlay.style.display = "flex";
+
+        okBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(true);
+        };
+      });
+    };
+
     // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
@@ -183,7 +238,9 @@
     };
 
     // Initialize Firebase & Firestore
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     function showBox(type) {
@@ -202,20 +259,22 @@
       showBox('profile');
       const nameElem = document.getElementById("user-display-name");
       const emailElem = document.getElementById("user-display-email");
+      const addrElem = document.getElementById("user-display-address");
       if (nameElem) nameElem.innerText = user.name;
       if (emailElem) emailElem.innerText = user.email;
+      if (addrElem) addrElem.innerText = `${user.address || ''}, ${user.city || ''} - ${user.pincode || ''}`;
     }
 
-    function logout() {
+    async function logout() {
       sessionStorage.removeItem("currentLoggedInUser");
-      alert("You have been successfully logged out!");
+      await showAlert("You have been successfully logged out!", "Logged Out", "success");
       window.location.href = "index.html";
     }
 
     // 2. Sign Up (Firebase)
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
-      signupForm.addEventListener("submit", function(e) {
+      signupForm.addEventListener("submit", async function(e) {
         e.preventDefault();
 
         const name = document.getElementById("signup-name").value.trim();
@@ -229,15 +288,16 @@
         const pincode = document.getElementById("signup-pincode").value.trim();
 
         if (!email || !password) {
-          alert("Please fill in email and password!");
+          await showAlert("Please fill in email and password!", "Missing Fields", "error");
           return;
         }
 
-        db.collection("users").doc(email).get().then((doc) => {
+        try {
+          const doc = await db.collection("users").doc(email).get();
           if (doc.exists) {
-            alert("This email address is already registered!");
+            await showAlert("This email address is already registered!", "Already Registered", "error");
           } else {
-            return db.collection("users").doc(email).set({
+            await db.collection("users").doc(email).set({
               name: name,
               email: email,
               password: password,
@@ -249,78 +309,78 @@
               pincode: pincode,
               orders: [],
               createdAt: new Date()
-            }).then(() => {
-              alert("Account created successfully! You can now log in.");
-              signupForm.reset();
-              showBox('login');
             });
+            await showAlert("Account created successfully! You can now log in.", "Welcome!", "success");
+            signupForm.reset();
+            showBox('login');
           }
-        }).catch((error) => {
-          alert("Error creating account: " + error.message);
-        });
+        } catch (error) {
+          await showAlert("Error creating account: " + error.message, "Error", "error");
+        }
       });
     }
 
     // 3. Sign In (Firebase)
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
-      loginForm.addEventListener("submit", function(e) {
+      loginForm.addEventListener("submit", async function(e) {
         e.preventDefault();
 
         const email = document.getElementById("login-email").value.trim().toLowerCase();
         const password = document.getElementById("login-password").value;
 
         if (!email || !password) {
-          alert("Please enter email and password!");
+          await showAlert("Please enter email and password!", "Missing Fields", "error");
           return;
         }
 
-        db.collection("users").doc(email).get().then((doc) => {
+        try {
+          const doc = await db.collection("users").doc(email).get();
           if (doc.exists && doc.data().password === password) {
             const userData = doc.data();
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
-            alert("Login successful!");
+            await showAlert("Login successful!", "Welcome Back", "success");
             loadProfile(userData);
           } else {
-            alert("Incorrect email or password! Please check again.");
+            await showAlert("Incorrect email or password! Please check again.", "Login Failed", "error");
           }
-        }).catch((error) => {
-          alert("Login error: " + error.message);
-        });
+        } catch (error) {
+          await showAlert("Login error: " + error.message, "Error", "error");
+        }
       });
     }
 
     // 4. Forgot Password (Firebase)
     const forgotForm = document.getElementById("forgot-form");
     if (forgotForm) {
-      forgotForm.addEventListener("submit", function(e) {
+      forgotForm.addEventListener("submit", async function(e) {
         e.preventDefault();
         const email = document.getElementById("forgot-email").value.trim().toLowerCase();
         const question = document.getElementById("forgot-question").value;
         const answer = document.getElementById("forgot-answer").value.trim().toLowerCase();
         const newPassword = document.getElementById("forgot-new-password").value;
 
-        db.collection("users").doc(email).get().then((doc) => {
+        try {
+          const doc = await db.collection("users").doc(email).get();
           if (!doc.exists) {
-            alert("This email address was not found in the system!");
+            await showAlert("This email address was not found in the system!", "Not Found", "error");
             return;
           }
           
           const user = doc.data();
           if (user.question === question && user.answer === answer) {
-            db.collection("users").doc(email).update({
+            await db.collection("users").doc(email).update({
               password: newPassword
-            }).then(() => {
-              alert("Password changed successfully! Log in with your new password.");
-              forgotForm.reset();
-              showBox('login');
             });
+            await showAlert("Password changed successfully! Log in with your new password.", "Password Updated", "success");
+            forgotForm.reset();
+            showBox('login');
           } else {
-            alert("Security question or answer does not match!");
+            await showAlert("Security question or answer does not match!", "Verification Failed", "error");
           }
-        }).catch((error) => {
-          alert("Error: " + error.message);
-        });
+        } catch (error) {
+          await showAlert("Error: " + error.message, "Error", "error");
+        }
       });
     }
 
