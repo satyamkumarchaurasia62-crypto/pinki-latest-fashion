@@ -47,7 +47,7 @@
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 1. Return Modal (Reason + Strict Same-Name Refund UPI/Bank + Minimum 3 Photos) -->
+    <!-- 1. Return Modal (Reason + Strict Same-Name Refund UPI/Bank with Bank Name + Minimum 3 Photos) -->
     <div id="return-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
@@ -97,11 +97,17 @@
                         </div>
                     </div>
 
-                    <!-- Bank Account Input Fields -->
+                    <!-- Bank Account Input Fields (Includes Bank Name) -->
                     <div id="refund-bank-box" class="hidden space-y-2 text-xs">
-                        <div>
-                            <label class="block font-semibold text-stone-700 mb-0.5">Account Holder Name (Must Match Order Name) *</label>
-                            <input type="text" id="refund-acc-name" readonly class="w-full border border-stone-200 rounded-lg px-3 py-2 bg-stone-100 text-stone-800 font-bold cursor-not-allowed">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">Account Holder Name (Locked) *</label>
+                                <input type="text" id="refund-acc-name" readonly class="w-full border border-stone-200 rounded-lg px-3 py-2 bg-stone-100 text-stone-800 font-bold cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">Bank Name *</label>
+                                <input type="text" id="refund-bank-name" placeholder="e.g., State Bank of India, HDFC" class="w-full border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-emerald-600">
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
@@ -613,7 +619,7 @@
             }
         }
 
-        // --- RETURN MODAL LOGIC WITH STRICT NAME MATCH ---
+        // --- RETURN MODAL LOGIC WITH STRICT NAME MATCH & BANK NAME ---
         function openReturnModal(docId) {
             selectedReturnDocId = docId;
             const orderObj = loadedOrdersMap[docId] || {};
@@ -623,11 +629,11 @@
             window.returnPhotos = { front: "", back: "", right: "", left: "" };
             document.getElementById("return-reason").value = "";
             document.getElementById("refund-upi-id").value = "";
+            document.getElementById("refund-bank-name").value = "";
             document.getElementById("refund-acc-number").value = "";
             document.getElementById("refund-ifsc").value = "";
             document.getElementById("refund-name-confirm").checked = false;
 
-            // Lock Account Holder Name strictly to the Order's Registered Name
             document.getElementById("required-holder-name-badge").innerText = registeredName || "your registered name";
             document.getElementById("confirm-holder-text").innerText = registeredName || "me";
             document.getElementById("refund-upi-holder").value = registeredName;
@@ -689,6 +695,7 @@
                 refundSummaryText = `UPI: ${upiId} (Holder: ${expectedName})`;
             } else {
                 const accName = document.getElementById("refund-acc-name").value.trim();
+                const bankName = document.getElementById("refund-bank-name").value.trim();
                 const accNum = document.getElementById("refund-acc-number").value.trim();
                 const ifsc = document.getElementById("refund-ifsc").value.trim().toUpperCase();
 
@@ -696,14 +703,20 @@
                     await showAlert(`Bank Account Holder Name must exactly match your registered order name (${expectedName}).`, "Name Mismatch", "error");
                     return;
                 }
+                if (!bankName || bankName.length < 2) {
+                    await showAlert("Please enter your Bank Name (e.g., State Bank of India, HDFC Bank).", "Bank Name Required", "error");
+                    document.getElementById("refund-bank-name").focus();
+                    return;
+                }
                 if (!accNum || ifsc.length < 8) {
                     await showAlert("Please enter valid Bank Account Number and IFSC Code.", "Bank Details Required", "error");
                     return;
                 }
                 refundDetailsObj.accountHolder = expectedName;
+                refundDetailsObj.bankName = bankName;
                 refundDetailsObj.accountNumber = accNum;
                 refundDetailsObj.ifscCode = ifsc;
-                refundSummaryText = `${expectedName} | A/C: ${accNum} | IFSC: ${ifsc}`;
+                refundSummaryText = `${expectedName} | ${bankName} | A/C: ${accNum} | IFSC: ${ifsc}`;
             }
 
             if (!isNameConfirmed) {
