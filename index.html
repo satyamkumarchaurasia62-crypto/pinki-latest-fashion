@@ -670,7 +670,7 @@
           return;
         }
 
-        const minRequiredQty = Number(cData.minQty) || 3;
+        const minRequiredQty = Number(cData.minQty ?? cData.min_order_quantity ?? 3);
         if (totalCartQty < minRequiredQty) {
           msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Add at least ${minRequiredQty} outfits in cart to apply this coupon! (Currently: ${totalCartQty})</span>`;
           activeCartCoupon = null;
