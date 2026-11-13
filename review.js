@@ -1,4 +1,4 @@
-// reviews.js - Public Ratings & Multiple Photos System
+// review.js - Public Ratings & Multi-Angle Camera Photos System
 
 let selectedRating = 5;
 let currentReviewOrderId = "";
@@ -11,8 +11,20 @@ function openRatingModal(orderId, productId) {
   selectedRating = 5;
   updateStarsUI(5);
   document.getElementById("reviewComment").value = "";
-  document.getElementById("reviewPhotosInput").value = "";
-  document.getElementById("reviewPhotoPreview").innerHTML = "";
+
+  // Sabhi 4 angle photo slots reset karein
+  window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
+  ['front', 'back', 'right', 'left'].forEach(angle => {
+    const img = document.getElementById(`review-preview-${angle}`);
+    if (img) {
+      img.src = "";
+      img.classList.add("hidden");
+    }
+  });
+  if (typeof updateAnglePhotoCount === "function") {
+    updateAnglePhotoCount("review", 2);
+  }
+
   document.getElementById("ratingModal").style.display = "flex";
 }
 
@@ -33,51 +45,14 @@ function updateStarsUI(star) {
   });
 }
 
-// 3. Multiple Photos ko compress karke preview dikhana (Max 3 photos)
-function previewReviewPhotos(event) {
-  const files = Array.from(event.target.files).slice(0, 3);
-  const previewDiv = document.getElementById("reviewPhotoPreview");
-  previewDiv.innerHTML = "";
-
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = document.createElement("img");
-      img.src = e.target.result;
-      img.style = "width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #ddd;";
-      previewDiv.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// Helper: Photo ko chhota (compress) karna taaki Firebase fast chale
-function compressImage(file) {
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = event => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const maxWidth = 500;
-        const scale = img.width > maxWidth ? (maxWidth / img.width) : 1;
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.6)); // 60% quality JPEG
-      };
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// 4. Review ko Firebase mein save karna
+// 3. Review ko Firebase mein save karna (Minimum 2 Photos Compulsory)
 async function submitReview() {
   const comment = document.getElementById("reviewComment").value.trim();
-  const files = Array.from(document.getElementById("reviewPhotosInput").files).slice(0, 3);
   const submitBtn = document.getElementById("submitReviewBtn");
+
+  // Front, Back, Right, Left se upload ki gayi photos nikaalein
+  const anglePhotosObj = window.reviewAnglePhotos || {};
+  const photoBase64List = Object.values(anglePhotosObj).filter(val => val !== "");
 
   if (!comment) {
     if (typeof showAlert === "function") {
@@ -86,18 +61,17 @@ async function submitReview() {
     return;
   }
 
+  if (photoBase64List.length < 2) {
+    if (typeof showAlert === "function") {
+      await showAlert(`Please capture or upload at least 2 photos (Front, Back, Right/Left). Currently uploaded: ${photoBase64List.length}`, "Minimum 2 Photos Required", "error");
+    }
+    return;
+  }
+
   submitBtn.disabled = true;
   submitBtn.innerText = "Submitting...";
 
   try {
-    // Photos ko compress karke array banayein
-    const photoBase64List = [];
-    for (const file of files) {
-      const compressed = await compressImage(file);
-      photoBase64List.push(compressed);
-    }
-
-    // Privacy ke liye buyer ka sirf pehla naam (First Name) sessionStorage se lein
     let firstName = "Verified Buyer";
     const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
     if (loggedInRaw) {
@@ -109,7 +83,6 @@ async function submitReview() {
 
     const database = window.db || firebase.firestore();
 
-    // Firestore ke 'reviews' collection mein save karein
     await database.collection("reviews").add({
       productId: String(currentReviewProductId),
       orderId: currentReviewOrderId,
@@ -120,14 +93,13 @@ async function submitReview() {
       createdAt: new Date().toISOString()
     });
 
-    // Order document ko update karein taaki dubara rate na ho sake
     await database.collection("orders").doc(currentReviewOrderId).update({
       isRated: true
     });
 
     closeRatingModal();
     if (typeof showAlert === "function") {
-      await showAlert("Thank you! Your review and rating have been published.", "Review Submitted", "success");
+      await showAlert("Thank you! Your review and photos have been published.", "Review Submitted", "success");
     }
     if (typeof loadUserOrders === "function") {
       loadUserOrders();
@@ -142,7 +114,7 @@ async function submitReview() {
   }
 }
 
-// 5. Home Page (index.html) par har product ki Public Star Rating dikhana
+// 4. Home Page (index.html) par har product ki Public Star Rating dikhana
 window.allPublicReviewsCache = {};
 
 async function loadPublicReviews() {
@@ -187,7 +159,7 @@ async function loadPublicReviews() {
   }
 }
 
-// 6. Product par click karne par sabhi customer reviews & photos ka pop-up kholna
+// 5. Product par click karne par sabhi customer reviews & photos ka pop-up kholna
 function openPublicReviewsModal(productId) {
   const modal = document.getElementById("viewReviewsModal");
   const listDiv = document.getElementById("publicReviewsList");
@@ -199,7 +171,6 @@ function openPublicReviewsModal(productId) {
   if (reviews.length === 0) {
     listDiv.innerHTML = `<p style="padding:16px 0; text-align:center; color:#78716c; font-size:13px;">No reviews available for this outfit yet.</p>`;
   } else {
-    // Naye reviews upar dikhane ke liye sort karein
     reviews.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     reviews.forEach(rev => {
