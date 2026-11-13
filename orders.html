@@ -350,6 +350,42 @@
             });
         }
 
+        // 7-Day Return Window Calculator (Parses DD/MM/YYYY or standard JS date strings)
+        function parseFlexibleDate(dateStr) {
+            if (!dateStr) return null;
+            if (typeof dateStr === "object" && typeof dateStr.toDate === "function") {
+                return dateStr.toDate();
+            }
+            const cleanStr = String(dateStr).trim();
+            // Handle Indian format DD/MM/YYYY, HH:MM:SS
+            const dmyMatch = cleanStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (dmyMatch) {
+                const day = parseInt(dmyMatch[1], 10);
+                const month = parseInt(dmyMatch[2], 10) - 1;
+                const year = parseInt(dmyMatch[3], 10);
+                const parsed = new Date(year, month, day);
+                if (!isNaN(parsed.getTime())) return parsed;
+            }
+            const fallback = new Date(cleanStr);
+            return isNaN(fallback.getTime()) ? null : fallback;
+        }
+
+        function getReturnWindowStatus(order) {
+            const refDateStr = order.deliveredAt || order.updatedAt || order.orderDate;
+            const refDate = parseFlexibleDate(refDateStr);
+            if (!refDate) {
+                return { isExpired: false, daysLeft: 7 };
+            }
+            const now = new Date();
+            const msInDay = 24 * 60 * 60 * 1000;
+            const daysPassed = Math.floor((now.getTime() - refDate.getTime()) / msInDay);
+            const daysLeft = 7 - daysPassed;
+            return {
+                isExpired: daysPassed >= 7,
+                daysLeft: Math.max(0, daysLeft)
+            };
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
             authDomain: "pinki-latest-fashion.firebaseapp.com",
@@ -496,6 +532,7 @@
                         order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज"
                     );
                     const isDelivered = statusRaw === "delivered";
+                    const returnWindow = getReturnWindowStatus(order);
 
                     let trackingBoxHTML = "";
                     if (order.trackingId || order.courierName || order.expectedDelivery) {
@@ -556,10 +593,18 @@
                             actionButtonsHTML += `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-center">✓ Rated</span>`;
                         }
                         if (!isReturnRejected) {
-                            actionButtonsHTML += `
-                                <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
-                                    <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
-                                </button>`;
+                            if (!returnWindow.isExpired) {
+                                actionButtonsHTML += `
+                                    <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
+                                        <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
+                                    </button>
+                                    <span class="text-[11px] text-stone-500 text-center font-medium">Return valid for ${returnWindow.daysLeft} more day(s)</span>`;
+                            } else {
+                                actionButtonsHTML += `
+                                    <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-stone-100 text-stone-500 text-center border border-stone-200">
+                                        Return Window Closed (7 Days)
+                                    </span>`;
+                            }
                         }
                     } else {
                         actionButtonsHTML = `
@@ -619,10 +664,17 @@
             }
         }
 
-        // --- RETURN MODAL LOGIC WITH STRICT NAME MATCH & BANK NAME ---
+        // --- RETURN MODAL LOGIC WITH 7-DAY CHECK, STRICT NAME MATCH & BANK NAME ---
         function openReturnModal(docId) {
-            selectedReturnDocId = docId;
             const orderObj = loadedOrdersMap[docId] || {};
+            const winStatus = getReturnWindowStatus(orderObj);
+            if (winStatus.isExpired) {
+                showAlert("The 7-day return window for this order has expired.", "Return Window Closed", "error");
+                loadUserOrders();
+                return;
+            }
+
+            selectedReturnDocId = docId;
             const registeredName = (orderObj.userName || currentUser.name || "").trim();
             selectedReturnOrderName = registeredName;
 
@@ -659,6 +711,14 @@
         }
 
         async function submitReturnRequest() {
+            const orderObj = loadedOrdersMap[selectedReturnDocId] || {};
+            if (getReturnWindowStatus(orderObj).isExpired) {
+                await showAlert("Sorry, the 7-day return window has expired.", "Return Window Closed", "error");
+                closeReturnModal();
+                loadUserOrders();
+                return;
+            }
+
             const reason = document.getElementById("return-reason").value.trim();
             const refundMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
             const isNameConfirmed = document.getElementById("refund-name-confirm").checked;
