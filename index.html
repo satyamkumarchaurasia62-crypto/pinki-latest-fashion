@@ -43,7 +43,7 @@
   </script>
 </head>
 <body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-stone-900">
-<!-- सिंपल और पतली अनाउंसमेंट पट्टी (बिना इमोजी के) -->
+
 <div class="bg-stone-900 text-stone-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide">
 </div>
 
@@ -64,23 +64,21 @@
       <!-- Direct Actions (Profile & Contact) -->
       <div class="flex items-center gap-4">
         
-        <!-- Live Profile Status Widget Button -->
        <div class="flex items-center gap-2 shrink-0">
-    <!-- Live Profile Status Widget Button -->
-    <div class="live-profile-widget">
-        <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 shadow-sm text-stone-700 text-xs font-semibold whitespace-nowrap">
-            <div style="width: 20px; height: 20px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-1.5 text-[10px]" id="home-user-logo">
-                <i class="fa-solid fa-user text-[10px]"></i>
-            </div>
-            <span id="home-user-text" class="max-w-[90px] sm:max-w-none truncate">Account</span>
-        </a>
-    </div>
+          <div class="live-profile-widget">
+              <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 shadow-sm text-stone-700 text-xs font-semibold whitespace-nowrap">
+                  <div style="width: 20px; height: 20px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-1.5 text-[10px]" id="home-user-logo">
+                      <i class="fa-solid fa-user text-[10px]"></i>
+                  </div>
+                  <span id="home-user-text" class="max-w-[90px] sm:max-w-none truncate">Account</span>
+              </a>
+          </div>
 
-    <!-- My Orders Button -->
-    <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-2.5 py-1.5 bg-pink-100 text-pink-700 text-xs font-semibold rounded-full hover:bg-pink-200 transition whitespace-nowrap">
-        <i class="fa-solid fa-bag-shopping mr-1"></i> Orders
-    </a>
-</div>
+          <!-- My Orders Button -->
+          <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-2.5 py-1.5 bg-pink-100 text-pink-700 text-xs font-semibold rounded-full hover:bg-pink-200 transition whitespace-nowrap">
+              <i class="fa-solid fa-bag-shopping mr-1"></i> Orders
+          </a>
+      </div>
     </div>
   </header>
 
@@ -122,13 +120,10 @@
     
     <!-- Dynamic Product Populating Grid -->
     <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
-      <!-- Your premium ready outfits configurations can be safely populated down here -->
     </div>
   </main>
 
   <!-- Contact & Footer Section -->
-  <section class="bg-white border-t border-stone-200 py-14">
-      <!-- Store Information & Boutique Location Details -->
   <section class="bg-white border-t border-stone-200 py-14">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
@@ -141,7 +136,6 @@
           </div>
           <div>
             <h3 class="font-bold text-stone-900 text-base">Pinki Latest Fashion</h3>
-            <p class="font-medium text-stone-800 text-xs mt-0.5"></p>
           </div>
           <p class="text-stone-600 text-xs leading-relaxed">
             Omicron-1, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh
@@ -158,7 +152,6 @@
           </div>
           <div>
             <h3 class="font-bold text-stone-900 text-base">Call & WhatsApp Order</h3>
-            <p class="text-stone-500 text-xs mt-0.5"></p>
           </div>
           <div class="space-y-1">
             <a href="tel:8130748293" class="text-stone-900 font-bold hover:text-boutique-800 text-base block transition">
@@ -217,31 +210,23 @@
     </div>
   </footer>
 
-        </div>
-
-      </div>
-    </div>
-  </section>
-
   <!-- Persistent Active Sessions Script -->
   <script>
-    // Page Session Init Check Validation Toggling
     document.addEventListener("DOMContentLoaded", function() {
       const loggedInUser = sessionStorage.getItem("currentLoggedInUser");
       if (loggedInUser) {
         const user = JSON.parse(loggedInUser);
-        // Sync real name configurations inside the homepage widget structure
         document.getElementById("home-user-text").innerText = "Hi, " + user.name;
         document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase();
-        document.getElementById("home-user-logo").style.background = "#10b981"; // Success logging indicator green flag
+        document.getElementById("home-user-logo").style.background = "#10b981";
       }
     });
   </script>    
+
   <!-- Core Javascript Connections -->
   <script src="products.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // 1. लोकल स्टोरेज से सेशन सिंक करना
       const loggedInUser = sessionStorage.getItem("currentLoggedInUser");
       if (loggedInUser) {
         const user = JSON.parse(loggedInUser);
@@ -250,57 +235,58 @@
         document.getElementById("home-user-logo").style.background = "#10b981"; 
       }
       const ordersBtn = document.getElementById("my-orders-btn");
-    if (ordersBtn) {
-        ordersBtn.classList.remove("hidden");
-    }
+      if (ordersBtn) {
+          ordersBtn.classList.remove("hidden");
+      }
 
-      // 2. product.js फ़ाइल के PRODUCTS ऐरे से कपड़े ग्रिड में लोड करना
       const gridContainer = document.getElementById("product-grid");
       if (gridContainer && typeof PRODUCTS !== 'undefined') {
         gridContainer.innerHTML = "";
-        PRODUCTS.forEach(product => {let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
-            const productCard = `
-              <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
-                <div>
-                  <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
-                    <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
-                  </div>
-                  <div class="p-4">
-                    <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
-                    <p class="text-xs text-stone-500 mt-1">${product.desc || 'प्रीमियम रेडीमेड कलेक्शन'}</p>
-                    
-                    <div class="flex items-center justify-between mt-3">
-                      <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
-                      <div class="flex items-center gap-1">
-                        <span class="text-xs text-stone-500">Size:</span>
-                        <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
-                          ${sizeOptions}
-                        </select>
+        PRODUCTS.forEach(product => {
+          let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+          const productCard = `
+            <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
+              <div>
+                <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
+                  <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                  <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
+                  <p class="text-xs text-stone-500 mt-1">${product.desc || 'Premium Ready-made Collection'}</p>
+                  
+                  <div class="flex items-center justify-between mt-3">
+                    <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
+                    <div class="flex items-center gap-1">
+                      <span class="text-xs text-stone-500">Size:</span>
+                      <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
+                        ${sizeOptions}
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
-<div class="p-4 pt-0 space-y-2">
-  <div class="flex items-center justify-between text-xs text-stone-600 mb-2">
-    <label>मात्रा (Qty):</label>
-    <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
-  </div>
-  
-  <div class="text-xs text-stone-600 space-y-1 mb-3">
-    <div class="font-semibold">पेमेंट का प्रकार:</div>
-    <label class="flex items-center gap-1.5 cursor-pointer">
-      <input type="radio" name="pay-${product.id}" value="COD" checked>
-      <span>कैश ऑन डिलीवरी (COD)</span>
-    </label>
-    <label class="flex items-center gap-1.5 cursor-pointer">
-      <input type="radio" name="pay-${product.id}" value="Online UPI">
-      <span>ऑनलाइन UPI</span>
-    </label>
-  </div>
+              <div class="p-4 pt-0 space-y-2">
+                <div class="flex items-center justify-between text-xs text-stone-600 mb-2">
+                  <label>Quantity (Qty):</label>
+                  <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
+                </div>
+                
+                <div class="text-xs text-stone-600 space-y-1 mb-3">
+                  <div class="font-semibold">Payment Type:</div>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="pay-${product.id}" value="COD" checked>
+                    <span>Cash on Delivery (COD)</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="pay-${product.id}" value="Online UPI">
+                    <span>Online UPI</span>
+                  </label>
+                </div>
 
-  <button onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow">
-    BUY NOW / अभी खरीदें
-  </button>
-</div>
+                <button onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow">
+                  BUY NOW
+                </button>
+              </div>
             </div>
           `;
           gridContainer.innerHTML += productCard;
@@ -310,91 +296,82 @@
       }
     });
   </script>
-<!-- Firebase Scripts & db initialization -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
-    authDomain: "pinki-latest-fashion.firebaseapp.com",
-    projectId: "pinki-latest-fashion",
-    storageBucket: "pinki-latest-fashion.firebasestorage.app",
-    messagingSenderId: "432889531515",
-    appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
-  };
 
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  window.db = firebase.firestore();
-    // नया और सही handleBuyNow फ़ंक्शन
-function handleBuyNow(id) {
-  // 1. चेक करें कि यूज़र लॉग इन है या नहीं
-  const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
-  if (!loggedInRaw) {
-    alert("कृपया ऑर्डर करने के लिए पहले लॉगिन करें!");
-    window.location.href = "account.html";
-    return;
-  }
+  <!-- Firebase Scripts & db initialization -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
+      authDomain: "pinki-latest-fashion.firebaseapp.com",
+      projectId: "pinki-latest-fashion",
+      storageBucket: "pinki-latest-fashion.firebasestorage.app",
+      messagingSenderId: "432889531515",
+      appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
+    };
 
-  const user = JSON.parse(loggedInRaw);
-  const item = PRODUCTS.find(p => p.id === id);
-  if (!item) return;
-
-  // साइज़, मात्रा और पेमेंट का प्रकार प्राप्त करें
-  const sizeElem = document.getElementById(`size-${id}`);
-  const selectedSize = sizeElem ? sizeElem.value : "Free Size";
-
-  const qtyElem = document.getElementById(`qty-${id}`);
-  const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
-
-  const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
-  const paymentMethod = payElem ? payElem.value : "COD";
-
-  const totalAmount = item.price * quantity;
-  const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-
-  // कन्फर्मेशन पॉपअप
-  const confirmMsg = `सामान: ${item.title || item.name}\nसाइज़: ${selectedSize}\nमात्रा: ${quantity}\nकुल राशि: ₹${totalAmount}\nपेमेंट मोड: ${paymentMethod}\n\nडिलीवरी का पता:\n${user.address || "पता उपलब्ध नहीं"}, ${user.city || ""} - ${user.pincode || ""}\n\nक्या आप यह ऑर्डर कन्फ़र्म करना चाहते हैं?`;
-
-  if (!confirm(confirmMsg)) return;
-  // 2. Firebase Firestore में ऑर्डर सेव करें
-  db.collection("orders").doc(orderId).set({
-    orderId: orderId,
-    productId: item.id,
-    productName: item.title || item.name,
-    size: selectedSize,
-    quantity: quantity,
-    totalAmount: totalAmount,
-    paymentMethod: paymentMethod,
-    paymentStatus: (paymentMethod === "COD") ? "पेंडिंग (कैश ऑन डिलीवरी)" : "ऑनलाइन प्रोसेस में",
-    deliveryStatus: "packing",
-    userEmail: (user.email || "").toLowerCase(),
-    userName: user.name || "ग्राहक",
-    phone: user.phone || "",
-    shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
-    orderDate: new Date().toLocaleString("hi-IN")
-  }).then(() => {
-    alert(`बधाई हो! आपका ऑर्डर दर्ज हो गया है।\nऑर्डर आईडी: ${orderId}`);
-      // 3. यदि ग्राहक ने 'Online UPI' चुना है तो सीधे UPI पेमेंट ऐप खोलें
-    if (paymentMethod === "Online UPI") {
-      const myUpiId = "8130748293@pthdfc"; // आपकी असली UPI ID
-      const merchantName = "Pinki Latest Fashion";
-      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
-
-      // UPI ऐप पर रीडायरेक्ट करें
-      window.location.href = upiUrl;
-    } else {
-    
-      // COD के लिए सीधे अकाउंट पेज पर भेजें
-      window.location.href = "account.html";
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-  }).catch((err) => {
-    alert("ऑर्डर दर्ज करने में समस्या आई: " + err.message);
-  });
-}
-</script>
+    window.db = firebase.firestore();
 
-    </div>
+    function handleBuyNow(id) {
+      const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+      if (!loggedInRaw) {
+        alert("Please log in first to place an order!");
+        window.location.href = "account.html";
+        return;
+      }
+
+      const user = JSON.parse(loggedInRaw);
+      const item = PRODUCTS.find(p => p.id === id);
+      if (!item) return;
+
+      const sizeElem = document.getElementById(`size-${id}`);
+      const selectedSize = sizeElem ? sizeElem.value : "Free Size";
+
+      const qtyElem = document.getElementById(`qty-${id}`);
+      const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
+
+      const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
+      const paymentMethod = payElem ? payElem.value : "COD";
+
+      const totalAmount = item.price * quantity;
+      const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+
+      const confirmMsg = `Item: ${item.title || item.name}\nSize: ${selectedSize}\nQuantity: ${quantity}\nTotal Amount: ₹${totalAmount}\nPayment Mode: ${paymentMethod}\n\nShipping Address:\n${user.address || "Address not available"}, ${user.city || ""} - ${user.pincode || ""}\n\nDo you want to confirm this order?`;
+
+      if (!confirm(confirmMsg)) return;
+
+      db.collection("orders").doc(orderId).set({
+        orderId: orderId,
+        productId: item.id,
+        productName: item.title || item.name,
+        size: selectedSize,
+        quantity: quantity,
+        totalAmount: totalAmount,
+        paymentMethod: paymentMethod,
+        paymentStatus: (paymentMethod === "COD") ? "Pending (Cash on Delivery)" : "Processing Online",
+        deliveryStatus: "packing",
+        userEmail: (user.email || "").toLowerCase(),
+        userName: user.name || "Customer",
+        phone: user.phone || "",
+        shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
+        orderDate: new Date().toLocaleString()
+      }).then(() => {
+        alert(`Congratulations! Your order has been placed.\nOrder ID: ${orderId}`);
+        if (paymentMethod === "Online UPI") {
+          const myUpiId = "8130748293@pthdfc";
+          const merchantName = "Pinki Latest Fashion";
+          const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
+          window.location.href = upiUrl;
+        } else {
+          window.location.href = "account.html";
+        }
+      }).catch((err) => {
+        alert("Error placing order: " + err.message);
+      });
+    }
+  </script>
 </body>
-</html>
+</html>.
