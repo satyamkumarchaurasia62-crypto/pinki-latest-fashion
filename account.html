@@ -265,12 +265,15 @@
     let phoneConfirmationResult = null;
     let verifiedPhoneNumber = "";
 
-    // Initialize Invisible reCAPTCHA for Firebase Mobile OTP
-    window.addEventListener("DOMContentLoaded", () => {
+    // Initialize Invisible reCAPTCHA safely after window load
+    window.addEventListener("load", () => {
       try {
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
-          size: "invisible"
-        });
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
+            size: "invisible"
+          });
+          window.recaptchaVerifier.render();
+        }
       } catch (e) {
         console.warn("reCAPTCHA init note:", e.message);
       }
@@ -293,14 +296,20 @@
       btn.innerText = "Sending...";
 
       try {
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
+        }
+        
         phoneConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, window.recaptchaVerifier);
         document.getElementById("mobile-otp-box").classList.remove("hidden");
         await showAlert(`A 6-digit SMS OTP has been sent to ${fullPhone}.`, "Mobile OTP Sent", "success");
       } catch (err) {
         await showAlert("Failed to send Mobile OTP: " + err.message, "SMS OTP Error", "error");
-        if (window.recaptchaVerifier) {
-          window.recaptchaVerifier.render().then(id => grecaptcha.reset(id));
-        }
+        try {
+          window.recaptchaVerifier.render().then(widgetId => {
+            grecaptcha.reset(widgetId);
+          });
+        } catch(ex) {}
       } finally {
         btn.disabled = false;
         btn.innerText = "Send OTP";
@@ -369,7 +378,7 @@
       window.location.href = "index.html";
     }
 
-    // Sign Up Submit (Requires Mobile OTP Verified + Sends Firebase Verification Email)
+    // Sign Up Submit
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
       signupForm.addEventListener("submit", async function(e) {
@@ -399,13 +408,9 @@
           if (doc.exists) {
             await showAlert("This email address is already registered!", "Already Registered", "error");
           } else {
-            // 1. Create User in Firebase Auth
             const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            
-            // 2. Send Official Verification Email from Firebase
             await userCred.user.sendEmailVerification();
 
-            // 3. Save User Data in Firestore
             await db.collection("users").doc(email).set({
               name: name,
               email: email,
