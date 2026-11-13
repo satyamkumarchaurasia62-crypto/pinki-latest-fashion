@@ -42,7 +42,7 @@
 <body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-stone-900">
 
 <div class="bg-stone-900 text-stone-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide">
-  Free Local Delivery above ₹999 | Pan-India Shipping & Special Coupon Discounts on 3+ Outfits!
+  Free Delivery on Eligible Orders | Special Coupon Discounts on 3+ Outfits!
 </div>
 
   <!-- Minimalist Sticky Header -->
@@ -98,7 +98,7 @@
       </h1>
       
       <p class="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-        Add single or multiple outfits to your cart, check delivery charges by your Pincode, apply your promo code, and pay via Cash on Delivery or Instant UPI.
+        Add single or multiple outfits to your cart, apply your promo code at checkout, and pay via Cash on Delivery or Instant UPI.
       </p>
     </div>
   </section>
@@ -160,7 +160,7 @@
           <ul class="text-stone-600 text-xs space-y-2">
             <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>100% Ready-to-wear with inner lining</span></li>
             <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Online UPI & Cash on Delivery</span></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Free Local Delivery above ₹999</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Pan-India Doorstep Delivery</span></li>
           </ul>
         </div>
       </div>
@@ -185,7 +185,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- SHOPPING CART & BILL CHECKOUT MODAL                                   -->
+  <!-- SHOPPING CART & BILL CHECKOUT MODAL (Silent Pincode Delivery Logic)   -->
   <!-- ===================================================================== -->
   <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
@@ -211,19 +211,16 @@
         <!-- Cart Items List -->
         <div id="cart-items-list" class="space-y-2.5 max-h-52 overflow-y-auto pr-1"></div>
 
-        <!-- Delivery Pincode Distance Checker -->
-        <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3 space-y-1.5">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-bold text-blue-900"><i class="fa-solid fa-truck-fast mr-1"></i> Delivery Pincode (For Distance Charge):</label>
-            <span id="delivery-zone-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">Enter 6-digit Pincode</span>
-          </div>
-          <div class="flex gap-2">
-            <input type="text" id="cart-pincode-input" maxlength="6" oninput="renderCartModal()" placeholder="e.g. 201310" class="w-full text-xs font-bold border border-blue-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:border-blue-600">
-          </div>
-          <div id="delivery-free-hint" class="text-[11px] text-blue-800 font-medium"></div>
+        <!-- Simple Delivery Pincode Box (No distance/zone text shown to customer) -->
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
+          <label class="block text-xs font-bold text-stone-700">
+            <i class="fa-solid fa-location-dot text-pink-600 mr-1"></i> Delivery Pincode *
+          </label>
+          <input type="text" id="cart-pincode-input" maxlength="6" oninput="this.value = this.value.replace(/\D/g, ''); renderCartModal();" placeholder="Enter 6-digit Pincode" class="w-full text-xs font-bold border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-pink-500">
+          <div id="delivery-free-hint" class="text-[11px] text-emerald-700 font-medium"></div>
         </div>
 
-        <!-- Coupon Code Section (Applies to Total Cart Bill) -->
+        <!-- Coupon Code Section -->
         <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
           <label class="block text-xs font-bold text-stone-700">Have a Promo / Coupon Code?</label>
           <div class="flex gap-2">
@@ -235,14 +232,14 @@
           <div id="cart-coupon-msg" class="text-[11px] font-medium"></div>
         </div>
 
-        <!-- Complete Price & Delivery Breakdown -->
+        <!-- Complete Price & Delivery Breakdown (Clean, No Zone Label) -->
         <div class="bg-pink-50/60 border border-pink-100 rounded-xl p-3.5 space-y-2 text-xs">
           <div class="flex justify-between text-stone-600">
             <span>Total Outfits (<span id="bill-total-qty">0</span> pcs):</span>
             <span id="bill-subtotal" class="font-semibold text-stone-800">₹0</span>
           </div>
           <div class="flex justify-between text-stone-600">
-            <span>Delivery Charges <span id="bill-zone-label" class="text-[10px] text-stone-500"></span>:</span>
+            <span>Delivery Charges:</span>
             <span id="bill-delivery" class="font-semibold text-stone-800">₹0</span>
           </div>
           <div id="bill-discount-row" class="hidden flex justify-between text-emerald-700 font-bold">
@@ -574,47 +571,44 @@
     }
     window.db = firebase.firestore();
 
-    function calculateDeliveryByPincode(pincodeRaw, subtotal) {
+    // Hidden Background Distance Calculator (Customer only sees final fee & free-delivery threshold)
+    function calculateDeliverySilent(pincodeRaw, subtotal) {
       const pin = (pincodeRaw || "").replace(/\D/g, "");
 
       if (pin.length < 3) {
+        const freeLimit = 1499;
         return {
-          zoneName: "Standard",
-          fee: subtotal >= 1499 ? 0 : 60,
-          freeLimit: 1499,
-          hint: "Enter 6-digit Pincode for exact distance delivery rate"
+          fee: subtotal >= freeLimit ? 0 : 60,
+          hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
         };
       }
 
       const prefix3 = pin.slice(0, 3);
 
+      // Local Pincodes (201xxx)
       if (prefix3 === "201") {
         const freeLimit = 999;
         return {
-          zoneName: "Local (Noida/G.Noida)",
           fee: subtotal >= freeLimit ? 0 : 40,
-          freeLimit: freeLimit,
-          hint: subtotal >= freeLimit ? "🎉 Free Local Delivery unlocked!" : `Add ₹${freeLimit - subtotal} more for FREE Local Delivery (₹40 fee)`
+          hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
         };
       }
 
+      // NCR & Nearby Pincodes
       const ncrPrefixes = ["110", "121", "122", "202", "203", "250"];
       if (ncrPrefixes.includes(prefix3)) {
         const freeLimit = 1499;
         return {
-          zoneName: "Delhi NCR & Nearby",
           fee: subtotal >= freeLimit ? 0 : 60,
-          freeLimit: freeLimit,
-          hint: subtotal >= freeLimit ? "🎉 Free NCR Delivery unlocked!" : `Add ₹${freeLimit - subtotal} more for FREE NCR Delivery (₹60 fee)`
+          hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
         };
       }
 
+      // Other Pincodes
       const freeLimit = 1999;
       return {
-        zoneName: "Pan-India Shipping",
         fee: subtotal >= freeLimit ? 0 : 90,
-        freeLimit: freeLimit,
-        hint: subtotal >= freeLimit ? "🎉 Free Pan-India Delivery unlocked!" : `Add ₹${freeLimit - subtotal} more for FREE Pan-India Delivery (₹90 fee)`
+        hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
       };
     }
 
@@ -775,12 +769,10 @@
       });
 
       const enteredPin = document.getElementById("cart-pincode-input")?.value || "";
-      const deliveryInfo = calculateDeliveryByPincode(enteredPin, subtotal);
+      const deliveryInfo = calculateDeliverySilent(enteredPin, subtotal);
       const deliveryCharge = deliveryInfo.fee;
 
-      document.getElementById("delivery-zone-badge").innerText = deliveryInfo.zoneName;
       document.getElementById("delivery-free-hint").innerText = deliveryInfo.hint;
-      document.getElementById("bill-zone-label").innerText = `(${deliveryInfo.zoneName})`;
 
       let discountAmount = 0;
       const discountRow = document.getElementById("bill-discount-row");
@@ -865,7 +857,6 @@
       }
     }
 
-    // Step A: Checkout Click Handler (COD submits immediately; Online UPI opens Payment & Proof Modal BEFORE creating order)
     async function checkoutCart() {
       if (shoppingCart.length === 0) return;
 
@@ -880,7 +871,7 @@
       const user = JSON.parse(loggedInRaw);
       const enteredPin = (document.getElementById("cart-pincode-input")?.value || user.pincode || "").trim();
       if (enteredPin.length < 6) {
-        await showAlert("Please enter a valid 6-digit Delivery Pincode to calculate delivery charges.", "Pincode Required", "error");
+        await showAlert("Please enter a valid 6-digit Delivery Pincode.", "Pincode Required", "error");
         document.getElementById("cart-pincode-input")?.focus();
         return;
       }
@@ -900,7 +891,7 @@
         totalQty += cItem.quantity;
       }
 
-      const deliveryInfo = calculateDeliveryByPincode(enteredPin, subtotal);
+      const deliveryInfo = calculateDeliverySilent(enteredPin, subtotal);
       const deliveryCharge = deliveryInfo.fee;
       let discountAmount = 0;
       let appliedCode = "";
@@ -927,7 +918,6 @@
       const orderContext = {
         user,
         enteredPin,
-        deliveryInfo,
         deliveryCharge,
         discountAmount,
         appliedCode,
@@ -936,7 +926,6 @@
         paymentMethod
       };
 
-      // If Online UPI: DO NOT create order yet — open UPI Payment + Mandatory UTR & Screenshot Modal first!
       if (paymentMethod === "Online UPI") {
         pendingUpiOrderPayload = orderContext;
         uploadedUpiScreenshotBase64 = "";
@@ -950,15 +939,12 @@
 
         closeCartModal();
         document.getElementById("upiPaymentModal").classList.remove("hidden");
-
-        // Trigger UPI app automatically just like before
         openUpiAppForPendingOrder();
         return;
       }
 
-      // If COD: Confirm and submit order directly
       const summaryLines = shoppingCart.map(i => `• ${i.title} (${i.size}) x${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
-      const confirmMsg = `${summaryLines}\n\nSubtotal: ₹${subtotal}\nDelivery (${deliveryInfo.zoneName} - ${enteredPin}): ${deliveryCharge === 0 ? 'FREE' : '₹' + deliveryCharge}${discountAmount > 0 ? `\nCoupon (${appliedCode}): -₹${discountAmount}` : ''}\nGrand Total Payable: ₹${grandTotal}\nPayment Mode: Cash on Delivery (COD)\n\nConfirm this order?`;
+      const confirmMsg = `${summaryLines}\n\nSubtotal: ₹${subtotal}\nDelivery: ${deliveryCharge === 0 ? 'FREE' : '₹' + deliveryCharge}${discountAmount > 0 ? `\nCoupon (${appliedCode}): -₹${discountAmount}` : ''}\nGrand Total Payable: ₹${grandTotal}\nPayment Mode: Cash on Delivery (COD)\n\nConfirm this order?`;
 
       const isConfirmed = await showConfirm(confirmMsg, "Confirm COD Order");
       if (!isConfirmed) return;
@@ -982,7 +968,6 @@
       uploadedUpiScreenshotBase64 = "";
     }
 
-    // Compress and store uploaded payment screenshot
     function handleUpiScreenshotUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1014,7 +999,6 @@
       reader.readAsDataURL(file);
     }
 
-    // Validate BOTH 12-Digit UTR and Screenshot before generating Online Order
     async function confirmAndCreateUpiOrder() {
       if (!pendingUpiOrderPayload) return;
 
@@ -1046,7 +1030,6 @@
       }
     }
 
-    // Save Order to Firebase Firestore
     async function finalizeOrderInFirestore(ctx, utrNumber, paymentScreenshot) {
       const checkoutBtn = document.getElementById("checkout-submit-btn");
       if (checkoutBtn) {
@@ -1073,7 +1056,6 @@
             quantity: cItem.quantity,
             subtotal: itemAmount,
             deliveryCharge: isFirst ? ctx.deliveryCharge : 0,
-            deliveryZone: ctx.deliveryInfo.zoneName,
             couponUsed: isFirst ? (ctx.appliedCode || "None") : (ctx.appliedCode ? `Included in ${ctx.batchOrderGroup}` : "None"),
             discountGiven: isFirst ? ctx.discountAmount : 0,
             totalAmount: netItemPayable,
