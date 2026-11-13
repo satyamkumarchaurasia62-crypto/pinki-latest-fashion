@@ -1,40 +1,75 @@
 // product.js - Pinki Latest Fashion Products Catalog, Live Stock & Auto Discount
 const PRODUCTS = [
   {
-    id: 1,
-    title: "Royal Pink Anarkali Kurti",
-    mrp: 1999,
-    price: 1299,
-    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80",
-    sizes: ["S", "M", "L", "XL"],
-    stock: { S: 10, M: 5, L: 8, XL: 4 }
+    "id": 1,
+    "title": "Royal Pink Anarkali Kurti",
+    "mrp": 1999,
+    "price": 1299,
+    "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80"
+    ],
+    "sizes": [
+      "S",
+      "M"
+    ],
+    "stock": {
+      "S": 10,
+      "M": 1
+    }
   },
   {
-    id: 2,
-    title: "Designer Ethnic Party Gown",
-    mrp: 2799,
-    price: 1899,
-    image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&auto=format&fit=crop&q=80",
-    sizes: ["M", "L", "XL", "XXL"],
-    stock: { M: 6, L: 2, XL: 0, XXL: 5 }
+    "id": 2,
+    "title": "Designer Ethnic Party Gown",
+    "mrp": 2799,
+    "price": 1899,
+    "image": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&auto=format&fit=crop&q=80",
+    "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "stock": {
+      "M": 6,
+      "L": 2,
+      "XL": 0,
+      "XXL": 5
+    }
   },
   {
-    id: 3,
-    title: "Floral Printed Cotton Suit Set",
-    mrp: 1599,
-    price: 999,
-    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&auto=format&fit=crop&q=80",
-    sizes: ["S", "M", "L"],
-    stock: { S: 4, M: 4, L: 4 }
+    "id": 3,
+    "title": "Floral Printed Cotton Suit Set",
+    "mrp": 1599,
+    "price": 999,
+    "image": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&auto=format&fit=crop&q=80",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": {
+      "S": 4,
+      "M": 4,
+      "L": 4
+    }
   },
   {
-    id: 4,
-    title: "Traditional Silk Festive Kurta",
-    mrp: 2199,
-    price: 1499,
-    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80",
-    sizes: ["M", "L", "XL"],
-    stock: { M: 3, L: 3, XL: 3 }
+    "id": 4,
+    "title": "Traditional Silk Festive Kurta",
+    "mrp": 2199,
+    "price": 1499,
+    "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80",
+    "sizes": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "stock": {
+      "M": 3,
+      "L": 3,
+      "XL": 3
+    }
   }
 ];
 
