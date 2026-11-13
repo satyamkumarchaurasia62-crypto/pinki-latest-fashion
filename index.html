@@ -225,7 +225,6 @@
   <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px; transition:opacity 0.2s ease;">
     <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; font-family:'Plus Jakarta Sans', sans-serif; animation:popScale 0.2s ease-out;">
       
-      <!-- Pink/Red Alert Icon -->
       <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
         !
       </div>
@@ -330,11 +329,19 @@
         gridContainer.innerHTML = "";
         PRODUCTS.forEach(product => {
           let sizeOptions = (product.sizes || ["Free Size"]).map(s => `<option value="${s}">${s}</option>`).join("");
+          
+          // Auto Calculate Discount Percentage
+          let discountPercent = 0;
+          if (product.mrp && product.mrp > product.price) {
+            discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+          }
+
           const productCard = `
             <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
               <div>
                 <div class="relative pt-[125%] bg-stone-50 overflow-hidden">
                   <img src="${product.image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover">
+                  ${discountPercent > 0 ? `<span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">${discountPercent}% OFF</span>` : ''}
                 </div>
                 <div class="p-4">
                   <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
@@ -346,9 +353,15 @@
                   <!-- Live Stock Badge -->
                   <div id="stock-badge-${product.id}" class="mt-1.5 text-xs font-semibold text-stone-400">Checking stock...</div>
 
-                  <div class="flex items-center justify-between mt-3">
-                    <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
-                    <div class="flex items-center gap-1">
+                  <div class="flex items-start justify-between mt-3 gap-2">
+                    <div class="flex flex-col">
+                      <div class="flex items-baseline gap-1.5">
+                        <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
+                        ${product.mrp && product.mrp > product.price ? `<span class="text-xs text-stone-400 line-through">₹${product.mrp}</span>` : ''}
+                      </div>
+                      ${discountPercent > 0 ? `<span class="text-[11px] font-bold text-emerald-600">Save ₹${product.mrp - product.price} (${discountPercent}% OFF)</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
                       <span class="text-xs text-stone-500">Size:</span>
                       <select id="size-${product.id}" onchange="if(typeof refreshProductStockUI==='function') refreshProductStockUI(${product.id})" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
                         ${sizeOptions}
@@ -361,6 +374,17 @@
                 <div class="flex items-center justify-between text-xs text-stone-600 mb-2">
                   <label>Quantity (Qty):</label>
                   <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
+                </div>
+
+                <!-- Coupon Code Input Box (Min 3-4 Qty Condition) -->
+                <div class="mb-2.5">
+                  <div class="flex gap-1.5">
+                    <input type="text" id="coupon-${product.id}" placeholder="Coupon Code" class="w-full text-xs uppercase border border-stone-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-pink-500">
+                    <button type="button" onclick="applyCoupon(${product.id})" class="px-3 py-1.5 bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold rounded-lg shrink-0 transition">
+                      Apply
+                    </button>
+                  </div>
+                  <div id="coupon-msg-${product.id}" class="text-[11px] mt-1 font-medium"></div>
                 </div>
                 
                 <div class="text-xs text-stone-600 space-y-1 mb-3">
@@ -384,7 +408,6 @@
           gridContainer.innerHTML += productCard;
         });
 
-        // Trigger loading public reviews after product cards render
         if (typeof loadPublicReviews === "function") {
           loadPublicReviews();
         }
@@ -411,6 +434,59 @@
       firebase.initializeApp(firebaseConfig);
     }
     window.db = firebase.firestore();
+
+    window.appliedCoupons = {};
+
+    // Single-Use & Minimum Quantity Coupon Validation
+    async function applyCoupon(productId) {
+      const input = document.getElementById(`coupon-${productId}`);
+      const msgEl = document.getElementById(`coupon-msg-${productId}`);
+      const qtyElem = document.getElementById(`qty-${productId}`);
+      const currentQty = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
+      const code = (input.value || "").trim().toUpperCase();
+
+      if (!code) {
+        msgEl.innerHTML = `<span class="text-red-600">Please enter a coupon code.</span>`;
+        delete window.appliedCoupons[productId];
+        return;
+      }
+
+      msgEl.innerHTML = `<span class="text-stone-500">Checking code...</span>`;
+
+      try {
+        const docSnap = await db.collection("coupons").doc(code).get();
+
+        if (!docSnap.exists) {
+          msgEl.innerHTML = `<span class="text-red-600">✕ Invalid coupon code.</span>`;
+          delete window.appliedCoupons[productId];
+          return;
+        }
+
+        const couponData = docSnap.data();
+        if (couponData.isUsed === true) {
+          msgEl.innerHTML = `<span class="text-red-600">✕ This coupon has already been used/expired.</span>`;
+          delete window.appliedCoupons[productId];
+          return;
+        }
+
+        const minRequiredQty = Number(couponData.minQty) || 3;
+        if (currentQty < minRequiredQty) {
+          msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Buy at least ${minRequiredQty} pieces together to use this coupon! (Current Qty: ${currentQty})</span>`;
+          delete window.appliedCoupons[productId];
+          return;
+        }
+
+        const discountAmt = Number(couponData.discount) || 0;
+        window.appliedCoupons[productId] = { 
+          code: code, 
+          discount: discountAmt, 
+          minQty: minRequiredQty 
+        };
+        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Coupon '${code}' applied! Extra ₹${discountAmt} off</span>`;
+      } catch (err) {
+        msgEl.innerHTML = `<span class="text-red-600">Error checking coupon.</span>`;
+      }
+    }
 
     async function handleBuyNow(id) {
       const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
@@ -444,10 +520,39 @@
       const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
       const paymentMethod = payElem ? payElem.value : "COD";
 
-      const totalAmount = item.price * quantity;
+      // Coupon & Price Calculation
+      const baseAmount = item.price * quantity;
+      const applied = window.appliedCoupons[id];
+      let discountAmount = 0;
+      let appliedCode = "";
+
+      if (applied) {
+        if (quantity < applied.minQty) {
+          await showAlert(`Coupon '${applied.code}' is only valid when buying at least ${applied.minQty} pieces together!`, "Minimum Quantity Required", "error");
+          return;
+        }
+
+        const freshSnap = await db.collection("coupons").doc(applied.code).get();
+        if (!freshSnap.exists || freshSnap.data().isUsed === true) {
+          await showAlert("Sorry! This coupon code was just used or expired. Please remove it or try another.", "Coupon Expired", "error");
+          delete window.appliedCoupons[id];
+          return;
+        }
+
+        discountAmount = Math.min(baseAmount, applied.discount);
+        appliedCode = applied.code;
+      }
+
+      const totalAmount = Math.max(0, baseAmount - discountAmount);
       const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
 
-      const confirmMsg = `Item: ${item.title || item.name}\nSize: ${selectedSize}\nQuantity: ${quantity}\nTotal Amount: ₹${totalAmount}\nPayment Mode: ${paymentMethod}\n\nShipping Address:\n${user.address || "Address not available"}, ${user.city || ""} - ${user.pincode || ""}\n\nDo you want to confirm this order?`;
+      let priceBreakdown = `Subtotal: ₹${baseAmount}`;
+      if (discountAmount > 0) {
+        priceBreakdown += `\nCoupon (${appliedCode}): -₹${discountAmount}`;
+      }
+      priceBreakdown += `\nFinal Payable: ₹${totalAmount}`;
+
+      const confirmMsg = `Item: ${item.title || item.name}\nSize: ${selectedSize}\nQuantity: ${quantity}\n${priceBreakdown}\nPayment Mode: ${paymentMethod}\n\nShipping Address:\n${user.address || "Address not available"}, ${user.city || ""} - ${user.pincode || ""}\n\nDo you want to confirm this order?`;
 
       const isConfirmed = await showConfirm(confirmMsg, "Confirm Your Order");
       if (!isConfirmed) return;
@@ -459,6 +564,9 @@
           productName: item.title || item.name,
           size: selectedSize,
           quantity: quantity,
+          subtotal: baseAmount,
+          couponUsed: appliedCode || "None",
+          discountGiven: discountAmount,
           totalAmount: totalAmount,
           paymentMethod: paymentMethod,
           paymentStatus: (paymentMethod === "COD") ? "Pending (Cash on Delivery)" : "Processing Online",
@@ -470,7 +578,18 @@
           orderDate: new Date().toLocaleString()
         });
 
-        // Turant screen par stock update karein
+        // Expire coupon immediately after one-time use
+        if (appliedCode) {
+          await db.collection("coupons").doc(appliedCode).update({
+            isUsed: true,
+            usedBy: (user.email || "Customer"),
+            usedInOrder: orderId,
+            usedAt: new Date().toLocaleString()
+          });
+          delete window.appliedCoupons[id];
+        }
+
+        // Update live stock on screen
         if (typeof syncProductsAndLiveStock === "function") {
           await syncProductsAndLiveStock();
         }
