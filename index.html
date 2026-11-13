@@ -185,7 +185,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- SHOPPING CART & BILL CHECKOUT MODAL (Silent Pincode Delivery Logic)   -->
+  <!-- SHOPPING CART & BILL CHECKOUT MODAL (100% Hidden Pincode Logic)       -->
   <!-- ===================================================================== -->
   <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
@@ -209,16 +209,7 @@
       <div id="filled-cart-view" class="space-y-4">
         
         <!-- Cart Items List -->
-        <div id="cart-items-list" class="space-y-2.5 max-h-52 overflow-y-auto pr-1"></div>
-
-        <!-- Simple Delivery Pincode Box (No distance/zone text shown to customer) -->
-        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
-          <label class="block text-xs font-bold text-stone-700">
-            <i class="fa-solid fa-location-dot text-pink-600 mr-1"></i> Delivery Pincode *
-          </label>
-          <input type="text" id="cart-pincode-input" maxlength="6" oninput="this.value = this.value.replace(/\D/g, ''); renderCartModal();" placeholder="Enter 6-digit Pincode" class="w-full text-xs font-bold border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-pink-500">
-          <div id="delivery-free-hint" class="text-[11px] text-emerald-700 font-medium"></div>
-        </div>
+        <div id="cart-items-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1"></div>
 
         <!-- Coupon Code Section -->
         <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
@@ -232,7 +223,7 @@
           <div id="cart-coupon-msg" class="text-[11px] font-medium"></div>
         </div>
 
-        <!-- Complete Price & Delivery Breakdown (Clean, No Zone Label) -->
+        <!-- Complete Price & Delivery Breakdown (Clean, No Pincode Box) -->
         <div class="bg-pink-50/60 border border-pink-100 rounded-xl p-3.5 space-y-2 text-xs">
           <div class="flex justify-between text-stone-600">
             <span>Total Outfits (<span id="bill-total-qty">0</span> pcs):</span>
@@ -242,6 +233,7 @@
             <span>Delivery Charges:</span>
             <span id="bill-delivery" class="font-semibold text-stone-800">₹0</span>
           </div>
+          <div id="delivery-free-hint" class="text-[11px] text-emerald-700 font-medium"></div>
           <div id="bill-discount-row" class="hidden flex justify-between text-emerald-700 font-bold">
             <span>Coupon Discount (<span id="bill-coupon-name"></span>):</span>
             <span id="bill-discount">-₹0</span>
@@ -464,9 +456,6 @@
         document.getElementById("home-user-text").innerText = "Hi, " + user.name;
         document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase();
         document.getElementById("home-user-logo").style.background = "#10b981";
-        if (user.pincode) {
-          document.getElementById("cart-pincode-input").value = user.pincode;
-        }
       }
       const ordersBtn = document.getElementById("my-orders-btn");
       if (ordersBtn) ordersBtn.classList.remove("hidden");
@@ -571,9 +560,20 @@
     }
     window.db = firebase.firestore();
 
-    // Hidden Background Distance Calculator (Customer only sees final fee & free-delivery threshold)
-    function calculateDeliverySilent(pincodeRaw, subtotal) {
-      const pin = (pincodeRaw || "").replace(/\D/g, "");
+    // Reads saved pincode automatically from user profile in background (completely hidden from UI)
+    function getSavedUserPincode() {
+      try {
+        const raw = sessionStorage.getItem("currentLoggedInUser");
+        if (raw) {
+          const u = JSON.parse(raw);
+          return String(u.pincode || "").replace(/\D/g, "");
+        }
+      } catch (e) {}
+      return "";
+    }
+
+    function calculateDeliverySilent(subtotal) {
+      const pin = getSavedUserPincode();
 
       if (pin.length < 3) {
         const freeLimit = 1499;
@@ -708,14 +708,6 @@
     }
 
     function openCartModal() {
-      const pinInput = document.getElementById("cart-pincode-input");
-      if (pinInput && !pinInput.value) {
-        const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
-        if (loggedInRaw) {
-          const u = JSON.parse(loggedInRaw);
-          if (u.pincode) pinInput.value = u.pincode;
-        }
-      }
       renderCartModal();
       document.getElementById("cartModal").classList.remove("hidden");
     }
@@ -768,8 +760,7 @@
         `;
       });
 
-      const enteredPin = document.getElementById("cart-pincode-input")?.value || "";
-      const deliveryInfo = calculateDeliverySilent(enteredPin, subtotal);
+      const deliveryInfo = calculateDeliverySilent(subtotal);
       const deliveryCharge = deliveryInfo.fee;
 
       document.getElementById("delivery-free-hint").innerText = deliveryInfo.hint;
@@ -869,13 +860,6 @@
       }
 
       const user = JSON.parse(loggedInRaw);
-      const enteredPin = (document.getElementById("cart-pincode-input")?.value || user.pincode || "").trim();
-      if (enteredPin.length < 6) {
-        await showAlert("Please enter a valid 6-digit Delivery Pincode.", "Pincode Required", "error");
-        document.getElementById("cart-pincode-input")?.focus();
-        return;
-      }
-
       const payElem = document.querySelector('input[name="cart-payment-mode"]:checked');
       const paymentMethod = payElem ? payElem.value : "COD";
 
@@ -891,7 +875,7 @@
         totalQty += cItem.quantity;
       }
 
-      const deliveryInfo = calculateDeliverySilent(enteredPin, subtotal);
+      const deliveryInfo = calculateDeliverySilent(subtotal);
       const deliveryCharge = deliveryInfo.fee;
       let discountAmount = 0;
       let appliedCode = "";
@@ -917,7 +901,6 @@
 
       const orderContext = {
         user,
-        enteredPin,
         deliveryCharge,
         discountAmount,
         appliedCode,
@@ -1068,7 +1051,7 @@
             userEmail: (ctx.user.email || "").toLowerCase(),
             userName: ctx.user.name || "Customer",
             phone: ctx.user.phone || "",
-            shippingAddress: `${ctx.user.address || ""}, ${ctx.user.city || ""}, ${ctx.enteredPin}`,
+            shippingAddress: `${ctx.user.address || ""}, ${ctx.user.city || ""}, ${ctx.user.pincode || ""}`,
             orderDate: new Date().toLocaleString()
           });
         }
