@@ -210,18 +210,99 @@
     </div>
   </footer>
 
-  <!-- Persistent Active Sessions Script -->
+  <!-- Public Reviews List Pop-up -->
+  <div id="viewReviewsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:9999;">
+    <div style="background:#fff; padding:20px; border-radius:14px; width:90%; max-width:400px; max-height:80vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px;">
+        <h3 style="margin:0; font-size:16px; font-weight:bold;">Customer Reviews</h3>
+        <button onclick="document.getElementById('viewReviewsModal').style.display='none'" style="border:none; background:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <div id="publicReviewsList"></div>
+    </div>
+  </div>
+
+  <!-- Custom Smooth White Alert & Confirm Modal -->
+  <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px; transition:opacity 0.2s ease;">
+    <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; font-family:'Plus Jakarta Sans', sans-serif; animation:popScale 0.2s ease-out;">
+      
+      <!-- Pink/Red Alert Icon -->
+      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
+        !
+      </div>
+
+      <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
+      <p id="customPopupMessage" style="margin:0 0 20px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
+
+      <div id="customPopupButtons" style="display:flex; gap:10px; justify-content:center;">
+        <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Cancel</button>
+        <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @keyframes popScale {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+
+  <!-- Custom Popup Functions -->
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const loggedInUser = sessionStorage.getItem("currentLoggedInUser");
-      if (loggedInUser) {
-        const user = JSON.parse(loggedInUser);
-        document.getElementById("home-user-text").innerText = "Hi, " + user.name;
-        document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase();
-        document.getElementById("home-user-logo").style.background = "#10b981";
-      }
-    });
-  </script>    
+    window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("customPopupOverlay");
+        const icon = document.getElementById("customPopupIcon");
+        document.getElementById("customPopupTitle").innerText = title;
+        document.getElementById("customPopupMessage").innerText = message;
+        
+        if (type === "error") {
+          icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
+        } else if (type === "success") {
+          icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
+        } else {
+          icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
+        }
+
+        document.getElementById("customPopupCancelBtn").style.display = "none";
+        const okBtn = document.getElementById("customPopupOkBtn");
+        okBtn.innerText = "OK";
+        overlay.style.display = "flex";
+
+        okBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(true);
+        };
+      });
+    };
+
+    window.showConfirm = function(message, title = "Confirm Order") {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("customPopupOverlay");
+        const icon = document.getElementById("customPopupIcon");
+        document.getElementById("customPopupTitle").innerText = title;
+        document.getElementById("customPopupMessage").innerText = message;
+        
+        icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "?";
+
+        const cancelBtn = document.getElementById("customPopupCancelBtn");
+        const okBtn = document.getElementById("customPopupOkBtn");
+        cancelBtn.style.display = "block";
+        okBtn.innerText = "Confirm";
+        overlay.style.display = "flex";
+
+        cancelBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(false);
+        };
+        okBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(true);
+        };
+      });
+    };
+  </script>
 
   <!-- Core Javascript Connections -->
   <script src="products.js"></script>
@@ -254,6 +335,9 @@
                   <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
                   <p class="text-xs text-stone-500 mt-1">${product.desc || 'Premium Ready-made Collection'}</p>
                   
+                  <!-- Public Star Rating Box -->
+                  <div class="public-rating-box mt-1.5" data-product-id="${product.id}"></div>
+
                   <div class="flex items-center justify-between mt-3">
                     <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
                     <div class="flex items-center gap-1">
@@ -291,6 +375,11 @@
           `;
           gridContainer.innerHTML += productCard;
         });
+
+        // Trigger loading public reviews after product cards render
+        if (typeof loadPublicReviews === "function") {
+          loadPublicReviews();
+        }
       } else {
         console.error("PRODUCTS array is missing or product.js failed to load.");
       }
@@ -315,10 +404,10 @@
     }
     window.db = firebase.firestore();
 
-    function handleBuyNow(id) {
+    async function handleBuyNow(id) {
       const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
       if (!loggedInRaw) {
-        alert("Please log in first to place an order!");
+        await showAlert("Please log in first to place an order!", "Login Required", "info");
         window.location.href = "account.html";
         return;
       }
@@ -341,25 +430,29 @@
 
       const confirmMsg = `Item: ${item.title || item.name}\nSize: ${selectedSize}\nQuantity: ${quantity}\nTotal Amount: ₹${totalAmount}\nPayment Mode: ${paymentMethod}\n\nShipping Address:\n${user.address || "Address not available"}, ${user.city || ""} - ${user.pincode || ""}\n\nDo you want to confirm this order?`;
 
-      if (!confirm(confirmMsg)) return;
+      const isConfirmed = await showConfirm(confirmMsg, "Confirm Your Order");
+      if (!isConfirmed) return;
 
-      db.collection("orders").doc(orderId).set({
-        orderId: orderId,
-        productId: item.id,
-        productName: item.title || item.name,
-        size: selectedSize,
-        quantity: quantity,
-        totalAmount: totalAmount,
-        paymentMethod: paymentMethod,
-        paymentStatus: (paymentMethod === "COD") ? "Pending (Cash on Delivery)" : "Processing Online",
-        deliveryStatus: "packing",
-        userEmail: (user.email || "").toLowerCase(),
-        userName: user.name || "Customer",
-        phone: user.phone || "",
-        shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
-        orderDate: new Date().toLocaleString()
-      }).then(() => {
-        alert(`Congratulations! Your order has been placed.\nOrder ID: ${orderId}`);
+      try {
+        await db.collection("orders").doc(orderId).set({
+          orderId: orderId,
+          productId: item.id,
+          productName: item.title || item.name,
+          size: selectedSize,
+          quantity: quantity,
+          totalAmount: totalAmount,
+          paymentMethod: paymentMethod,
+          paymentStatus: (paymentMethod === "COD") ? "Pending (Cash on Delivery)" : "Processing Online",
+          deliveryStatus: "packing",
+          userEmail: (user.email || "").toLowerCase(),
+          userName: user.name || "Customer",
+          phone: user.phone || "",
+          shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
+          orderDate: new Date().toLocaleString()
+        });
+
+        await showAlert(`Congratulations! Your order has been placed.\nOrder ID: ${orderId}`, "Order Placed", "success");
+
         if (paymentMethod === "Online UPI") {
           const myUpiId = "8130748293@pthdfc";
           const merchantName = "Pinki Latest Fashion";
@@ -368,10 +461,13 @@
         } else {
           window.location.href = "account.html";
         }
-      }).catch((err) => {
-        alert("Error placing order: " + err.message);
-      });
+      } catch (err) {
+        await showAlert("Error placing order: " + err.message, "Order Failed", "error");
+      }
     }
   </script>
+
+  <!-- Public Reviews System Script -->
+  <script src="review.js"></script>
 </body>
-</html>.
+</html>
