@@ -28,4 +28,4 @@ const PRODUCTS = [
     image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80",
     sizes: ["M", "L", "XL"]
   }
-];........................
+];
