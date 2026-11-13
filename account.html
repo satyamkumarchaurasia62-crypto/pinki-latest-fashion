@@ -4,9 +4,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <!-- Firebase SDK -->
+  <!-- Firebase SDKs (App, Firestore & Auth) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pinki Latest Fashion - Account & Security</title>
@@ -23,25 +24,23 @@
     }
     .auth-container {
       background: #ffffff;
-      padding: 35px;
+      padding: 32px 28px;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
       border: 1px solid #e7e5e4;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       box-sizing: border-box;
     }
-    h2 { margin: 0 0 10px 0; color: #1f2937; font-size: 24px; font-weight: 700; }
-    .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
-    .form-group { margin-bottom: 16px; }
+    h2 { margin: 0 0 8px 0; color: #1f2937; font-size: 24px; font-weight: 700; }
+    .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 22px; }
+    .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #374151; }
     input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
     input:focus, select:focus { outline: none; border-color: #db2777; background: #fff; box-shadow: 0 0 0 3px rgba(219,39,119,0.15); }
-    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
+    button.main-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
     .btn-primary { background-color: #db2777; }
     .btn-primary:hover { background-color: #be185d; }
-    .btn-danger { background-color: #ef4444; }
-    .btn-danger:hover { background-color: #dc2626; }
     .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
     .toggle-text a { color: #db2777; text-decoration: none; font-weight: 600; cursor: pointer; }
     .toggle-text a:hover { text-decoration: underline; }
@@ -55,6 +54,9 @@
   </style>
 </head>
 <body>
+
+  <!-- Invisible reCAPTCHA Container for Firebase Mobile OTP -->
+  <div id="recaptcha-container"></div>
 
   <div class="auth-container">
     
@@ -72,30 +74,53 @@
           <input type="password" id="login-password" placeholder="••••••••" required>
           <a class="forgot-link" onclick="showBox('forgot')">Forgot Password?</a>
         </div>
-        <button type="submit" class="w-full py-3 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition">Login</button>
+        <button type="submit" class="main-btn btn-primary transition">Login</button>
       </form>
       <p class="toggle-text">Don't have an account? <a onclick="showBox('signup')">Sign Up</a></p>
     </div>
 
-    <!-- 2. Registration Box -->
+    <!-- 2. Registration Box (With Firebase Email & Mobile Verification) -->
     <div id="signup-box" style="display: none;">
       <h2>Create Account</h2>
-      <p class="subtitle">Fill in your details to start shopping.</p>
+      <p class="subtitle">Verify your Mobile via SMS OTP to register.</p>
       <form id="signup-form">
         <div class="form-group">
-          <label>Full Name</label>
+          <label>Full Name *</label>
           <input type="text" id="signup-name" placeholder="Anjali Sharma" required>
         </div>
+
         <div class="form-group">
-          <label>Email Address</label>
+          <label>Email Address * (Verification link will be sent here)</label>
           <input type="email" id="signup-email" placeholder="example@mail.com" required>
         </div>
+
+        <!-- Phone Number + SMS OTP Verification -->
         <div class="form-group">
-          <label>Password</label>
+          <div class="flex justify-between items-center mb-1">
+            <label style="margin:0;">Mobile Number (10 Digits) *</label>
+            <span id="mobile-otp-status" class="text-[11px] font-semibold text-amber-600">SMS Verification Required</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="tel" id="signup-phone" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="9876543210" required>
+            <button type="button" id="send-mobile-otp-btn" onclick="sendMobileOtp()" class="px-3 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-lg shrink-0 transition">
+              Send OTP
+            </button>
+          </div>
+          <!-- Mobile OTP Input Box -->
+          <div id="mobile-otp-box" class="hidden mt-2 flex gap-2 bg-pink-50 p-2 rounded-lg border border-pink-200">
+            <input type="text" id="mobile-otp-input" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="Enter 6-digit SMS OTP" class="text-xs font-mono font-bold bg-white">
+            <button type="button" onclick="verifyMobileOtp()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shrink-0 transition">
+              Verify
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password *</label>
           <input type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
         </div>
         <div class="form-group">
-          <label>Security Question</label>
+          <label>Security Question *</label>
           <select id="signup-question" required>
             <option value="pet">What was the name of your first pet?</option>
             <option value="school">What was the name of your first school?</option>
@@ -103,26 +128,24 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Your Answer</label>
+          <label>Your Answer *</label>
           <input type="text" id="signup-answer" placeholder="Enter your secret answer" required>
         </div>
         <div class="form-group">
-          <label>Phone Number</label>
-          <input type="tel" id="signup-phone" placeholder="10 digit mobile number" required>
-        </div>
-        <div class="form-group">
-          <label>Full Address</label>
+          <label>Full Address *</label>
           <input type="text" id="signup-address" placeholder="House number, street, area" required>
         </div>
-        <div class="form-group">
-          <label>City</label>
-          <input type="text" id="signup-city" placeholder="City name" required>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="signup-city" placeholder="City name" required>
+          </div>
+          <div class="form-group">
+            <label>Pincode *</label>
+            <input type="text" id="signup-pincode" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="6-digit Pincode" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Pincode</label>
-          <input type="text" id="signup-pincode" placeholder="Pincode" required>
-        </div>     
-        <button type="submit" class="btn-primary">Register & Create Account</button>
+        <button type="submit" id="register-submit-btn" class="main-btn btn-primary transition">Register & Verify Account</button>
       </form>
       <p class="toggle-text">Already have an account? <a onclick="showBox('login')">Sign In</a></p>
     </div>
@@ -152,7 +175,7 @@
           <label>New Password</label>
           <input type="password" id="forgot-new-password" placeholder="Set new password" minlength="8" required>
         </div>
-        <button type="submit" class="btn-primary">Update & Save Password</button>
+        <button type="submit" class="main-btn btn-primary transition">Update & Save Password</button>
       </form>
       <p class="toggle-text"><a onclick="showBox('login')">← Back to Login</a></p>
     </div>
@@ -164,11 +187,12 @@
       <div class="profile-view">
         <p><strong>Name:</strong> <span id="user-display-name"></span></p>
         <p><strong>Email:</strong> <span id="user-display-email"></span></p>
+        <p><strong>Mobile:</strong> <span id="user-display-phone"></span> <span class="text-xs text-emerald-600 font-bold">✓</span></p>
         <p><strong>Address:</strong> <span id="user-display-address"></span></p>
       </div>
 
       <div class="mt-6 flex flex-col sm:flex-row gap-3">
-        <a href="index.html" class="flex-1 text-center py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition flex items-center justify-center" style="margin-top: 10px;">
+        <a href="index.html" class="flex-1 text-center py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition flex items-center justify-center">
           <i class="fa-solid fa-house mr-2"></i>Home
         </a>
         <button onclick="logout()" class="flex-1 py-2.5 bg-stone-800 text-white font-semibold rounded-lg hover:bg-stone-900 transition">
@@ -182,19 +206,13 @@
   <!-- Custom Smooth White Alert & Confirm Modal -->
   <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px; transition:opacity 0.2s ease;">
     <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
-      
-      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
-        !
-      </div>
-
+      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
       <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
       <p id="customPopupMessage" style="margin:0 0 20px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
-
       <div id="customPopupButtons" style="display:flex; gap:10px; justify-content:center;">
         <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; margin-top:0;">Cancel</button>
         <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25); margin-top:0;">OK</button>
       </div>
-
     </div>
   </div>
 
@@ -237,11 +255,89 @@
       appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
     };
 
-    // Initialize Firebase & Firestore
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.firestore();
+
+    // Verification States
+    let isPhoneVerified = false;
+    let phoneConfirmationResult = null;
+    let verifiedPhoneNumber = "";
+
+    // Initialize Invisible reCAPTCHA for Firebase Mobile OTP
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
+          size: "invisible"
+        });
+      } catch (e) {
+        console.warn("reCAPTCHA init note:", e.message);
+      }
+    });
+
+    // Send Mobile SMS OTP via Firebase Phone Auth
+    async function sendMobileOtp() {
+      const rawPhone = (document.getElementById("signup-phone").value || "").replace(/\D/g, "");
+      if (rawPhone.length !== 10) {
+        await showAlert("Please enter a valid 10-digit mobile number!", "Invalid Number", "error");
+        return;
+      }
+
+      const fullPhone = "+91" + rawPhone;
+      verifiedPhoneNumber = rawPhone;
+      isPhoneVerified = false;
+
+      const btn = document.getElementById("send-mobile-otp-btn");
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+
+      try {
+        phoneConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, window.recaptchaVerifier);
+        document.getElementById("mobile-otp-box").classList.remove("hidden");
+        await showAlert(`A 6-digit SMS OTP has been sent to ${fullPhone}.`, "Mobile OTP Sent", "success");
+      } catch (err) {
+        await showAlert("Failed to send Mobile OTP: " + err.message, "SMS OTP Error", "error");
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.render().then(id => grecaptcha.reset(id));
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send OTP";
+      }
+    }
+
+    // Verify Mobile SMS OTP
+    async function verifyMobileOtp() {
+      const otpCode = (document.getElementById("mobile-otp-input").value || "").trim();
+      const currentPhone = (document.getElementById("signup-phone").value || "").replace(/\D/g, "");
+
+      if (!phoneConfirmationResult) {
+        await showAlert("Please click 'Send OTP' next to your mobile number first.", "Send OTP First", "error");
+        return;
+      }
+      if (currentPhone !== verifiedPhoneNumber) {
+        await showAlert("Mobile number was changed. Please send OTP to the new number.", "Number Changed", "error");
+        return;
+      }
+      if (otpCode.length !== 6) {
+        await showAlert("Please enter the 6-digit SMS OTP.", "Invalid OTP", "error");
+        return;
+      }
+
+      try {
+        await phoneConfirmationResult.confirm(otpCode);
+        isPhoneVerified = true;
+        document.getElementById("signup-phone").readOnly = true;
+        document.getElementById("signup-phone").style.background = "#ecfdf5";
+        document.getElementById("send-mobile-otp-btn").style.display = "none";
+        document.getElementById("mobile-otp-box").classList.add("hidden");
+        document.getElementById("mobile-otp-status").innerHTML = `<span class="text-emerald-600 font-bold">✓ Mobile Verified</span>`;
+        await showAlert("Mobile number verified successfully!", "Verified", "success");
+      } catch (err) {
+        await showAlert("Incorrect SMS OTP. Please check and try again.", "Invalid OTP", "error");
+      }
+    }
 
     function showBox(type) {
       const loginBox = document.getElementById("login-box");
@@ -259,9 +355,11 @@
       showBox('profile');
       const nameElem = document.getElementById("user-display-name");
       const emailElem = document.getElementById("user-display-email");
+      const phoneElem = document.getElementById("user-display-phone");
       const addrElem = document.getElementById("user-display-address");
       if (nameElem) nameElem.innerText = user.name;
       if (emailElem) emailElem.innerText = user.email;
+      if (phoneElem) phoneElem.innerText = user.phone || "N/A";
       if (addrElem) addrElem.innerText = `${user.address || ''}, ${user.city || ''} - ${user.pincode || ''}`;
     }
 
@@ -271,11 +369,16 @@
       window.location.href = "index.html";
     }
 
-    // 2. Sign Up (Firebase)
+    // Sign Up Submit (Requires Mobile OTP Verified + Sends Firebase Verification Email)
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
       signupForm.addEventListener("submit", async function(e) {
         e.preventDefault();
+
+        if (!isPhoneVerified) {
+          await showAlert("Please verify your 10-digit Mobile Number via SMS OTP before creating your account.", "Mobile Verification Required", "error");
+          return;
+        }
 
         const name = document.getElementById("signup-name").value.trim();
         const email = document.getElementById("signup-email").value.trim().toLowerCase();
@@ -287,16 +390,22 @@
         const city = document.getElementById("signup-city").value.trim();
         const pincode = document.getElementById("signup-pincode").value.trim();
 
-        if (!email || !password) {
-          await showAlert("Please fill in email and password!", "Missing Fields", "error");
-          return;
-        }
+        const btn = document.getElementById("register-submit-btn");
+        btn.disabled = true;
+        btn.innerText = "Creating Account & Sending Email...";
 
         try {
           const doc = await db.collection("users").doc(email).get();
           if (doc.exists) {
             await showAlert("This email address is already registered!", "Already Registered", "error");
           } else {
+            // 1. Create User in Firebase Auth
+            const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+            
+            // 2. Send Official Verification Email from Firebase
+            await userCred.user.sendEmailVerification();
+
+            // 3. Save User Data in Firestore
             await db.collection("users").doc(email).set({
               name: name,
               email: email,
@@ -304,23 +413,30 @@
               question: question,
               answer: answer,
               phone: phone,
+              phoneVerified: true,
               address: address,
               city: city,
               pincode: pincode,
               orders: [],
               createdAt: new Date()
             });
-            await showAlert("Account created successfully! You can now log in.", "Welcome!", "success");
+
+            await showAlert("Account created successfully!\n\nWe have sent a verification link to your email (" + email + "). Please check your inbox and verify your email.", "Verification Email Sent", "success");
+            
+            await firebase.auth().signOut();
             signupForm.reset();
             showBox('login');
           }
         } catch (error) {
-          await showAlert("Error creating account: " + error.message, "Error", "error");
+          await showAlert("Error: " + error.message, "Registration Failed", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Register & Verify Account";
         }
       });
     }
 
-    // 3. Sign In (Firebase)
+    // Sign In
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -350,7 +466,7 @@
       });
     }
 
-    // 4. Forgot Password (Firebase)
+    // Forgot Password
     const forgotForm = document.getElementById("forgot-form");
     if (forgotForm) {
       forgotForm.addEventListener("submit", async function(e) {
@@ -387,8 +503,8 @@
     // Check login state on page load
     const savedUser = sessionStorage.getItem("currentLoggedInUser");
     if (savedUser) {
-        const userData = JSON.parse(savedUser);
-        loadProfile(userData);
+      const userData = JSON.parse(savedUser);
+      loadProfile(userData);
     }
   </script>
 </body>
