@@ -14,9 +14,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <!-- Razorpay Payment Integration Script -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
   <script>
     tailwind.config = {
       theme: {
@@ -45,73 +42,73 @@
 <body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-stone-900">
 
 <div class="bg-stone-900 text-stone-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide">
+  Free Delivery on orders above ₹999 | Special Coupon Discounts on 3+ Outfits!
 </div>
 
   <!-- Minimalist Sticky Header -->
-  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200/80 shadow-sm pt-7 pb-8">
-    <div class="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200/80 shadow-sm py-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
       
       <!-- Brand Logo / Typography -->
-      <a href="#" class="flex flex-col">
-        <span class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-stone-650">
-          Pinki <span class="text-boutique-700 italic font-medium">Latest Fashion</span>
+      <a href="#" class="flex flex-col min-w-0">
+        <span class="font-serif text-xl sm:text-3xl font-bold tracking-tight text-stone-800 truncate">
+          Pinki <span class="text-boutique-800 italic font-medium">Latest Fashion</span>
         </span>
-        <span class="text-[10px] tracking-[0.2em] uppercase text-stone-500 font-semibold mt-0.5">
-          Ready-to-Wear Ladies Clothes & Designer Clothes
+        <span class="text-[9px] sm:text-[10px] tracking-[0.15em] uppercase text-stone-500 font-semibold truncate">
+          Ready-to-Wear Ladies Designer Clothes
         </span>
       </a>
 
-      <!-- Direct Actions (Profile & Contact) -->
-      <div class="flex items-center gap-4">
-        
-       <div class="flex items-center gap-2 shrink-0">
-          <div class="live-profile-widget">
-              <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 shadow-sm text-stone-700 text-xs font-semibold whitespace-nowrap">
-                  <div style="width: 20px; height: 20px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-1.5 text-[10px]" id="home-user-logo">
-                      <i class="fa-solid fa-user text-[10px]"></i>
-                  </div>
-                  <span id="home-user-text" class="max-w-[90px] sm:max-w-none truncate">Account</span>
-              </a>
-          </div>
+      <!-- Direct Actions (Profile, Orders & Cart) -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="live-profile-widget">
+            <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 shadow-sm text-stone-700 text-xs font-semibold whitespace-nowrap">
+                <div style="width: 20px; height: 20px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-1.5 text-[10px]" id="home-user-logo">
+                    <i class="fa-solid fa-user text-[10px]"></i>
+                </div>
+                <span id="home-user-text" class="max-w-[70px] sm:max-w-none truncate">Account</span>
+            </a>
+        </div>
 
-          <!-- My Orders Button -->
-          <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-2.5 py-1.5 bg-pink-100 text-pink-700 text-xs font-semibold rounded-full hover:bg-pink-200 transition whitespace-nowrap">
-              <i class="fa-solid fa-bag-shopping mr-1"></i> Orders
-          </a>
+        <!-- My Orders Button -->
+        <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-2.5 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-full hover:bg-stone-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-box mr-1"></i> <span class="hidden sm:inline">Orders</span>
+        </a>
+
+        <!-- Floating/Header Cart Button -->
+        <button onclick="openCartModal()" class="relative inline-flex items-center px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-full shadow-sm transition whitespace-nowrap">
+            <i class="fa-solid fa-cart-shopping mr-1.5"></i>
+            <span>Cart</span>
+            <span id="cart-badge-count" class="ml-1.5 bg-white text-pink-700 font-extrabold px-1.5 py-0.2 rounded-full text-[11px]">0</span>
+        </button>
       </div>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="relative bg-gradient-to-b from-stone-100 via-[#fbf7f5] to-[#fcfaf9] py-14 sm:py-20 border-b border-stone-200/70">
+  <section class="relative bg-gradient-to-b from-stone-100 via-[#fbf7f5] to-[#fcfaf9] py-12 sm:py-16 border-b border-stone-200/70">
     <div class="max-w-5xl mx-auto px-4 text-center space-y-4">
       <div class="inline-flex items-center gap-2 bg-rose-50 border border-rose-200/60 text-boutique-800 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
         <i class="fa-solid fa-sparkles text-xs"></i>
         New Festive & Wedding Arrivals
       </div>
       
-      <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-stone-900 tracking-tight leading-tight">
+      <h1 class="font-serif text-3xl sm:text-5xl font-bold text-stone-900 tracking-tight leading-tight">
         Handcrafted Ready Fashion Clothes & <br class="hidden sm:inline"/><span class="italic font-normal text-boutique-800">Premium Ladies Outfits</span>
       </h1>
       
       <p class="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-        Completely ready to wear premium ladies attire. No tailoring delays—simply choose your preferred size and place your order instantly.
+        Add single or multiple outfits to your cart, apply your promo code at checkout, and pay via Cash on Delivery or Instant UPI.
       </p>
-
-      <div class="pt-2 flex flex-wrap justify-center items-center gap-6 text-xs text-stone-500 font-medium">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-600"></i> Fully Stitched & Lined</span>
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-600"></i> Instant Razorpay UPI Checkout</span>
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-600"></i> Fast Local Dispatch</span>
-      </div>
     </div>
   </section>
 
   <!-- Products Catalog -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex-grow w-full">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-stone-200 pb-4 mb-10 gap-2">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow w-full">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-stone-200 pb-4 mb-8 gap-2">
       <div>
         <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Curated Ethnic Collection</h2>
-        <p class="text-xs sm:text-sm text-stone-500 mt-1">Select your preferred fit and buy directly with Online UPI or Cash on Delivery</p>
+        <p class="text-xs sm:text-sm text-stone-500 mt-1">Select your size & quantity, then add to your shopping cart</p>
       </div>
       <div id="catalog-count" class="text-xs font-semibold text-stone-500">
         Exclusive Readymade Outfits
@@ -119,24 +116,19 @@
     </div>
     
     <!-- Dynamic Product Populating Grid -->
-    <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
     </div>
   </main>
 
   <!-- Contact & Footer Section -->
-  <section class="bg-white border-t border-stone-200 py-14">
+  <section class="bg-white border-t border-stone-200 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="bg-stone-50 rounded-3xl p-6 sm:p-10 border border-stone-200/80 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
-        
-        <!-- Store Address -->
+      <div class="bg-stone-50 rounded-3xl p-6 sm:p-10 border border-stone-200/80 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
         <div class="space-y-3">
           <div class="w-10 h-10 rounded-full bg-rose-100 text-boutique-800 flex items-center justify-center">
             <i class="fa-solid fa-location-dot text-base"></i>
           </div>
-          <div>
-            <h3 class="font-bold text-stone-900 text-base">Pinki Latest Fashion</h3>
-          </div>
+          <h3 class="font-bold text-stone-900 text-base">Pinki Latest Fashion</h3>
           <p class="text-stone-600 text-xs leading-relaxed">
             Omicron-1, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh
           </p>
@@ -145,70 +137,132 @@
           </span>
         </div>
 
-        <!-- Phone & WhatsApp Support -->
         <div class="space-y-3">
           <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
             <i class="fa-solid fa-phone text-base"></i>
           </div>
-          <div>
-            <h3 class="font-bold text-stone-900 text-base">Call & WhatsApp Order</h3>
-          </div>
+          <h3 class="font-bold text-stone-900 text-base">Call & WhatsApp Order</h3>
           <div class="space-y-1">
             <a href="tel:8130748293" class="text-stone-900 font-bold hover:text-boutique-800 text-base block transition">
               +91 8130748293
             </a>
-            <a href="https://wa.me/918130748293?text=Hello%20Pinki%20Latest%20Fashion" 
-               target="_blank" 
-               class="text-xs text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1">
+            <a href="https://wa.me/918130748293?text=Hello%20Pinki%20Latest%20Fashion" target="_blank" class="text-xs text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1">
               <i class="fa-brands fa-whatsapp"></i> Chat directly on WhatsApp
             </a>
           </div>
         </div>
 
-        <!-- Payment & Delivery Assurance -->
         <div class="space-y-3">
           <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center">
             <i class="fa-solid fa-shield-halved text-base"></i>
           </div>
-          <div>
-            <h3 class="font-bold text-stone-900 text-base">Safe Shopping Guarantee</h3>
-            <p class="text-stone-500 text-xs mt-0.5">Easy, verified and instant delivery</p>
-          </div>
+          <h3 class="font-bold text-stone-900 text-base">Safe Shopping Guarantee</h3>
           <ul class="text-stone-600 text-xs space-y-2">
-            <li class="flex items-center gap-2">
-              <i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i>
-              <span>100% Ready-to-wear with inner lining</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i>
-              <span>Online UPI (GPay, PhonePe, Paytm) & Cash</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i>
-              <span>Local doorstep delivery in India</span>
-            </li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>100% Ready-to-wear with inner lining</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Online UPI & Cash on Delivery</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Free Delivery above ₹999</span></li>
           </ul>
         </div>
-
       </div>
-
     </div>
   </section>
 
   <!-- Clean Footer -->
   <footer class="bg-stone-950 text-stone-400 py-8 text-xs text-center border-t border-stone-800">
     <div class="max-w-7xl mx-auto px-4 space-y-2">
-      <div class="font-serif text-lg text-white font-bold tracking-tight">
-        Pinki Latest Fashion
-      </div>
-      <p class="text-stone-500">
-        Omicron-1, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh | Helpline: +91 8130748293
-      </p>
-      <p class="text-[11px] text-stone-600 pt-2">
-        © 2026 Pinki Latest Fashion. All rights reserved.
-      </p>
+      <div class="font-serif text-lg text-white font-bold tracking-tight">Pinki Latest Fashion</div>
+      <p class="text-stone-500">Omicron-1, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh | Helpline: +91 8130748293</p>
+      <p class="text-[11px] text-stone-600 pt-2">© 2026 Pinki Latest Fashion. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- ===================================================================== -->
+  <!-- SHOPPING CART & BILL CHECKOUT MODAL (With Delivery Charge & Coupon)   -->
+  <!-- ===================================================================== -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-bold text-stone-800 flex items-center gap-2">
+          <i class="fa-solid fa-bag-shopping text-pink-600"></i> Your Shopping Cart
+        </h3>
+        <button onclick="closeCartModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+      </div>
+
+      <!-- Empty Cart View -->
+      <div id="empty-cart-view" class="hidden text-center py-10 space-y-3">
+        <i class="fa-solid fa-cart-arrow-down text-4xl text-stone-300"></i>
+        <p class="text-sm font-semibold text-stone-600">Your cart is currently empty.</p>
+        <button onclick="closeCartModal()" class="px-5 py-2 bg-pink-600 text-white text-xs font-bold rounded-xl hover:bg-pink-700">Continue Shopping</button>
+      </div>
+
+      <!-- Filled Cart Items + Billing Summary -->
+      <div id="filled-cart-view" class="space-y-4">
+        
+        <!-- Cart Items List -->
+        <div id="cart-items-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1"></div>
+
+        <!-- Coupon Code Section (Applies to Total Cart Bill) -->
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
+          <label class="block text-xs font-bold text-stone-700">Have a Promo / Coupon Code?</label>
+          <div class="flex gap-2">
+            <input type="text" id="cart-coupon-input" placeholder="Enter coupon code (e.g. PINKI100)" class="w-full text-xs uppercase border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-pink-500">
+            <button type="button" onclick="applyCartCoupon()" class="px-4 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-lg shrink-0 transition">
+              Apply
+            </button>
+          </div>
+          <div id="cart-coupon-msg" class="text-[11px] font-medium"></div>
+        </div>
+
+        <!-- Complete Price & Delivery Breakdown -->
+        <div class="bg-pink-50/60 border border-pink-100 rounded-xl p-3.5 space-y-2 text-xs">
+          <div class="flex justify-between text-stone-600">
+            <span>Total Outfits (<span id="bill-total-qty">0</span> pcs):</span>
+            <span id="bill-subtotal" class="font-semibold text-stone-800">₹0</span>
+          </div>
+          <div class="flex justify-between text-stone-600">
+            <span>Delivery Charges <span class="text-[10px] text-stone-400">(Free above ₹999)</span>:</span>
+            <span id="bill-delivery" class="font-semibold text-stone-800">₹0</span>
+          </div>
+          <div id="bill-discount-row" class="hidden flex justify-between text-emerald-700 font-bold">
+            <span>Coupon Discount (<span id="bill-coupon-name"></span>):</span>
+            <span id="bill-discount">-₹0</span>
+          </div>
+          <div class="border-t border-pink-200 pt-2 flex justify-between text-sm font-extrabold text-stone-900">
+            <span>Grand Total Payable:</span>
+            <span id="bill-grand-total" class="text-pink-600 text-base">₹0</span>
+          </div>
+        </div>
+
+        <!-- Payment Mode Selection -->
+        <div class="space-y-1.5 text-xs">
+          <div class="font-bold text-stone-700">Select Payment Method:</div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 border border-stone-200 rounded-xl p-2.5 cursor-pointer hover:bg-stone-50">
+              <input type="radio" name="cart-payment-mode" value="COD" checked>
+              <span class="font-semibold text-stone-700">Cash on Delivery</span>
+            </label>
+            <label class="flex items-center gap-2 border border-stone-200 rounded-xl p-2.5 cursor-pointer hover:bg-stone-50">
+              <input type="radio" name="cart-payment-mode" value="Online UPI">
+              <span class="font-semibold text-stone-700">Online UPI</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Checkout Action Buttons -->
+        <div class="flex gap-2.5 pt-2">
+          <button onclick="closeCartModal()" class="w-1/3 py-2.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl text-xs transition">
+            + Add More
+          </button>
+          <button id="checkout-submit-btn" onclick="checkoutCart()" class="w-2/3 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-sm shadow transition">
+            Place Order & Pay
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <!-- Public Reviews List Pop-up -->
   <div id="viewReviewsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:9999;">
@@ -222,21 +276,15 @@
   </div>
 
   <!-- Custom Smooth White Alert & Confirm Modal -->
-  <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px; transition:opacity 0.2s ease;">
+  <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
     <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; font-family:'Plus Jakarta Sans', sans-serif; animation:popScale 0.2s ease-out;">
-      
-      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
-        !
-      </div>
-
+      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
       <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
       <p id="customPopupMessage" style="margin:0 0 20px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
-
       <div id="customPopupButtons" style="display:flex; gap:10px; justify-content:center;">
         <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Cancel</button>
         <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
       </div>
-
     </div>
   </div>
 
@@ -303,7 +351,7 @@
     };
   </script>
 
-  <!-- Core Javascript Connections (Exact filename: product.js) -->
+  <!-- Core Product Catalog -->
   <script src="product.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -315,22 +363,16 @@
         document.getElementById("home-user-logo").style.background = "#10b981"; 
       }
       const ordersBtn = document.getElementById("my-orders-btn");
-      if (ordersBtn) {
-          ordersBtn.classList.remove("hidden");
-      }
+      if (ordersBtn) ordersBtn.classList.remove("hidden");
 
       const gridContainer = document.getElementById("product-grid");
       if (gridContainer && typeof PRODUCTS !== 'undefined') {
         const countEl = document.getElementById("catalog-count");
-        if (countEl) {
-          countEl.innerText = `${PRODUCTS.length} Exclusive Readymade Outfits`;
-        }
+        if (countEl) countEl.innerText = `${PRODUCTS.length} Exclusive Readymade Outfits`;
 
         gridContainer.innerHTML = "";
         PRODUCTS.forEach(product => {
           let sizeOptions = (product.sizes || ["Free Size"]).map(s => `<option value="${s}">${s}</option>`).join("");
-          
-          // Auto Calculate Discount Percentage
           let discountPercent = 0;
           if (product.mrp && product.mrp > product.price) {
             discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
@@ -370,37 +412,16 @@
                   </div>
                 </div>
               </div>
-              <div class="p-4 pt-0 space-y-2">
-                <div class="flex items-center justify-between text-xs text-stone-600 mb-2">
+
+              <div class="p-4 pt-0 space-y-2.5">
+                <div class="flex items-center justify-between text-xs text-stone-600">
                   <label>Quantity (Qty):</label>
                   <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
                 </div>
 
-                <!-- Coupon Code Input Box (Min 3-4 Qty Condition) -->
-                <div class="mb-2.5">
-                  <div class="flex gap-1.5">
-                    <input type="text" id="coupon-${product.id}" placeholder="Coupon Code" class="w-full text-xs uppercase border border-stone-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-pink-500">
-                    <button type="button" onclick="applyCoupon(${product.id})" class="px-3 py-1.5 bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold rounded-lg shrink-0 transition">
-                      Apply
-                    </button>
-                  </div>
-                  <div id="coupon-msg-${product.id}" class="text-[11px] mt-1 font-medium"></div>
-                </div>
-                
-                <div class="text-xs text-stone-600 space-y-1 mb-3">
-                  <div class="font-semibold">Payment Type:</div>
-                  <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="pay-${product.id}" value="COD" checked>
-                    <span>Cash on Delivery (COD)</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="pay-${product.id}" value="Online UPI">
-                    <span>Online UPI</span>
-                  </label>
-                </div>
-
-                <button id="buy-btn-${product.id}" onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow">
-                  BUY NOW
+                <!-- Add to Cart Button (Primary) -->
+                <button id="buy-btn-${product.id}" onclick="addToCart(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-cart-plus"></i> ADD TO CART
                 </button>
               </div>
             </div>
@@ -408,16 +429,13 @@
           gridContainer.innerHTML += productCard;
         });
 
-        if (typeof loadPublicReviews === "function") {
-          loadPublicReviews();
-        }
-      } else {
-        console.error("PRODUCTS array is missing or product.js failed to load.");
+        if (typeof loadPublicReviews === "function") loadPublicReviews();
+        updateCartBadge();
       }
     });
   </script>
 
-  <!-- Firebase Scripts & db initialization -->
+  <!-- Firebase & Complete Cart Checkout Engine -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script>
@@ -435,76 +453,46 @@
     }
     window.db = firebase.firestore();
 
-    window.appliedCoupons = {};
+    // =========================================================================
+    // SHOPPING CART STATE & DELIVERY RULES
+    // =========================================================================
+    const FREE_DELIVERY_MIN_AMOUNT = 999; // ₹999 या उससे ऊपर Free Delivery
+    const STANDARD_DELIVERY_CHARGE = 60;  // ₹999 से कम पर ₹60 Delivery Charge
 
-    // Single-Use & Minimum Quantity Coupon Validation
-    async function applyCoupon(productId) {
-      const input = document.getElementById(`coupon-${productId}`);
-      const msgEl = document.getElementById(`coupon-msg-${productId}`);
-      const qtyElem = document.getElementById(`qty-${productId}`);
-      const currentQty = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
-      const code = (input.value || "").trim().toUpperCase();
+    let shoppingCart = JSON.parse(localStorage.getItem("pinki_fashion_cart") || "[]");
+    let activeCartCoupon = null; // { code, discount, minQty }
 
-      if (!code) {
-        msgEl.innerHTML = `<span class="text-red-600">Please enter a coupon code.</span>`;
-        delete window.appliedCoupons[productId];
-        return;
-      }
-
-      msgEl.innerHTML = `<span class="text-stone-500">Checking code...</span>`;
-
-      try {
-        const docSnap = await db.collection("coupons").doc(code).get();
-
-        if (!docSnap.exists) {
-          msgEl.innerHTML = `<span class="text-red-600">✕ Invalid coupon code.</span>`;
-          delete window.appliedCoupons[productId];
-          return;
-        }
-
-        const couponData = docSnap.data();
-        if (couponData.isUsed === true) {
-          msgEl.innerHTML = `<span class="text-red-600">✕ This coupon has already been used/expired.</span>`;
-          delete window.appliedCoupons[productId];
-          return;
-        }
-
-        const minRequiredQty = Number(couponData.minQty) || 3;
-        if (currentQty < minRequiredQty) {
-          msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Buy at least ${minRequiredQty} pieces together to use this coupon! (Current Qty: ${currentQty})</span>`;
-          delete window.appliedCoupons[productId];
-          return;
-        }
-
-        const discountAmt = Number(couponData.discount) || 0;
-        window.appliedCoupons[productId] = { 
-          code: code, 
-          discount: discountAmt, 
-          minQty: minRequiredQty 
-        };
-        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Coupon '${code}' applied! Extra ₹${discountAmt} off</span>`;
-      } catch (err) {
-        msgEl.innerHTML = `<span class="text-red-600">Error checking coupon.</span>`;
-      }
+    function saveCartToStorage() {
+      localStorage.setItem("pinki_fashion_cart", JSON.stringify(shoppingCart));
+      updateCartBadge();
     }
 
-    async function handleBuyNow(id) {
-      const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
-      if (!loggedInRaw) {
-        await showAlert("Please log in first to place an order!", "Login Required", "info");
-        window.location.href = "account.html";
+    function updateCartBadge() {
+      const totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById("cart-badge-count");
+      if (badge) badge.innerText = totalItems;
+    }
+
+    // 1. Add Product to Cart
+    async function addToCart(productId) {
+      const item = PRODUCTS.find(p => p.id === productId);
+      if (!item) return;
+
+      const sizeElem = document.getElementById(`size-${productId}`);
+      const selectedSize = sizeElem ? sizeElem.value : "Free Size";
+
+      const qtyElem = document.getElementById(`qty-${productId}`);
+      const addQty = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
+
+      if (addQty < 1) {
+        await showAlert("Please select at least 1 quantity.", "Invalid Quantity", "error");
         return;
       }
 
-      const user = JSON.parse(loggedInRaw);
-      const item = PRODUCTS.find(p => p.id === id);
-      if (!item) return;
-
-      const sizeElem = document.getElementById(`size-${id}`);
-      const selectedSize = sizeElem ? sizeElem.value : "Free Size";
-
-      const qtyElem = document.getElementById(`qty-${id}`);
-      const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
+      // Check existing qty of same product + size in cart
+      const existingIndex = shoppingCart.findIndex(c => c.productId === item.id && c.size === selectedSize);
+      const alreadyInCartQty = existingIndex > -1 ? shoppingCart[existingIndex].quantity : 0;
+      const totalRequestedQty = alreadyInCartQty + addQty;
 
       // Live Stock Validation
       const avail = window.liveRemainingStock?.[String(item.id)]?.[selectedSize];
@@ -512,100 +500,331 @@
         await showAlert(`Sorry, Size ${selectedSize} is currently Out of Stock!`, "Out of Stock", "error");
         return;
       }
-      if (avail !== undefined && quantity > avail) {
-        await showAlert(`Only ${avail} piece(s) left in Size ${selectedSize}. Please reduce quantity.`, "Limited Stock", "error");
+      if (avail !== undefined && totalRequestedQty > avail) {
+        await showAlert(`Only ${avail} piece(s) available in Size ${selectedSize} (You already have ${alreadyInCartQty} in cart).`, "Limited Stock", "error");
         return;
       }
 
-      const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
+      if (existingIndex > -1) {
+        shoppingCart[existingIndex].quantity += addQty;
+      } else {
+        shoppingCart.push({
+          productId: item.id,
+          title: item.title,
+          price: item.price,
+          image: item.image,
+          size: selectedSize,
+          quantity: addQty
+        });
+      }
+
+      saveCartToStorage();
+      openCartModal();
+    }
+
+    // 2. Remove Item or Change Qty in Cart
+    function removeCartItem(index) {
+      shoppingCart.splice(index, 1);
+      saveCartToStorage();
+      renderCartModal();
+    }
+
+    async function updateCartItemQty(index, delta) {
+      const cartItem = shoppingCart[index];
+      if (!cartItem) return;
+
+      const newQty = cartItem.quantity + delta;
+      if (newQty <= 0) {
+        removeCartItem(index);
+        return;
+      }
+
+      const avail = window.liveRemainingStock?.[String(cartItem.productId)]?.[cartItem.size];
+      if (avail !== undefined && newQty > avail) {
+        await showAlert(`Maximum ${avail} piece(s) available in Size ${cartItem.size}.`, "Stock Limit", "error");
+        return;
+      }
+
+      cartItem.quantity = newQty;
+      saveCartToStorage();
+      renderCartModal();
+    }
+
+    function openCartModal() {
+      renderCartModal();
+      document.getElementById("cartModal").classList.remove("hidden");
+    }
+
+    function closeCartModal() {
+      document.getElementById("cartModal").classList.add("hidden");
+    }
+
+    // 3. Render Cart Items & Calculate Subtotal + Delivery + Coupon
+    function renderCartModal() {
+      const emptyView = document.getElementById("empty-cart-view");
+      const filledView = document.getElementById("filled-cart-view");
+      const listContainer = document.getElementById("cart-items-list");
+
+      if (shoppingCart.length === 0) {
+        emptyView.classList.remove("hidden");
+        filledView.classList.add("hidden");
+        activeCartCoupon = null;
+        return;
+      }
+
+      emptyView.classList.add("hidden");
+      filledView.classList.remove("hidden");
+      listContainer.innerHTML = "";
+
+      let subtotal = 0;
+      let totalQty = 0;
+
+      shoppingCart.forEach((cItem, idx) => {
+        const itemTotal = cItem.price * cItem.quantity;
+        subtotal += itemTotal;
+        totalQty += cItem.quantity;
+
+        listContainer.innerHTML += `
+          <div class="flex items-center justify-between gap-3 bg-white border border-stone-200 rounded-xl p-2.5">
+            <img src="${cItem.image}" class="w-12 h-14 object-cover rounded-lg border shrink-0">
+            <div class="flex-grow min-w-0">
+              <div class="text-xs font-bold text-stone-800 truncate">${cItem.title}</div>
+              <div class="text-[11px] text-stone-500">Size: <span class="font-semibold">${cItem.size}</span> | ₹${cItem.price} each</div>
+              <div class="flex items-center gap-2 mt-1">
+                <button onclick="updateCartItemQty(${idx}, -1)" class="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 font-bold text-xs">-</button>
+                <span class="text-xs font-bold">${cItem.quantity}</span>
+                <button onclick="updateCartItemQty(${idx}, 1)" class="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 font-bold text-xs">+</button>
+              </div>
+            </div>
+            <div class="text-right shrink-0 space-y-1">
+              <div class="text-xs font-extrabold text-pink-600">₹${itemTotal}</div>
+              <button onclick="removeCartItem(${idx})" class="text-[11px] text-red-500 hover:underline">Remove</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Delivery Charge Logic
+      const deliveryCharge = (subtotal >= FREE_DELIVERY_MIN_AMOUNT) ? 0 : STANDARD_DELIVERY_CHARGE;
+
+      // Check if applied coupon still meets minimum total cart quantity
+      let discountAmount = 0;
+      const discountRow = document.getElementById("bill-discount-row");
+      const msgEl = document.getElementById("cart-coupon-msg");
+
+      if (activeCartCoupon) {
+        if (totalQty < activeCartCoupon.minQty) {
+          msgEl.innerHTML = `<span class="text-red-600">✕ Coupon '${activeCartCoupon.code}' removed (requires at least ${activeCartCoupon.minQty} items in cart).</span>`;
+          activeCartCoupon = null;
+          discountRow.classList.add("hidden");
+        } else {
+          discountAmount = Math.min(subtotal + deliveryCharge, activeCartCoupon.discount);
+          discountRow.classList.remove("hidden");
+          document.getElementById("bill-coupon-name").innerText = activeCartCoupon.code;
+          document.getElementById("bill-discount").innerText = `-₹${discountAmount}`;
+        }
+      } else {
+        discountRow.classList.add("hidden");
+      }
+
+      const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);
+
+      document.getElementById("bill-total-qty").innerText = totalQty;
+      document.getElementById("bill-subtotal").innerText = `₹${subtotal}`;
+      document.getElementById("bill-delivery").innerHTML = deliveryCharge === 0 
+        ? `<span class="text-emerald-600 font-bold">FREE</span>` 
+        : `₹${deliveryCharge}`;
+      document.getElementById("bill-grand-total").innerText = `₹${grandTotal}`;
+    }
+
+    // 4. Apply Coupon on Entire Cart
+    async function applyCartCoupon() {
+      const input = document.getElementById("cart-coupon-input");
+      const msgEl = document.getElementById("cart-coupon-msg");
+      const code = (input.value || "").trim().toUpperCase();
+      const totalCartQty = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+
+      if (!code) {
+        msgEl.innerHTML = `<span class="text-red-600">Please enter a coupon code.</span>`;
+        activeCartCoupon = null;
+        renderCartModal();
+        return;
+      }
+
+      msgEl.innerHTML = `<span class="text-stone-500">Verifying coupon...</span>`;
+
+      try {
+        const docSnap = await db.collection("coupons").doc(code).get();
+        if (!docSnap.exists) {
+          msgEl.innerHTML = `<span class="text-red-600">✕ Invalid coupon code.</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        const cData = docSnap.data();
+        if (cData.isUsed === true) {
+          msgEl.innerHTML = `<span class="text-red-600">✕ This coupon has already been used/expired.</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        const minRequiredQty = Number(cData.minQty) || 3;
+        if (totalCartQty < minRequiredQty) {
+          msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Add at least ${minRequiredQty} outfits in cart to apply this coupon! (Currently: ${totalCartQty})</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        const discountAmt = Number(cData.discount) || 0;
+        activeCartCoupon = {
+          code: code,
+          discount: discountAmt,
+          minQty: minRequiredQty
+        };
+
+        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Coupon '${code}' applied! ₹${discountAmt} deducted from total bill.</span>`;
+        renderCartModal();
+      } catch (err) {
+        msgEl.innerHTML = `<span class="text-red-600">Error verifying coupon.</span>`;
+      }
+    }
+
+    // 5. Final Checkout & Place All Cart Orders Together
+    async function checkoutCart() {
+      if (shoppingCart.length === 0) return;
+
+      const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+      if (!loggedInRaw) {
+        closeCartModal();
+        await showAlert("Please log in first to place your order!", "Login Required", "info");
+        window.location.href = "account.html";
+        return;
+      }
+
+      const user = JSON.parse(loggedInRaw);
+      const payElem = document.querySelector('input[name="cart-payment-mode"]:checked');
       const paymentMethod = payElem ? payElem.value : "COD";
 
-      // Coupon & Price Calculation
-      const baseAmount = item.price * quantity;
-      const applied = window.appliedCoupons[id];
+      // Re-verify stock for every item in cart
+      let subtotal = 0;
+      let totalQty = 0;
+      for (const cItem of shoppingCart) {
+        const avail = window.liveRemainingStock?.[String(cItem.productId)]?.[cItem.size];
+        if (avail !== undefined && cItem.quantity > avail) {
+          await showAlert(`Sorry, "${cItem.title}" (Size ${cItem.size}) only has ${avail} piece(s) left. Please adjust your cart.`, "Stock Updated", "error");
+          return;
+        }
+        subtotal += cItem.price * cItem.quantity;
+        totalQty += cItem.quantity;
+      }
+
+      const deliveryCharge = (subtotal >= FREE_DELIVERY_MIN_AMOUNT) ? 0 : STANDARD_DELIVERY_CHARGE;
       let discountAmount = 0;
       let appliedCode = "";
 
-      if (applied) {
-        if (quantity < applied.minQty) {
-          await showAlert(`Coupon '${applied.code}' is only valid when buying at least ${applied.minQty} pieces together!`, "Minimum Quantity Required", "error");
+      if (activeCartCoupon) {
+        if (totalQty < activeCartCoupon.minQty) {
+          await showAlert(`Coupon '${activeCartCoupon.code}' requires at least ${activeCartCoupon.minQty} items in cart.`, "Condition Not Met", "error");
           return;
         }
-
-        const freshSnap = await db.collection("coupons").doc(applied.code).get();
+        const freshSnap = await db.collection("coupons").doc(activeCartCoupon.code).get();
         if (!freshSnap.exists || freshSnap.data().isUsed === true) {
-          await showAlert("Sorry! This coupon code was just used or expired. Please remove it or try another.", "Coupon Expired", "error");
-          delete window.appliedCoupons[id];
+          await showAlert("Sorry! This coupon was just used/expired. Please remove it or try another.", "Coupon Expired", "error");
+          activeCartCoupon = null;
+          renderCartModal();
           return;
         }
-
-        discountAmount = Math.min(baseAmount, applied.discount);
-        appliedCode = applied.code;
+        discountAmount = Math.min(subtotal + deliveryCharge, activeCartCoupon.discount);
+        appliedCode = activeCartCoupon.code;
       }
 
-      const totalAmount = Math.max(0, baseAmount - discountAmount);
-      const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+      const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);
+      const summaryLines = shoppingCart.map(i => `• ${i.title} (${i.size}) x${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
 
-      let priceBreakdown = `Subtotal: ₹${baseAmount}`;
-      if (discountAmount > 0) {
-        priceBreakdown += `\nCoupon (${appliedCode}): -₹${discountAmount}`;
-      }
-      priceBreakdown += `\nFinal Payable: ₹${totalAmount}`;
+      const confirmMsg = `${summaryLines}\n\nSubtotal: ₹${subtotal}\nDelivery: ${deliveryCharge === 0 ? 'FREE' : '₹' + deliveryCharge}${discountAmount > 0 ? `\nCoupon (${appliedCode}): -₹${discountAmount}` : ''}\nGrand Total Payable: ₹${grandTotal}\nPayment Mode: ${paymentMethod}\n\nConfirm this order?`;
 
-      const confirmMsg = `Item: ${item.title || item.name}\nSize: ${selectedSize}\nQuantity: ${quantity}\n${priceBreakdown}\nPayment Mode: ${paymentMethod}\n\nShipping Address:\n${user.address || "Address not available"}, ${user.city || ""} - ${user.pincode || ""}\n\nDo you want to confirm this order?`;
-
-      const isConfirmed = await showConfirm(confirmMsg, "Confirm Your Order");
+      const isConfirmed = await showConfirm(confirmMsg, "Confirm Cart Checkout");
       if (!isConfirmed) return;
 
-      try {
-        await db.collection("orders").doc(orderId).set({
-          orderId: orderId,
-          productId: item.id,
-          productName: item.title || item.name,
-          size: selectedSize,
-          quantity: quantity,
-          subtotal: baseAmount,
-          couponUsed: appliedCode || "None",
-          discountGiven: discountAmount,
-          totalAmount: totalAmount,
-          paymentMethod: paymentMethod,
-          paymentStatus: (paymentMethod === "COD") ? "Pending (Cash on Delivery)" : "Processing Online",
-          deliveryStatus: "packing",
-          userEmail: (user.email || "").toLowerCase(),
-          userName: user.name || "Customer",
-          phone: user.phone || "",
-          shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
-          orderDate: new Date().toLocaleString()
-        });
+      const checkoutBtn = document.getElementById("checkout-submit-btn");
+      checkoutBtn.disabled = true;
+      checkoutBtn.innerText = "Placing Order...";
 
-        // Expire coupon immediately after one-time use
+      const batchOrderGroup = "GRP-" + Math.floor(100000 + Math.random() * 900000);
+
+      try {
+        // Save each item in Firestore 'orders' so individual Return & Rating works smoothly in orders.html
+        for (let i = 0; i < shoppingCart.length; i++) {
+          const cItem = shoppingCart[i];
+          const singleOrderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+          const itemAmount = cItem.price * cItem.quantity;
+
+          // Distribute delivery & discount proportionally or record on first item
+          const isFirst = (i === 0);
+          const netItemPayable = isFirst ? Math.max(0, itemAmount + deliveryCharge - discountAmount) : itemAmount;
+
+          await db.collection("orders").doc(singleOrderId).set({
+            orderId: singleOrderId,
+            groupOrderId: batchOrderGroup,
+            productId: cItem.productId,
+            productName: cItem.title,
+            size: cItem.size,
+            quantity: cItem.quantity,
+            subtotal: itemAmount,
+            deliveryCharge: isFirst ? deliveryCharge : 0,
+            couponUsed: isFirst ? (appliedCode || "None") : (appliedCode ? `Included in ${batchOrderGroup}` : "None"),
+            discountGiven: isFirst ? discountAmount : 0,
+            totalAmount: netItemPayable,
+            cartGrandTotal: grandTotal,
+            paymentMethod: paymentMethod,
+            paymentStatus: (paymentMethod === "COD") ? "Pending (Cash on Delivery)" : "Processing Online",
+            deliveryStatus: "packing",
+            userEmail: (user.email || "").toLowerCase(),
+            userName: user.name || "Customer",
+            phone: user.phone || "",
+            shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
+            orderDate: new Date().toLocaleString()
+          });
+        }
+
+        // Expire coupon after one-time use
         if (appliedCode) {
           await db.collection("coupons").doc(appliedCode).update({
             isUsed: true,
             usedBy: (user.email || "Customer"),
-            usedInOrder: orderId,
+            usedInOrder: batchOrderGroup,
             usedAt: new Date().toLocaleString()
           });
-          delete window.appliedCoupons[id];
         }
 
-        // Update live stock on screen
+        // Clear cart & update live stock
+        shoppingCart = [];
+        activeCartCoupon = null;
+        saveCartToStorage();
+        closeCartModal();
+
         if (typeof syncProductsAndLiveStock === "function") {
           await syncProductsAndLiveStock();
         }
 
-        await showAlert(`Congratulations! Your order has been placed.\nOrder ID: ${orderId}`, "Order Placed", "success");
+        await showAlert(`Order Placed Successfully!\nReference ID: ${batchOrderGroup}\nTotal Paid/Payable: ₹${grandTotal}`, "Order Confirmed", "success");
 
         if (paymentMethod === "Online UPI") {
           const myUpiId = "8130748293@pthdfc";
           const merchantName = "Pinki Latest Fashion";
-          const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}`;
+          const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${grandTotal}&cu=INR&tn=${encodeURIComponent("Order " + batchOrderGroup)}`;
           window.location.href = upiUrl;
         } else {
-          window.location.href = "account.html";
+          window.location.href = "orders.html";
         }
       } catch (err) {
-        await showAlert("Error placing order: " + err.message, "Order Failed", "error");
+        await showAlert("Error placing order: " + err.message, "Checkout Failed", "error");
+      } finally {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerText = "Place Order & Pay";
       }
     }
   </script>
