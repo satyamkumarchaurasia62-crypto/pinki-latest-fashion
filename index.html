@@ -111,10 +111,10 @@
     <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-stone-200 pb-4 mb-10 gap-2">
       <div>
         <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Curated Ethnic Collection</h2>
-        <p class="text-xs sm:text-sm text-stone-500 mt-1">Select your preferred fit and buy directly with Online UPI or WhatsApp</p>
+        <p class="text-xs sm:text-sm text-stone-500 mt-1">Select your preferred fit and buy directly with Online UPI or Cash on Delivery</p>
       </div>
-      <div class="text-xs font-semibold text-stone-500">
-        4 Exclusive Readymade Outfits
+      <div id="catalog-count" class="text-xs font-semibold text-stone-500">
+        Exclusive Readymade Outfits
       </div>
     </div>
     
@@ -304,8 +304,8 @@
     };
   </script>
 
-  <!-- Core Javascript Connections -->
-  <script src="products.js"></script>
+  <!-- Core Javascript Connections (Exact filename: product.js) -->
+  <script src="product.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const loggedInUser = sessionStorage.getItem("currentLoggedInUser");
@@ -322,9 +322,14 @@
 
       const gridContainer = document.getElementById("product-grid");
       if (gridContainer && typeof PRODUCTS !== 'undefined') {
+        const countEl = document.getElementById("catalog-count");
+        if (countEl) {
+          countEl.innerText = `${PRODUCTS.length} Exclusive Readymade Outfits`;
+        }
+
         gridContainer.innerHTML = "";
         PRODUCTS.forEach(product => {
-          let sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+          let sizeOptions = (product.sizes || ["Free Size"]).map(s => `<option value="${s}">${s}</option>`).join("");
           const productCard = `
             <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
               <div>
@@ -338,11 +343,14 @@
                   <!-- Public Star Rating Box -->
                   <div class="public-rating-box mt-1.5" data-product-id="${product.id}"></div>
 
+                  <!-- Live Stock Badge -->
+                  <div id="stock-badge-${product.id}" class="mt-1.5 text-xs font-semibold text-stone-400">Checking stock...</div>
+
                   <div class="flex items-center justify-between mt-3">
                     <span class="text-lg font-bold text-pink-600">₹${product.price}</span>
                     <div class="flex items-center gap-1">
                       <span class="text-xs text-stone-500">Size:</span>
-                      <select id="size-${product.id}" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
+                      <select id="size-${product.id}" onchange="if(typeof refreshProductStockUI==='function') refreshProductStockUI(${product.id})" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
                         ${sizeOptions}
                       </select>
                     </div>
@@ -367,7 +375,7 @@
                   </label>
                 </div>
 
-                <button onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow">
+                <button id="buy-btn-${product.id}" onclick="handleBuyNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow">
                   BUY NOW
                 </button>
               </div>
@@ -422,6 +430,17 @@
       const qtyElem = document.getElementById(`qty-${id}`);
       const quantity = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;
 
+      // Live Stock Validation
+      const avail = window.liveRemainingStock?.[String(item.id)]?.[selectedSize];
+      if (avail !== undefined && avail <= 0) {
+        await showAlert(`Sorry, Size ${selectedSize} is currently Out of Stock!`, "Out of Stock", "error");
+        return;
+      }
+      if (avail !== undefined && quantity > avail) {
+        await showAlert(`Only ${avail} piece(s) left in Size ${selectedSize}. Please reduce quantity.`, "Limited Stock", "error");
+        return;
+      }
+
       const payElem = document.querySelector(`input[name="pay-${id}"]:checked`);
       const paymentMethod = payElem ? payElem.value : "COD";
 
@@ -450,6 +469,11 @@
           shippingAddress: `${user.address || ""}, ${user.city || ""}, ${user.pincode || ""}`,
           orderDate: new Date().toLocaleString()
         });
+
+        // Turant screen par stock update karein
+        if (typeof syncProductsAndLiveStock === "function") {
+          await syncProductsAndLiveStock();
+        }
 
         await showAlert(`Congratulations! Your order has been placed.\nOrder ID: ${orderId}`, "Order Placed", "success");
 
