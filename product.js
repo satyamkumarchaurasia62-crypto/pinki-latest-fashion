@@ -14,7 +14,7 @@ const PRODUCTS = [
       "M"
     ],
     "stock": {
-      "S": 10,
+      "S": 1,
       "M": 1
     }
   },
