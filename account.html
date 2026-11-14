@@ -156,7 +156,7 @@
     <!-- 3. Password Reset Box -->
     <div id="forgot-box" style="display: none;">
       <h2>Reset Password</h2>
-      <p class="subtitle">We'll help you secure your account back.</p>
+      <p class="subtitle">Answer your security question to set a new password directly.</p>
       <form id="forgot-form">
         <div class="form-group">
           <label>Registered Email Address</label>
@@ -176,7 +176,7 @@
         </div>
         <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
           <label>New Password</label>
-          <input type="password" id="forgot-new-password" placeholder="Set new password" minlength="8" required>
+          <input type="password" id="forgot-new-password" placeholder="Set new password (min 8 chars)" minlength="8" required>
         </div>
         <button type="submit" class="main-btn btn-primary transition">Update Password</button>
       </form>
@@ -586,6 +586,7 @@
 
     async function logout() {
       sessionStorage.removeItem("currentLoggedInUser");
+      await firebase.auth().signOut();
       await showAlert("You have been successfully logged out. Have a wonderful day!", "Logged Out", "success");
       window.location.href = "index.html";
     }
@@ -646,13 +647,23 @@
           if (doc.exists) {
             await showAlert("An account with this email already exists. Please sign in instead.", "Already Registered", "info");
           } else {
-            const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            await userCred.user.sendEmailVerification();
+            let userCred;
+            try {
+              userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+              await userCred.user.sendEmailVerification();
+            } catch (authErr) {
+              // Agar email Auth me pehle se bacha hua tha (jabki Firestore se delete ho chuka tha)
+              if (authErr.code === 'auth/email-already-in-use') {
+                userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+              } else {
+                throw authErr;
+              }
+            }
 
             const newUserData = {
               name, email, password, question, answer, phone,
               phoneVerified: true, address, city, pincode,
-              nameChangedCount: 0, orders: [], createdAt: new Date()
+              nameChangedCount: 0, orders: [], createdAt: new Date().toISOString()
             };
 
             await db.collection("users").doc(email).set(newUserData);
@@ -672,7 +683,7 @@
       });
     }
 
-    // Sign In Form Submission with Direct Firestore Database Check
+    // Sign In Form Submission with Direct Firestore Check & Auto-Sync
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -687,6 +698,7 @@
         }
 
         try {
+          // 1. Pehle Firestore Database me check karo ki ye email exist karta hai ya nahi
           const userDoc = await db.collection("users").doc(email).get();
 
           if (!userDoc.exists) {
@@ -697,6 +709,9 @@
             return;
           }
 
+          const userData = userDoc.data();
+
+          // 2. Firebase Auth se login try karo
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
@@ -706,22 +721,23 @@
             return;
           }
 
-          const userData = userDoc.data();
-          if (userData.password === password) {
-            sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
-            await showAlert("Welcome back! Glad to see you again.", "Success", "success");
-            window.location.href = "index.html";
-          } else {
-            await showAlert("Incorrect password. Please check your details and try again.", "Sign In Failed", "error");
+          // Agar Auth login pass ho gaya par Firestore me purana password tha, toh Firestore ko auto-sync kar do
+          if (userData.password !== password) {
+            await db.collection("users").doc(email).update({ password: password });
+            userData.password = password;
           }
 
+          sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+          await showAlert("Welcome back! Glad to see you again.", "Success", "success");
+          window.location.href = "index.html";
+
         } catch (error) {
-          await showAlert("Incorrect password or login details. Please check your details and try again.", "Sign In Failed", "error");
+          await showAlert("Incorrect password. Please check your details and try again.", "Sign In Failed", "error");
         }
       });
     }
 
-    // Forgot Password (Updated to sync both Firestore & Firebase Auth)
+    // Forgot Password - Sahi Order (1. Auth Update -> 2. Firestore Update)
     const forgotForm = document.getElementById("forgot-form");
     if (forgotForm) {
       forgotForm.addEventListener("submit", async function(e) {
@@ -736,36 +752,42 @@
         btn.innerText = "Updating...";
 
         try {
+          // 1. Database se user ki details nikalo
           const doc = await db.collection("users").doc(email).get();
           if (!doc.exists) {
             await showAlert("We couldn't find an account with this email address.", "Not Found", "error");
-            btn.disabled = false;
-            btn.innerText = "Update Password";
             return;
           }
           
           const user = doc.data();
-          if (user.question === question && user.answer === answer) {
-            // 1. Firestore me password update karo
-            await db.collection("users").doc(email).update({ password: newPassword });
 
-            // 2. Firebase Auth me bhi password sync karo
-            try {
-              const tempUserCred = await firebase.auth().signInWithEmailAndPassword(email, user.password);
-              await tempUserCred.user.updatePassword(newPassword);
-              await firebase.auth().signOut();
-            } catch (authErr) {
-              console.warn("Auth password update note:", authErr.message);
-            }
+          // 2. Security Question aur Answer match karo
+          if (user.question === question && user.answer.trim().toLowerCase() === answer) {
+            
+            // 3. SABSE PEHLE: Purane password se background me Auth login karo aur Auth ka password badlo
+            const tempUserCred = await firebase.auth().signInWithEmailAndPassword(email, user.password);
+            await tempUserCred.user.updatePassword(newPassword);
+            
+            // 4. JAB AUTH UPDATE HO JAYE, TABHI Firestore database me naya password save karo
+            await db.collection("users").doc(email).update({ 
+              password: newPassword,
+              updatedAt: new Date().toISOString()
+            });
 
-            await showAlert("Your password has been updated successfully. You can now sign in with your new password.", "Success", "success");
+            // 5. Background login ko sign out aur session clear kar do taaki user fresh login kar sake
+            await firebase.auth().signOut();
+            sessionStorage.removeItem("currentLoggedInUser");
+
+            await showAlert("Your password has been updated successfully! You can now sign in with your new password.", "Success", "success");
             forgotForm.reset();
             showBox('login');
+
           } else {
             await showAlert("The security answer you entered is incorrect. Please check and try again.", "Verification Failed", "error");
           }
         } catch (error) {
-          await showAlert("Something went wrong. Please try again later.", "Notice", "error");
+          console.error("Reset Error:", error);
+          await showAlert("Could not update password. Make sure your account is in sync or try creating a fresh account.", "Notice", "error");
         } finally {
           btn.disabled = false;
           btn.innerText = "Update Password";
