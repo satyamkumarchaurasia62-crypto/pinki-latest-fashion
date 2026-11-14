@@ -414,7 +414,14 @@
     }
 
     function openProductZoom(productId) {
-      const mainImg = document.getElementById(`main-img-${productId}`); if (!mainImg) return; document.getElementById("productZoomImg").src = mainImg.src; document.getElementById("productZoomModal").classList.remove("hidden"); }  function closeProductZoom() { document.getElementById("productZoomModal").classList.add("hidden"); } </script>  <!-- Core Product Catalog --> <script src="product.js"></script> <script> document.addEventListener("DOMContentLoaded", function() { const loggedInUser = sessionStorage.getItem("currentLoggedInUser"); if (loggedInUser) { const user = JSON.parse(loggedInUser); document.getElementById("home-user-text").innerText = "Hi, " + user.name; document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase(); document.getElementById("home-user-logo").style.background = "#10b981"; } const ordersBtn = document.getElementById("my-orders-btn"); if (ordersBtn) ordersBtn.classList.remove("hidden");  const gridContainer = document.getElementById("product-grid"); if (gridContainer && typeof PRODUCTS !== 'undefined') { const countEl = document.getElementById("catalog-count"); if (countEl) countEl.innerText = `${PRODUCTS.length} Exclusive Readymade Outfits`;
+      const mainImg = document.getElementById(`main-img-${productId}`); if (!mainImg) return; document.getElementById("productZoomImg").src = mainImg.src; document.getElementById("productZoomModal").classList.remove("hidden"); }  function closeProductZoom() { document.getElementById("productZoomModal").classList.add("hidden"); } </script>  <!-- Core Product Catalog --> <script src="product.js"></script> <script>
+    // Buy Now Direct Checkout Function
+    function buyNowNow(productId) {
+      addToCart(productId);
+      openCartModal();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() { const loggedInUser = sessionStorage.getItem("currentLoggedInUser"); if (loggedInUser) { const user = JSON.parse(loggedInUser); document.getElementById("home-user-text").innerText = "Hi, " + user.name; document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase(); document.getElementById("home-user-logo").style.background = "#10b981"; } const ordersBtn = document.getElementById("my-orders-btn"); if (ordersBtn) ordersBtn.classList.remove("hidden");  const gridContainer = document.getElementById("product-grid"); if (gridContainer && typeof PRODUCTS !== 'undefined') { const countEl = document.getElementById("catalog-count"); if (countEl) countEl.innerText = `${PRODUCTS.length} Exclusive Readymade Outfits`;
 
         gridContainer.innerHTML = "";
         PRODUCTS.forEach(product => {
@@ -473,9 +480,14 @@
                   <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
                 </div>
 
-                <button id="buy-btn-${product.id}" onclick="addToCart(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow flex items-center justify-center gap-1.5">
-                  <i class="fa-solid fa-cart-plus"></i> ADD TO CART
-                </button>
+                <div class="grid grid-cols-2 gap-2">
+                  <button onclick="buyNowNow(${product.id})" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition shadow">
+                    BUY NOW
+                  </button>
+                  <button id="buy-btn-${product.id}" onclick="addToCart(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-cart-plus"></i> ADD CART
+                  </button>
+                </div>
               </div>
             </div>
           `;
@@ -585,11 +597,11 @@
       const sizeElem = document.getElementById(`size-${productId}`);
       const selectedSize = sizeElem ? sizeElem.value : "Free Size";
 
-      const qtyElem = document.getElementById(`qty-${productId}`); const addQty = qtyElem ? (parseInt(qtyElem.value) \vert{}\vert{} 1) : 1;  if (addQty < 1) { await showAlert("Please select at least 1 quantity.", "Invalid Quantity", "error"); return; }  const existingIndex = shoppingCart.findIndex(c => c.productId === item.id && c.size === selectedSize); const alreadyInCartQty = existingIndex > -1 ? shoppingCart[existingIndex].quantity : 0; const totalRequestedQty = alreadyInCartQty + addQty;  const avail = window.liveRemainingStock?.[String(item.id)]?.[selectedSize]; if (avail !== undefined && avail <= 0) { await showAlert(`Sorry, Size ${selectedSize} is currently Out of Stock!`, "Out of Stock", "error");
+      const qtyElem = document.getElementById(`qty-${productId}`); const addQty = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;  if (addQty < 1) { await showAlert("Please select at least 1 quantity.", "Invalid Quantity", "error"); return; }  const existingIndex = shoppingCart.findIndex(c => c.productId === item.id && c.size === selectedSize); const alreadyInCartQty = existingIndex > -1 ? shoppingCart[existingIndex].quantity : 0; const totalRequestedQty = alreadyInCartQty + addQty;  const avail = window.liveRemainingStock?.[String(item.id)]?.[selectedSize]; if (avail !== undefined && avail <= 0) { await showAlert(`Sorry, Size ${selectedSize} is currently Out of Stock!`, "Out of Stock", "error");
         return;
       }
       if (avail !== undefined && totalRequestedQty > avail) {
-        await showAlert(`Only ${avail} piece(s) available in Size ${selectedSize} (You already have${alreadyInCartQty} in cart).`, "Limited Stock", "error");
+        await showAlert(`Only ${avail} piece(s) available in Size ${selectedSize} (You already have ${alreadyInCartQty} in cart).`, "Limited Stock", "error");
         return;
       }
 
@@ -628,7 +640,7 @@
 
       const avail = window.liveRemainingStock?.[String(cartItem.productId)]?.[cartItem.size];
       if (avail !== undefined && newQty > avail) {
-        await showAlert(`Maximum ${avail} piece(s) available in Size${cartItem.size}.`, "Stock Limit", "error");
+        await showAlert(`Maximum ${avail} piece(s) available in Size ${cartItem.size}.`, "Stock Limit", "error");
         return;
       }
 
@@ -675,7 +687,7 @@
             <img src="${cItem.image}" class="w-12 h-14 object-cover rounded-lg border shrink-0">
             <div class="flex-grow min-w-0">
               <div class="text-xs font-bold text-stone-800 truncate">${cItem.title}</div>
-              <div class="text-[11px] text-stone-500">Size: <span class="font-semibold">${cItem.size}</span> \vert{} ₹${cItem.price} each</div>
+              <div class="text-[11px] text-stone-500">Size: <span class="font-semibold">${cItem.size}</span> | ₹${cItem.price} each</div>
               <div class="flex items-center gap-2 mt-1">
                 <button onclick="updateCartItemQty(${idx}, -1)" class="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 font-bold text-xs">-</button>
                 <span class="text-xs font-bold">${cItem.quantity}</span>
@@ -701,17 +713,26 @@
 
       if (activeCartCoupon) {
         if (totalQty < activeCartCoupon.minQty) {
-          msgEl.innerHTML = `<span class="text-red-600">✕ Coupon '${activeCartCoupon.code}' removed (requires at least${activeCartCoupon.minQty} items in cart).</span>`;
+          msgEl.innerHTML = `<span class="text-red-600">✕ Coupon '${activeCartCoupon.code}' removed (requires at least ${activeCartCoupon.minQty} items in cart).</span>`;
           activeCartCoupon = null;
           discountRow.classList.add("hidden");
         } else {
           discountAmount = Math.min(subtotal + deliveryCharge, activeCartCoupon.discount);
           discountRow.classList.remove("hidden");
           document.getElementById("bill-coupon-name").innerText = activeCartCoupon.code;
-          document.getElementById("bill-discount").innerText = `-₹${discountAmount}`; } } else { discountRow.classList.add("hidden"); }  const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);  document.getElementById("bill-total-qty").innerText = totalQty; document.getElementById("bill-subtotal").innerText = `₹${subtotal}`;
+          document.getElementById("bill-discount").innerText = `-₹${discountAmount}`;
+        }
+      } else {
+        discountRow.classList.add("hidden");
+      }
+
+      const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);
+      document.getElementById("bill-total-qty").innerText = totalQty;
+      document.getElementById("bill-subtotal").innerText = `₹${subtotal}`;
       document.getElementById("bill-delivery").innerHTML = deliveryCharge === 0 
         ? `<span class="text-emerald-600 font-bold">FREE</span>` 
-        : `₹${deliveryCharge}`; document.getElementById("bill-grand-total").innerText = `₹${grandTotal}`;
+        : `₹${deliveryCharge}`;
+      document.getElementById("bill-grand-total").innerText = `₹${grandTotal}`;
     }
 
     async function applyCartCoupon() {
@@ -748,7 +769,7 @@
 
         const minRequiredQty = Number(cData.minQty ?? cData.min_order_quantity ?? 3);
         if (totalCartQty < minRequiredQty) {
-          msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Add at least ${minRequiredQty} outfits in cart to apply this coupon! (Currently:${totalCartQty})</span>`;
+          msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Add at least ${minRequiredQty} outfits in cart to apply this coupon! (Currently: ${totalCartQty})</span>`;
           activeCartCoupon = null;
           renderCartModal();
           return;
@@ -788,7 +809,7 @@
       for (const cItem of shoppingCart) {
         const avail = window.liveRemainingStock?.[String(cItem.productId)]?.[cItem.size];
         if (avail !== undefined && cItem.quantity > avail) {
-          await showAlert(`Sorry, "${cItem.title}" (Size ${cItem.size}) only has${avail} piece(s) left. Please adjust your cart.`, "Stock Updated", "error");
+          await showAlert(`Sorry, "${cItem.title}" (Size ${cItem.size}) only has ${avail} piece(s) left. Please adjust your cart.`, "Stock Updated", "error");
           return;
         }
         subtotal += cItem.price * cItem.quantity;
@@ -802,7 +823,7 @@
 
       if (activeCartCoupon) {
         if (totalQty < activeCartCoupon.minQty) {
-          await showAlert(`Coupon '${activeCartCoupon.code}' requires at least${activeCartCoupon.minQty} items in cart.`, "Condition Not Met", "error");
+          await showAlert(`Coupon '${activeCartCoupon.code}' requires at least ${activeCartCoupon.minQty} items in cart.`, "Condition Not Met", "error");
           return;
         }
         const freshSnap = await db.collection("coupons").doc(activeCartCoupon.code).get();
@@ -949,7 +970,6 @@
           const isFirst = (i === 0);
           const netItemPayable = isFirst ? Math.max(0, itemAmount + ctx.deliveryCharge - ctx.discountAmount) : itemAmount;
 
-          // ✅ Save UTR and Screenshot in ALL items of the cart so Admin Panel shows it on every order card
           await db.collection("orders").doc(singleOrderId).set({
             orderId: singleOrderId,
             groupOrderId: ctx.batchOrderGroup,
@@ -967,7 +987,12 @@
             paymentMethod: ctx.paymentMethod,
             utrNumber: ctx.paymentMethod === "Online UPI" ? utrNumber : "",
             paymentScreenshot: ctx.paymentMethod === "Online UPI" ? paymentScreenshot : "",
-            paymentStatus: (ctx.paymentMethod === "COD") ? "Pending (Cash on Delivery)" : `UPI Verification Pending (UTR: ${utrNumber})`, deliveryStatus: "packing", userEmail: (ctx.user.email \vert{}\vert{} "").toLowerCase(), userName: ctx.user.name \vert{}\vert{} "Customer", phone: ctx.user.phone \vert{}\vert{} "", shippingAddress: `${ctx.user.address || ""}, ${ctx.user.city \vert{}\vert{} ""}, ${ctx.user.pincode || ""}`,
+            paymentStatus: (ctx.paymentMethod === "COD") ? "Pending (Cash on Delivery)" : `UPI Verification Pending (UTR: ${utrNumber})`, 
+            deliveryStatus: "packing", 
+            userEmail: (ctx.user.email || "").toLowerCase(), 
+            userName: ctx.user.name || "Customer", 
+            phone: ctx.user.phone || "", 
+            shippingAddress: `${ctx.user.address || ""}, ${ctx.user.city || ""}, ${ctx.user.pincode || ""}`,
             orderDate: new Date().toLocaleString()
           });
         }
