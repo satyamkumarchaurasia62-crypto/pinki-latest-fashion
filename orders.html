@@ -654,6 +654,24 @@
                         `;
                     }
 
+                    // --- REJECTION REASON DISPLAY FOR CUSTOMER ---
+                    let rejectionAlertHTML = "";
+                    if (order.rejectionReason) {
+                        rejectionAlertHTML = `
+                            <div class="bg-red-50 border border-red-200 text-red-800 p-3 rounded-xl text-xs space-y-1 mt-2">
+                                <div class="font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Order Rejected by Store:
+                                </div>
+                                <div class="font-medium bg-white px-2 py-1 rounded border border-red-200">
+                                    ${order.rejectionReason}
+                                </div>
+                                <div class="text-[10px] text-red-600 pt-0.5">
+                                    कृपया सही भुगतान (Payment) करें या सहायता के लिए WhatsApp पर संपर्क करें।
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     let actionButtonsHTML = "";
                     if (isCancelled) {
                         actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-red-100 text-red-700 self-center">Order Cancelled</span>`;
@@ -708,6 +726,7 @@
                             </p>
                             ${trackingBoxHTML}
                             ${returnStatusBoxHTML}
+                            ${rejectionAlertHTML}
                         </div>
 
                         <div class="flex md:flex-col justify-end gap-2 shrink-0">
@@ -881,7 +900,6 @@
             const isNameConfirmed = document.getElementById("refund-name-confirm").checked;
             const submitBtn = document.getElementById("submit-return-btn");
             
-            // Plain array of base64 image strings so admin.html displays them directly
             const uploadedPhotosUrls = Object.values(window.returnPhotos).filter(data => data !== "");
 
             if (!reason) {
