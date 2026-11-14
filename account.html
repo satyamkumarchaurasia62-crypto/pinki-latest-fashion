@@ -72,7 +72,10 @@
         <div class="form-group">
           <label>Password</label>
           <input type="password" id="login-password" placeholder="••••••••" required>
-          <a class="forgot-link" onclick="showBox('forgot')">Forgot Password?</a>
+          <div class="flex justify-between items-center mt-1">
+            <a class="text-xs text-pink-600 hover:underline cursor-pointer font-semibold" onclick="resendVerificationFromLogin()">Resend Verification Link?</a>
+            <a class="forgot-link" style="margin-top:0;" onclick="showBox('forgot')">Forgot Password?</a>
+          </div>
         </div>
         <button type="submit" class="main-btn btn-primary transition">Login</button>
       </form>
@@ -662,6 +665,30 @@
       window.location.href = "index.html";
     }
 
+    // Resend Verification Link from Login screen
+    async function resendVerificationFromLogin() {
+      const email = document.getElementById("login-email").value.trim().toLowerCase();
+      const password = document.getElementById("login-password").value;
+
+      if (!email || !password) {
+        await showAlert("Please enter your registered Email and Password first, then click Resend Verification Link.", "Enter Credentials", "error");
+        return;
+      }
+
+      try {
+        const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+        if (userCred.user.emailVerified) {
+          await showAlert("Your email is already verified! You can log in directly.", "Already Verified", "success");
+        } else {
+          await userCred.user.sendEmailVerification();
+          await showAlert("A fresh verification link has been sent to " + email + ". Please check your inbox/spam.", "Link Sent", "success");
+        }
+        await firebase.auth().signOut();
+      } catch (err) {
+        await showAlert("Error: " + err.message, "Failed", "error");
+      }
+    }
+
     // Sign Up Submit
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
@@ -743,23 +770,21 @@
         }
 
         try {
-          // 1. First authenticate with Firebase Auth to check real-time email verification status
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
           if (!authUser.emailVerified) {
             await firebase.auth().signOut();
-            await showAlert("Your email is not verified yet! Please check your inbox/spam folder, click the verification link, and then try logging in.", "Email Not Verified", "error");
+            await showAlert("Your email is not verified yet! Please click 'Resend Verification Link' below if your link expired.", "Email Not Verified", "error");
             return;
           }
 
-          // 2. Fetch user details from Firestore database
           const doc = await db.collection("users").doc(email).get();
           if (doc.exists && doc.data().password === password) {
             const userData = doc.data();
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
             await showAlert("Login successful!", "Welcome Back", "success");
-            window.location.href = "index.html"; // 👈 OK दबाते ही सीधा होम फीड पर रीडायरेक्ट हो जाएगा
+            window.location.href = "index.html";
           } else {
             await showAlert("Incorrect email or password! Please check again.", "Login Failed", "error");
           }
