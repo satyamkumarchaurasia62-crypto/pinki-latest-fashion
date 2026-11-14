@@ -22,17 +22,14 @@ const PRODUCTS = [
     "mrp": 2799,
     "price": 1899,
     "image": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&auto=format&fit=crop&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&auto=format&fit=crop&q=80"
+    ],
     "sizes": [
-      "M",
-      "L",
-      "XL",
-      "XXL"
+      "S"
     ],
     "stock": {
-      "M": 6,
-      "L": 2,
-      "XL": 0,
-      "XXL": 5
+      "S": 1
     }
   },
   {
