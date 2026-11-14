@@ -239,11 +239,11 @@
           <div class="font-bold text-stone-700">Select Payment Method:</div>
           <div class="grid grid-cols-2 gap-2">
             <label class="flex items-center gap-2 border border-stone-200 rounded-xl p-2.5 cursor-pointer hover:bg-stone-50">
-              <input type="radio" name="cart-payment-mode" value="COD" checked>
+              <input type="radio" name="cart-payment-mode" value="COD" checked onchange="updateCheckoutButtonText()">
               <span class="font-semibold text-stone-700">Cash on Delivery</span>
             </label>
             <label class="flex items-center gap-2 border border-stone-200 rounded-xl p-2.5 cursor-pointer hover:bg-stone-50">
-              <input type="radio" name="cart-payment-mode" value="Online UPI">
+              <input type="radio" name="cart-payment-mode" value="Online UPI" onchange="updateCheckoutButtonText()">
               <span class="font-semibold text-stone-700">Online UPI</span>
             </label>
           </div>
@@ -254,7 +254,7 @@
             + Add More
           </button>
           <button id="checkout-submit-btn" onclick="checkoutCart()" class="w-2/3 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-sm shadow transition">
-            Place Order & Pay
+            Place Order
           </button>
         </div>
       </div>
@@ -590,6 +590,19 @@
       });
     }
 
+    // Dynamic Checkout Button Text Updater (COD vs Online)
+    function updateCheckoutButtonText() {
+      const payElem = document.querySelector('input[name="cart-payment-mode"]:checked');
+      const btn = document.getElementById("checkout-submit-btn");
+      if (!btn || !payElem) return;
+
+      if (payElem.value === "COD") {
+        btn.innerText = "Place Order";
+      } else {
+        btn.innerText = "Proceed to Pay & Place Order";
+      }
+    }
+
     async function addToCart(productId) {
       const item = PRODUCTS.find(p => p.id === productId);
       if (!item) return;
@@ -733,6 +746,9 @@
         ? `<span class="text-emerald-600 font-bold">FREE</span>` 
         : `₹${deliveryCharge}`;
       document.getElementById("bill-grand-total").innerText = `₹${grandTotal}`;
+      
+      // Update Button Text correctly on render
+      updateCheckoutButtonText();
     }
 
     async function applyCartCoupon() {
@@ -1022,7 +1038,7 @@
       } finally {
         if (checkoutBtn) {
           checkoutBtn.disabled = false;
-          checkoutBtn.innerText = "Place Order & Pay";
+          updateCheckoutButtonText();
         }
       }
     }
