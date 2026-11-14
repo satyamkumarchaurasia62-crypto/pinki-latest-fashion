@@ -672,7 +672,7 @@
       });
     }
 
-    // Sign In Form Submission with Soft Verification & Error Messages
+    // Sign In Form Submission with Smart Redirection & Soft Messages
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -690,7 +690,7 @@
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
-          // Soft and clear message if email is not verified
+          // Check if email is verified
           if (!authUser.emailVerified) {
             await firebase.auth().signOut();
             await showAlert("Please verify your email address before signing in. Check your inbox or click 'Resend Verification Link' above.", "Email Verification Required", "warning");
@@ -707,7 +707,21 @@
             await showAlert("Incorrect email or password. Please check your details and try again.", "Sign In Failed", "error");
           }
         } catch (error) {
-          await showAlert("Incorrect email or password. Please check your details and try again.", "Sign In Failed", "error");
+          // Smart check: Agar email database/auth mein nahi mili (New User)
+          if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
+            await showAlert("This email is not registered yet. Let's create your account!", "Account Not Found", "info");
+            loginForm.reset();
+            showBox('signup');
+            document.getElementById("signup-email").value = email; // Email auto-fill ho jayega
+          } 
+          // Agar password galat hai ya credentials match nahi hue
+          else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials' || error.code === 'auth/invalid-credential') {
+            await showAlert("Incorrect password or login details. Please check your password and try again.", "Sign In Failed", "error");
+          } 
+          // Kisi aur error ke liye
+          else {
+            await showAlert("Could not sign in right now. Please check your details and try again.", "Notice", "error");
+          }
         }
       });
     }
