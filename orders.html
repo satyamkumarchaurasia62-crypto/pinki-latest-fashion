@@ -47,7 +47,7 @@
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 1. Return Modal (Reason + Strict Same-Name Refund UPI/Bank with Bank Name + Minimum 3 Photos) -->
+    <!-- 1. Return Modal (Reason + Refund UPI/Bank + UTR/Screenshot for Online + Minimum 3 Photos) -->
     <div id="return-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
@@ -60,6 +60,25 @@
                 <div>
                     <label class="block text-sm font-semibold text-stone-700 mb-1">1. Reason for Return *</label>
                     <textarea id="return-reason" rows="2" placeholder="e.g., Size issue, fabric defect, wrong item..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
+                </div>
+
+                <!-- Online Payment Proof (UTR + Screenshot) - Shown automatically for Online Orders -->
+                <div id="return-online-proof-box" class="hidden bg-blue-50/80 border border-blue-200 rounded-xl p-3.5 space-y-3">
+                    <div class="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt"></i> Online Payment Verification (UTR & Screenshot) *
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">12-Digit UTR / UPI Transaction ID *</label>
+                        <input type="text" id="return-utr-input" placeholder="Enter 12-digit UTR / Ref No." class="w-full border border-blue-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-600 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Upload Payment Screenshot *</label>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-upload"></i> Select Payment Screenshot
+                            <input type="file" accept="image/*" onchange="handlePaymentProofUpload(event, 'return')" class="hidden">
+                        </label>
+                        <img id="return-payment-proof-preview" src="" class="hidden mt-2 w-full max-h-36 object-contain rounded-lg border bg-white p-1">
+                    </div>
                 </div>
 
                 <!-- Refund Account / UPI Details Box (Strict Name Match Rule) -->
@@ -189,6 +208,53 @@
         </div>
     </div>
 
+    <!-- 1B. Cancel Order Modal (Supports Online Payment UTR & Screenshot for Instant Refund) -->
+    <div id="cancel-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-red-600"><i class="fa-solid fa-ban mr-2"></i>Cancel Order</h3>
+                <button onclick="closeCancelModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">Reason for Cancellation *</label>
+                    <textarea id="cancel-reason-input" rows="2" placeholder="Write reason for cancelling..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
+                </div>
+
+                <!-- Shown only if Order was Online Paid -->
+                <div id="cancel-online-refund-box" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3.5 space-y-3 text-xs">
+                    <div class="font-bold text-blue-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-building-columns"></i> Online Payment Refund Details *
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">12-Digit Payment UTR / Transaction ID *</label>
+                        <input type="text" id="cancel-utr-input" placeholder="Enter 12-digit UTR Number" class="w-full border border-blue-300 rounded-lg px-3 py-2 bg-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">Refund UPI ID (Where you want refund) *</label>
+                        <input type="text" id="cancel-refund-upi" placeholder="e.g., 9876543210@ybl" class="w-full border border-blue-300 rounded-lg px-3 py-2 bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">Upload Payment Screenshot *</label>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-camera"></i> Upload Payment Screenshot
+                            <input type="file" accept="image/*" onchange="handlePaymentProofUpload(event, 'cancel')" class="hidden">
+                        </label>
+                        <img id="cancel-payment-proof-preview" src="" class="hidden mt-2 w-full max-h-36 object-contain rounded-lg border bg-white p-1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2.5 pt-3 border-t">
+                <button onclick="closeCancelModal()" class="px-4 py-2 bg-stone-200 text-stone-800 rounded-xl text-xs font-bold hover:bg-stone-300">Close</button>
+                <button id="confirm-cancel-btn" onclick="confirmCancelOrderSubmit()" class="px-5 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow">
+                    Confirm Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 2. Rate Product Modal -->
     <div id="ratingModal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
@@ -271,15 +337,13 @@
         </div>
     </div>
 
-    <!-- 3. Custom Smooth White Alert & Prompt Modal -->
+    <!-- 3. Custom Smooth White Alert Modal -->
     <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
         <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
             <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#fce7f3; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
             <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
             <p id="customPopupMessage" style="margin:0 0 16px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
-            <input type="text" id="customPopupInput" placeholder="Write reason here..." style="display:none; width:100%; padding:10px 12px; margin-bottom:16px; border:1px solid #d6d3d1; border-radius:10px; font-size:14px; box-sizing:border-box;">
             <div style="display:flex; gap:10px; justify-content:center;">
-                <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Close</button>
                 <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
             </div>
         </div>
@@ -292,7 +356,6 @@
                 const icon = document.getElementById("customPopupIcon");
                 document.getElementById("customPopupTitle").innerText = title;
                 document.getElementById("customPopupMessage").innerText = message;
-                document.getElementById("customPopupInput").style.display = "none";
                 
                 if (type === "error") {
                     icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
@@ -302,7 +365,6 @@
                     icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
                 }
 
-                document.getElementById("customPopupCancelBtn").style.display = "none";
                 const okBtn = document.getElementById("customPopupOkBtn");
                 okBtn.innerText = "OK";
                 overlay.style.display = "flex";
@@ -314,50 +376,18 @@
             });
         };
 
-        window.showPrompt = function(message, title = "Cancel Order") {
-            return new Promise((resolve) => {
-                const overlay = document.getElementById("customPopupOverlay");
-                const icon = document.getElementById("customPopupIcon");
-                const input = document.getElementById("customPopupInput");
-                
-                document.getElementById("customPopupTitle").innerText = title;
-                document.getElementById("customPopupMessage").innerText = message;
-                icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "!";
-                
-                input.value = "";
-                input.style.display = "block";
-
-                const cancelBtn = document.getElementById("customPopupCancelBtn");
-                const okBtn = document.getElementById("customPopupOkBtn");
-                cancelBtn.style.display = "block";
-                okBtn.innerText = "Confirm Cancel";
-                overlay.style.display = "flex";
-
-                cancelBtn.onclick = () => {
-                    overlay.style.display = "none";
-                    resolve(null);
-                };
-                okBtn.onclick = () => {
-                    overlay.style.display = "none";
-                    resolve(input.value.trim());
-                };
-            });
-        };
-
         function copyTrackingId(code) {
             navigator.clipboard.writeText(code).then(() => {
                 showAlert("Tracking ID copied: " + code, "Copied", "success");
             });
         }
 
-        // 7-Day Return Window Calculator (Parses DD/MM/YYYY or standard JS date strings)
         function parseFlexibleDate(dateStr) {
             if (!dateStr) return null;
             if (typeof dateStr === "object" && typeof dateStr.toDate === "function") {
                 return dateStr.toDate();
             }
             const cleanStr = String(dateStr).trim();
-            // Handle Indian format DD/MM/YYYY, HH:MM:SS
             const dmyMatch = cleanStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
             if (dmyMatch) {
                 const day = parseInt(dmyMatch[1], 10);
@@ -386,13 +416,15 @@
             };
         }
 
+        // ✅ UPDATED CORRECT FIREBASE CONFIGURATION
         const firebaseConfig = {
-            apiKey: "AIzaSyDSLRGEEt8Ig20xLUcPR3YLohGnsDohZLM",
+            apiKey: "AIzaSyDSLRGEEt8Ig2oXLUcPR3YLohGnSDohZLw",
             authDomain: "pinki-latest-fashion.firebaseapp.com",
             projectId: "pinki-latest-fashion",
             storageBucket: "pinki-latest-fashion.firebasestorage.app",
             messagingSenderId: "432889531515",
-            appId: "1:432889531515:web:e0d4e5f9e84369051ae6de"
+            appId: "1:432889531515:web:00d4e5f9e84369051ae6de",
+            measurementId: "G-CXSRMW6GVY"
         };
 
         if (!firebase.apps.length) {
@@ -410,9 +442,53 @@
 
         let selectedReturnDocId = null;
         let selectedReturnOrderName = "";
+        let selectedCancelDocId = null;
         let loadedOrdersMap = {};
         window.returnPhotos = { front: "", back: "", right: "", left: "" };
         window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
+        window.returnPaymentProofImage = "";
+        window.cancelPaymentProofImage = "";
+
+        function isOnlineOrder(order) {
+            const pm = (order.paymentMethod || "").toUpperCase();
+            const ps = (order.paymentStatus || "").toUpperCase();
+            return pm.includes("ONLINE") || pm.includes("UPI") || pm.includes("PAID") || ps.includes("PAID");
+        }
+
+        function handlePaymentProofUpload(event, mode) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 600;
+                    const scaleSize = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
+                    canvas.width = img.width * scaleSize;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedData = canvas.toDataURL("image/jpeg", 0.7);
+
+                    if (mode === "return") {
+                        window.returnPaymentProofImage = compressedData;
+                        const prev = document.getElementById("return-payment-proof-preview");
+                        prev.src = compressedData;
+                        prev.classList.remove("hidden");
+                    } else {
+                        window.cancelPaymentProofImage = compressedData;
+                        const prev = document.getElementById("cancel-payment-proof-preview");
+                        prev.src = compressedData;
+                        prev.classList.remove("hidden");
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
         function toggleRefundFields() {
             const selectedMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
@@ -523,9 +599,9 @@
                 matchedOrders.forEach(order => {
                     const docId = order.id;
                     const statusRaw = (order.deliveryStatus || order.status || "packing").toLowerCase();
-                    const isCancelled = statusRaw === "cancelled" || order.deliveryStatus === "कैंसिल किया गया";
-                    const isReturnRejected = statusRaw === "return rejected";
-                    const isReturnFlow = !isReturnRejected && (
+                    const isCancelled = statusRaw.includes("cancel") || order.deliveryStatus === "कैंसिल किया गया";
+                    const isReturnRejected = statusRaw === "return_rejected" || statusRaw === "return rejected";
+                    const isReturnFlow = !isReturnRejected && !isCancelled && (
                         statusRaw.includes("return") || 
                         statusRaw.includes("pickup") || 
                         statusRaw.includes("picked") || 
@@ -565,14 +641,14 @@
                                 <div class="text-red-800">Reason: <b>${order.returnRejectionReason || order.rejectionReason || "Did not meet return policy guidelines."}</b></div>
                             </div>
                         `;
-                    } else if (isReturnFlow) {
+                    } else if (isReturnFlow || isCancelled) {
                         returnStatusBoxHTML = `
                             <div class="mt-2.5 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs space-y-1">
                                 <div class="font-bold text-amber-900 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-rotate-left"></i> Return & Reverse Pickup Status: <span class="underline">${order.deliveryStatus}</span>
+                                    <i class="fa-solid fa-rotate-left"></i> Status: <span class="underline">${order.deliveryStatus}</span>
                                 </div>
+                                ${order.paymentUTR ? `<div class="text-stone-700">Submitted UTR: <b class="font-mono text-blue-700">${order.paymentUTR}</b></div>` : ''}
                                 ${order.refundAccountSummary ? `<div class="text-stone-700">Refund To: <b>${order.refundAccountSummary}</b></div>` : ''}
-                                ${order.pickupTrackingId ? `<div class="text-stone-700">Pickup Tracking ID: <b class="font-mono">${order.pickupTrackingId}</b></div>` : ''}
                                 ${order.paymentStatus && order.paymentStatus.toLowerCase().includes("refund") ? `<div class="text-emerald-700 font-bold">✓ ${order.paymentStatus}</div>` : ''}
                             </div>
                         `;
@@ -608,7 +684,7 @@
                         }
                     } else {
                         actionButtonsHTML = `
-                            <button onclick="cancelOrder('${docId}')" class="px-4 py-2 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 shadow-sm transition">
+                            <button onclick="openCancelModal('${docId}')" class="px-4 py-2 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 shadow-sm transition">
                                 <i class="fa-solid fa-xmark mr-1"></i> Cancel Order
                             </button>`;
                     }
@@ -647,24 +723,92 @@
             }
         }
 
-        async function cancelOrder(docId) {
-            const reason = await showPrompt("Enter reason for cancelling order (optional):", "Cancel Order");
-            if (reason === null) return;
+        // --- CANCEL ORDER MODAL LOGIC (WITH UTR & SCREENSHOT FOR ONLINE ORDERS) ---
+        function openCancelModal(docId) {
+            selectedCancelDocId = docId;
+            const orderObj = loadedOrdersMap[docId] || {};
+            window.cancelPaymentProofImage = "";
+            document.getElementById("cancel-reason-input").value = "";
+            document.getElementById("cancel-utr-input").value = "";
+            document.getElementById("cancel-refund-upi").value = "";
+            const prev = document.getElementById("cancel-payment-proof-preview");
+            prev.src = "";
+            prev.classList.add("hidden");
+
+            const onlineBox = document.getElementById("cancel-online-refund-box");
+            if (isOnlineOrder(orderObj)) {
+                onlineBox.classList.remove("hidden");
+            } else {
+                onlineBox.classList.add("hidden");
+            }
+
+            document.getElementById("cancel-modal").classList.remove("hidden");
+        }
+
+        function closeCancelModal() {
+            document.getElementById("cancel-modal").classList.add("hidden");
+            selectedCancelDocId = null;
+        }
+
+        async function confirmCancelOrderSubmit() {
+            if (!selectedCancelDocId) return;
+            const orderObj = loadedOrdersMap[selectedCancelDocId] || {};
+            const reason = document.getElementById("cancel-reason-input").value.trim();
+
+            if (!reason) {
+                await showAlert("Please write the reason for cancelling this order.", "Reason Required", "error");
+                return;
+            }
+
+            const updatePayload = {
+                deliveryStatus: "cancelled",
+                returnReason: `Cancelled: ${reason}`,
+                cancelReason: reason,
+                cancelledAt: new Date().toLocaleString()
+            };
+
+            if (isOnlineOrder(orderObj)) {
+                const utr = document.getElementById("cancel-utr-input").value.trim();
+                const upi = document.getElementById("cancel-refund-upi").value.trim();
+
+                if (!utr || utr.length < 6) {
+                    await showAlert("Please enter your Online Payment UTR / Transaction ID for refund verification.", "UTR Required", "error");
+                    return;
+                }
+                if (!upi || !upi.includes("@")) {
+                    await showAlert("Please enter a valid UPI ID where you want your refund.", "Refund UPI Required", "error");
+                    return;
+                }
+                if (!window.cancelPaymentProofImage) {
+                    await showAlert("Please upload your Payment Screenshot for refund verification.", "Screenshot Required", "error");
+                    return;
+                }
+
+                updatePayload.paymentUTR = utr;
+                updatePayload.refundAccountSummary = `UPI: ${upi} | UTR: ${utr}`;
+                updatePayload.proofImage = window.cancelPaymentProofImage;
+                updatePayload.returnImages = [window.cancelPaymentProofImage];
+                updatePayload.returnReason = `Cancelled (Online Paid) - Reason: ${reason} | UTR: ${utr} | Refund UPI: ${upi}`;
+            }
+
+            const btn = document.getElementById("confirm-cancel-btn");
+            btn.disabled = true;
+            btn.innerText = "Cancelling...";
 
             try {
-                await db.collection("orders").doc(docId).update({
-                    deliveryStatus: "Cancelled",
-                    cancelReason: reason || "Cancelled by customer",
-                    cancelledAt: new Date().toLocaleString()
-                });
-                await showAlert("Your order has been successfully cancelled.", "Order Cancelled", "success");
+                await db.collection("orders").doc(selectedCancelDocId).update(updatePayload);
+                closeCancelModal();
+                await showAlert("Your order has been cancelled successfully.", "Order Cancelled", "success");
                 loadUserOrders();
             } catch (err) {
                 await showAlert("Error occurred: " + err.message, "Error", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Confirm Cancel";
             }
         }
 
-        // --- RETURN MODAL LOGIC WITH 7-DAY CHECK, STRICT NAME MATCH & BANK NAME ---
+        // --- RETURN MODAL LOGIC ---
         function openReturnModal(docId) {
             const orderObj = loadedOrdersMap[docId] || {};
             const winStatus = getReturnWindowStatus(orderObj);
@@ -679,12 +823,25 @@
             selectedReturnOrderName = registeredName;
 
             window.returnPhotos = { front: "", back: "", right: "", left: "" };
+            window.returnPaymentProofImage = "";
             document.getElementById("return-reason").value = "";
+            document.getElementById("return-utr-input").value = "";
             document.getElementById("refund-upi-id").value = "";
             document.getElementById("refund-bank-name").value = "";
             document.getElementById("refund-acc-number").value = "";
             document.getElementById("refund-ifsc").value = "";
             document.getElementById("refund-name-confirm").checked = false;
+
+            const proofPrev = document.getElementById("return-payment-proof-preview");
+            proofPrev.src = "";
+            proofPrev.classList.add("hidden");
+
+            const onlineProofBox = document.getElementById("return-online-proof-box");
+            if (isOnlineOrder(orderObj)) {
+                onlineProofBox.classList.remove("hidden");
+            } else {
+                onlineProofBox.classList.add("hidden");
+            }
 
             document.getElementById("required-holder-name-badge").innerText = registeredName || "your registered name";
             document.getElementById("confirm-holder-text").innerText = registeredName || "me";
@@ -723,13 +880,26 @@
             const refundMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
             const isNameConfirmed = document.getElementById("refund-name-confirm").checked;
             const submitBtn = document.getElementById("submit-return-btn");
-            const uploadedPhotosList = Object.entries(window.returnPhotos)
-                .filter(([_, data]) => data !== "")
-                .map(([angle, data]) => ({ angle: angle, image: data }));
+            
+            // Plain array of base64 image strings so admin.html displays them directly
+            const uploadedPhotosUrls = Object.values(window.returnPhotos).filter(data => data !== "");
 
             if (!reason) {
                 await showAlert("Please write the reason for return.", "Reason Required", "error");
                 return;
+            }
+
+            let utrNumber = "";
+            if (isOnlineOrder(orderObj)) {
+                utrNumber = document.getElementById("return-utr-input").value.trim();
+                if (!utrNumber || utrNumber.length < 6) {
+                    await showAlert("Please enter your 12-digit Online Payment UTR / Transaction ID.", "UTR Required", "error");
+                    return;
+                }
+                if (!window.returnPaymentProofImage) {
+                    await showAlert("Please upload your Online Payment Screenshot.", "Screenshot Required", "error");
+                    return;
+                }
             }
 
             const expectedName = (selectedReturnOrderName || currentUser.name || "").trim();
@@ -765,7 +935,6 @@
                 }
                 if (!bankName || bankName.length < 2) {
                     await showAlert("Please enter your Bank Name (e.g., State Bank of India, HDFC Bank).", "Bank Name Required", "error");
-                    document.getElementById("refund-bank-name").focus();
                     return;
                 }
                 if (!accNum || ifsc.length < 8) {
@@ -779,14 +948,23 @@
                 refundSummaryText = `${expectedName} | ${bankName} | A/C: ${accNum} | IFSC: ${ifsc}`;
             }
 
+            if (utrNumber) {
+                refundDetailsObj.paymentUTR = utrNumber;
+                refundSummaryText += ` | UTR: ${utrNumber}`;
+            }
+
             if (!isNameConfirmed) {
                 await showAlert(`Please tick the confirmation box verifying that this account belongs to ${expectedName}.`, "Confirmation Required", "error");
                 return;
             }
 
-            if (uploadedPhotosList.length < 3) {
-                await showAlert(`Please capture or upload at least 3 photos (Front, Back, Right/Left). Currently uploaded: ${uploadedPhotosList.length}`, "Minimum 3 Photos Required", "error");
+            if (uploadedPhotosUrls.length < 3) {
+                await showAlert(`Please capture or upload at least 3 outfit photos. Currently uploaded: ${uploadedPhotosUrls.length}`, "Minimum 3 Photos Required", "error");
                 return;
+            }
+
+            if (window.returnPaymentProofImage) {
+                uploadedPhotosUrls.unshift(window.returnPaymentProofImage);
             }
 
             submitBtn.disabled = true;
@@ -794,16 +972,18 @@
 
             try {
                 await db.collection("orders").doc(selectedReturnDocId).update({
-                    deliveryStatus: "Return Request Placed",
-                    returnReason: reason,
+                    deliveryStatus: "return_requested",
+                    returnReason: `${reason} (${refundSummaryText})`,
                     refundDetails: refundDetailsObj,
                     refundAccountSummary: refundSummaryText,
-                    returnImages: uploadedPhotosList,
-                    returnImage: uploadedPhotosList[0].image,
+                    paymentUTR: utrNumber || "",
+                    proofImage: window.returnPaymentProofImage || "",
+                    returnImages: uploadedPhotosUrls,
+                    returnImage: uploadedPhotosUrls[0],
                     returnedAt: new Date().toLocaleString()
                 });
                 
-                await showAlert(`Return registered! Refund will be processed only to ${expectedName}'s account after pickup verification.`, "Return Submitted", "success");
+                await showAlert(`Return registered! Refund will be processed to ${expectedName}'s account after pickup verification.`, "Return Submitted", "success");
                 closeReturnModal();
                 loadUserOrders();
             } catch (err) {
@@ -865,7 +1045,7 @@
             }
 
             if (photoBase64List.length < 2) {
-                await showAlert(`Please capture or upload at least 2 photos (Front, Back, Right/Left). Currently uploaded: ${photoBase64List.length}`, "Minimum 2 Photos Required", "error");
+                await showAlert(`Please capture or upload at least 2 photos. Currently uploaded: ${photoBase64List.length}`, "Minimum 2 Photos Required", "error");
                 return;
             }
 
