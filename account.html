@@ -672,7 +672,7 @@
       });
     }
 
-    // Sign In Form Submission with Smart Redirection & Soft Messages
+    // Sign In Form Submission with Direct Firestore Database Check
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -687,6 +687,19 @@
         }
 
         try {
+          // 1. Pehle Firestore Database me check karo ki ye email exist karta hai ya nahi
+          const userDoc = await db.collection("users").doc(email).get();
+
+          if (!userDoc.exists) {
+            // Agar database me email nahi hai, matlab naya user hai -> Seedha Sign Up par bhejo
+            await showAlert("This email is not registered yet. Let's create your account!", "Account Not Found", "info");
+            loginForm.reset();
+            showBox('signup');
+            document.getElementById("signup-email").value = email; // Email auto-fill ho jayega
+            return;
+          }
+
+          // 2. Agar email mil gaya, toh Firebase Auth se login karo
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
@@ -697,31 +710,18 @@
             return;
           }
 
-          const doc = await db.collection("users").doc(email).get();
-          if (doc.exists && doc.data().password === password) {
-            const userData = doc.data();
+          const userData = userDoc.data();
+          if (userData.password === password) {
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
             await showAlert("Welcome back! Glad to see you again.", "Success", "success");
             window.location.href = "index.html";
           } else {
-            await showAlert("Incorrect email or password. Please check your details and try again.", "Sign In Failed", "error");
+            await showAlert("Incorrect password. Please check your details and try again.", "Sign In Failed", "error");
           }
+
         } catch (error) {
-          // Smart check: Agar email database/auth mein nahi mili (New User)
-          if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
-            await showAlert("This email is not registered yet. Let's create your account!", "Account Not Found", "info");
-            loginForm.reset();
-            showBox('signup');
-            document.getElementById("signup-email").value = email; // Email auto-fill ho jayega
-          } 
-          // Agar password galat hai ya credentials match nahi hue
-          else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials' || error.code === 'auth/invalid-credential') {
-            await showAlert("Incorrect password or login details. Please check your password and try again.", "Sign In Failed", "error");
-          } 
-          // Kisi aur error ke liye
-          else {
-            await showAlert("Could not sign in right now. Please check your details and try again.", "Notice", "error");
-          }
+          // Agar password galat hai ya koi aur Auth error hai
+          await showAlert("Incorrect password or login details. Please check your details and try again.", "Sign In Failed", "error");
         }
       });
     }
