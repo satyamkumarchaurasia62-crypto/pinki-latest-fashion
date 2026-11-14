@@ -62,8 +62,8 @@
     
     <!-- 1. Login Box -->
     <div id="login-box">
-      <h2>Sign In</h2>
-      <p class="subtitle">Login with your email and password</p>
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Please enter your details to sign in</p>
       <form id="login-form">
         <div class="form-group">
           <label>Email Address</label>
@@ -77,7 +77,7 @@
             <a class="forgot-link" style="margin-top:0;" onclick="showBox('forgot')">Forgot Password?</a>
           </div>
         </div>
-        <button type="submit" class="main-btn btn-primary transition">Login</button>
+        <button type="submit" class="main-btn btn-primary transition">Sign In</button>
       </form>
       <p class="toggle-text">Don't have an account? <a onclick="showBox('signup')">Sign Up</a></p>
     </div>
@@ -85,7 +85,7 @@
     <!-- 2. Registration Box -->
     <div id="signup-box" style="display: none;">
       <h2>Create Account</h2>
-      <p class="subtitle">Verify your Mobile via SMS OTP to register.</p>
+      <p class="subtitle">Join Pinki Latest Fashion today!</p>
       <form id="signup-form">
         <div class="form-group">
           <label>Full Name *</label>
@@ -148,7 +148,7 @@
             <input type="text" id="signup-pincode" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="6-digit Pincode" required>
           </div>
         </div>
-        <button type="submit" id="register-submit-btn" class="main-btn btn-primary transition">Register & Verify Account</button>
+        <button type="submit" id="register-submit-btn" class="main-btn btn-primary transition">Create My Account</button>
       </form>
       <p class="toggle-text">Already have an account? <a onclick="showBox('login')">Sign In</a></p>
     </div>
@@ -156,7 +156,7 @@
     <!-- 3. Password Reset Box -->
     <div id="forgot-box" style="display: none;">
       <h2>Reset Password</h2>
-      <p class="subtitle">Fill in the details to recover your account.</p>
+      <p class="subtitle">We'll help you secure your account back.</p>
       <form id="forgot-form">
         <div class="form-group">
           <label>Registered Email Address</label>
@@ -178,9 +178,9 @@
           <label>New Password</label>
           <input type="password" id="forgot-new-password" placeholder="Set new password" minlength="8" required>
         </div>
-        <button type="submit" class="main-btn btn-primary transition">Update & Save Password</button>
+        <button type="submit" class="main-btn btn-primary transition">Update Password</button>
       </form>
-      <p class="toggle-text"><a onclick="showBox('login')">← Back to Login</a></p>
+      <p class="toggle-text"><a onclick="showBox('login')">← Back to Sign In</a></p>
     </div>
 
     <!-- 4. Profile & Edit Box -->    
@@ -205,19 +205,16 @@
           <span id="name-limit-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Name Change: 1 Time Left</span>
         </div>
 
-        <!-- Name (1 Time Limit) -->
         <div>
-          <label class="text-xs">Full Name * <span id="name-edit-note" class="text-[10px] text-amber-700 font-normal">(Can only be changed ONCE for bank/refund match)</span></label>
+          <label class="text-xs">Full Name * <span id="name-edit-note" class="text-[10px] text-amber-700 font-normal">(Can only be changed ONCE)</span></label>
           <input type="text" id="edit-name" class="text-sm font-semibold">
         </div>
 
-        <!-- Email Change -->
         <div>
-          <label class="text-xs">Email Address * <span class="text-[10px] text-stone-500 font-normal">(Changing email sends a verification link)</span></label>
+          <label class="text-xs">Email Address *</label>
           <input type="email" id="edit-email" class="text-sm">
         </div>
 
-        <!-- Mobile Number Change (Requires OTP if modified) -->
         <div>
           <div class="flex justify-between items-center mb-1">
             <label class="text-xs" style="margin:0;">Mobile Number (10 Digits) *</label>
@@ -237,9 +234,8 @@
           </div>
         </div>
 
-        <!-- Address Fields -->
         <div>
-          <label class="text-xs">Full Address (House No, Street, Landmark) *</label>
+          <label class="text-xs">Full Address *</label>
           <input type="text" id="edit-address" class="text-sm">
         </div>
 
@@ -264,7 +260,7 @@
         </div>
       </div>
 
-      <!-- Action Buttons Stacked Cleanly at the Bottom -->
+      <!-- Action Buttons -->
       <div class="mt-4 flex flex-col gap-3">
         <a href="index.html" class="w-full text-center py-3 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition flex items-center justify-center shadow-sm">
           <i class="fa-solid fa-house mr-2"></i>Home
@@ -294,7 +290,7 @@
   </div>
 
   <script>
-    // Custom Alert Function
+    // Custom Soft Alert Function
     window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
       return new Promise((resolve) => {
         const overlay = document.getElementById("customPopupOverlay");
@@ -312,7 +308,7 @@
 
         document.getElementById("customPopupCancelBtn").style.display = "none";
         const okBtn = document.getElementById("customPopupOkBtn");
-        okBtn.innerText = "OK";
+        okBtn.innerText = "Okay";
         overlay.style.display = "flex";
 
         okBtn.onclick = () => {
@@ -322,7 +318,7 @@
       });
     };
 
-    // Correct Firebase Configuration
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDSLRGEEt8Ig2oXLUcPR3YLohGnSDohZLw",
       authDomain: "pinki-latest-fashion.firebaseapp.com",
@@ -338,27 +334,20 @@
     }
     const db = firebase.firestore();
 
-    // Verification States
     let isPhoneVerified = false;
     let isEditPhoneVerified = true;
     let phoneConfirmationResult = null;
     let verifiedPhoneNumber = "";
 
-    // Initialize Invisible reCAPTCHA safely after window load
     window.addEventListener("load", () => {
       try {
         if (!window.recaptchaVerifier) {
-          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
-            size: "invisible"
-          });
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
           window.recaptchaVerifier.render();
         }
-      } catch (e) {
-        console.warn("reCAPTCHA init note:", e.message);
-      }
+      } catch (e) {}
     });
 
-    // Send Mobile SMS OTP via Firebase Phone Auth (Supports both 'signup' and 'edit' modes)
     async function sendMobileOtp(mode = 'signup') {
       const inputId = mode === 'edit' ? "edit-phone" : "signup-phone";
       const btnId = mode === 'edit' ? "edit-send-otp-btn" : "send-mobile-otp-btn";
@@ -366,7 +355,7 @@
 
       const rawPhone = (document.getElementById(inputId).value || "").replace(/\D/g, "");
       if (rawPhone.length !== 10) {
-        await showAlert("Please enter a valid 10-digit mobile number!", "Invalid Number", "error");
+        await showAlert("Please enter a valid 10-digit mobile number.", "Almost There", "error");
         return;
       }
 
@@ -383,24 +372,17 @@
         if (!window.recaptchaVerifier) {
           window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
         }
-        
         phoneConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, window.recaptchaVerifier);
         document.getElementById(otpBoxId).classList.remove("hidden");
-        await showAlert(`A 6-digit SMS OTP has been sent to ${fullPhone}.`, "Mobile OTP Sent", "success");
+        await showAlert(`We have sent a 6-digit verification code to ${fullPhone}. Please enter it below.`, "OTP Sent", "success");
       } catch (err) {
-        await showAlert("Failed to send Mobile OTP: " + err.message, "SMS OTP Error", "error");
-        try {
-          window.recaptchaVerifier.render().then(widgetId => {
-            grecaptcha.reset(widgetId);
-          });
-        } catch(ex) {}
+        await showAlert("Could not send OTP right now. Please check your number and try again.", "Notice", "error");
       } finally {
         btn.disabled = false;
         btn.innerText = "Send OTP";
       }
     }
 
-    // Verify Mobile SMS OTP
     async function verifyMobileOtp(mode = 'signup') {
       const otpInputId = mode === 'edit' ? "edit-otp-input" : "mobile-otp-input";
       const phoneInputId = mode === 'edit' ? "edit-phone" : "signup-phone";
@@ -409,18 +391,13 @@
       const statusId = mode === 'edit' ? "edit-phone-status" : "mobile-otp-status";
 
       const otpCode = (document.getElementById(otpInputId).value || "").trim();
-      const currentPhone = (document.getElementById(phoneInputId).value || "").replace(/\D/g, "");
 
       if (!phoneConfirmationResult) {
-        await showAlert("Please click 'Send OTP' next to your mobile number first.", "Send OTP First", "error");
-        return;
-      }
-      if (currentPhone !== verifiedPhoneNumber) {
-        await showAlert("Mobile number was changed. Please send OTP to the new number.", "Number Changed", "error");
+        await showAlert("Please click 'Send OTP' first to receive the code.", "Notice", "error");
         return;
       }
       if (otpCode.length !== 6) {
-        await showAlert("Please enter the 6-digit SMS OTP.", "Invalid OTP", "error");
+        await showAlert("Please enter the complete 6-digit code.", "Notice", "error");
         return;
       }
 
@@ -437,22 +414,17 @@
         document.getElementById(phoneInputId).style.background = "#ecfdf5";
         document.getElementById(boxId).classList.add("hidden");
         document.getElementById(statusId).innerHTML = `<span class="text-emerald-600 font-bold">✓ Mobile Verified</span>`;
-        await showAlert("Mobile number verified successfully!", "Verified", "success");
+        await showAlert("Your mobile number has been verified successfully!", "Wonderful", "success");
       } catch (err) {
-        await showAlert("Incorrect SMS OTP. Please check and try again.", "Invalid OTP", "error");
+        await showAlert("The OTP you entered is incorrect. Please check and try again.", "Incorrect Code", "error");
       }
     }
 
     function showBox(type) {
-      const loginBox = document.getElementById("login-box");
-      const signupBox = document.getElementById("signup-box");
-      const forgotBox = document.getElementById("forgot-box");
-      const profileBox = document.getElementById("profile-box");
-
-      if (loginBox) loginBox.style.display = (type === 'login') ? 'block' : 'none';
-      if (signupBox) signupBox.style.display = (type === 'signup') ? 'block' : 'none';
-      if (forgotBox) forgotBox.style.display = (type === 'forgot') ? 'block' : 'none';
-      if (profileBox) profileBox.style.display = (type === 'profile') ? 'block' : 'none';
+      document.getElementById("login-box").style.display = (type === 'login') ? 'block' : 'none';
+      document.getElementById("signup-box").style.display = (type === 'signup') ? 'block' : 'none';
+      document.getElementById("forgot-box").style.display = (type === 'forgot') ? 'block' : 'none';
+      document.getElementById("profile-box").style.display = (type === 'profile') ? 'block' : 'none';
     }
 
     function loadProfile(user) {
@@ -463,7 +435,6 @@
       document.getElementById("user-display-address").innerText = `${user.address || ''}, ${user.city || ''} - ${user.pincode || ''}`;
     }
 
-    // Toggle Edit Profile Form & Enforce 1-Time Name Change Limit
     function toggleEditProfile(show) {
       const formBox = document.getElementById("edit-profile-form-box");
       const viewCard = document.getElementById("profile-view-card");
@@ -483,8 +454,6 @@
       document.getElementById("edit-name").value = user.name || "";
       document.getElementById("edit-email").value = user.email || "";
       document.getElementById("edit-phone").value = user.phone || "";
-      document.getElementById("edit-phone").readOnly = false;
-      document.getElementById("edit-phone").style.background = "#fff";
       document.getElementById("edit-address").value = user.address || "";
       document.getElementById("edit-city").value = user.city || "";
       document.getElementById("edit-pincode").value = user.pincode || "";
@@ -492,26 +461,20 @@
       isEditPhoneVerified = true;
       document.getElementById("edit-send-otp-btn").classList.add("hidden");
       document.getElementById("edit-otp-box").classList.add("hidden");
-      document.getElementById("edit-phone-status").innerHTML = `<span class="text-emerald-600 font-bold">✓ Current Verified</span>`;
 
       const nameChangeCount = user.nameChangedCount || 0;
       const nameInput = document.getElementById("edit-name");
       const nameBadge = document.getElementById("name-limit-badge");
-      const nameNote = document.getElementById("name-edit-note");
 
       if (nameChangeCount >= 1) {
         nameInput.readOnly = true;
         nameInput.style.background = "#e5e7eb";
         nameInput.style.color = "#6b7280";
-        nameInput.style.cursor = "not-allowed";
-        nameBadge.innerText = "Name Locked (Used 1/1)";
+        nameBadge.innerText = "Name Locked (Already Changed Once)";
         nameBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700";
-        nameNote.innerText = "(Name can only be changed once and is now permanently locked)";
       } else {
         nameInput.readOnly = false;
         nameInput.style.background = "#fff";
-        nameInput.style.color = "#1f2937";
-        nameInput.style.cursor = "text";
         nameBadge.innerText = "Name Change: 1 Time Left";
         nameBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800";
       }
@@ -530,7 +493,7 @@
       if (phoneInput.value !== (user.phone || "")) {
         isEditPhoneVerified = false;
         document.getElementById("edit-send-otp-btn").classList.remove("hidden");
-        document.getElementById("edit-phone-status").innerHTML = `<span class="text-amber-600 font-bold">SMS OTP Required</span>`;
+        document.getElementById("edit-phone-status").innerHTML = `<span class="text-amber-600 font-bold">Verification Needed</span>`;
       } else {
         isEditPhoneVerified = true;
         document.getElementById("edit-send-otp-btn").classList.add("hidden");
@@ -539,7 +502,6 @@
       }
     }
 
-    // Save Profile Updates (1-Time Name, Mobile OTP, Email Verification & Address)
     async function saveProfileUpdates() {
       const rawUser = sessionStorage.getItem("currentLoggedInUser");
       if (!rawUser) return;
@@ -554,19 +516,19 @@
       const newPincode = document.getElementById("edit-pincode").value.trim();
 
       if (!newName || !newEmail || newPhone.length !== 10 || !newAddress || !newCity || newPincode.length !== 6) {
-        await showAlert("Please fill all fields correctly (10-digit Mobile and 6-digit Pincode).", "Missing Details", "error");
+        await showAlert("Please check all fields and fill them correctly.", "Incomplete Details", "error");
         return;
       }
 
       if (!isEditPhoneVerified) {
-        await showAlert("You changed your mobile number. Please click 'Send OTP' and verify your new number first.", "Verify Mobile OTP", "error");
+        await showAlert("Please verify your updated mobile number with OTP before saving.", "OTP Verification Required", "error");
         return;
       }
 
       let nameChangedCount = currentUser.nameChangedCount || 0;
       if (newName !== currentUser.name) {
         if (nameChangedCount >= 1) {
-          await showAlert("You have already changed your name once. Name cannot be changed again.", "Name Locked", "error");
+          await showAlert("Your name can only be changed once and is now locked.", "Name Locked", "error");
           return;
         }
         nameChangedCount = 1;
@@ -589,11 +551,10 @@
           updatedAt: new Date().toISOString()
         };
 
-        // Handle Email Change if modified
         if (newEmail !== oldEmail) {
           const checkNew = await db.collection("users").doc(newEmail).get();
           if (checkNew.exists) {
-            await showAlert("This new email is already registered with another account!", "Email Taken", "error");
+            await showAlert("This email address is already registered with another account.", "Email Already Used", "error");
             btn.disabled = false;
             btn.innerText = "Save Changes";
             return;
@@ -602,57 +563,21 @@
           try {
             const cred = await firebase.auth().createUserWithEmailAndPassword(newEmail, currentUser.password);
             await cred.user.sendEmailVerification();
-          } catch (authErr) {
-            console.warn("Auth email update note:", authErr.message);
-          }
+          } catch (authErr) {}
 
           await db.collection("users").doc(newEmail).set(updatedData);
           await db.collection("users").doc(oldEmail).delete();
-
-          // Update email on past orders so order history stays linked
-          const ordersSnap = await db.collection("orders").get();
-          const batch = db.batch();
-          ordersSnap.forEach(doc => {
-            const od = doc.data();
-            if ((od.email || od.userEmail || "").toLowerCase() === oldEmail) {
-              batch.update(doc.ref, { email: newEmail, userEmail: newEmail, userName: newName });
-            }
-          });
-          await batch.commit();
-
-          await showAlert(`Profile updated! A verification link has also been sent to your new email (${newEmail}).`, "Updated & Verification Sent", "success");
+          await showAlert(`Profile updated successfully! A verification link has also been sent to your new email (${newEmail}).`, "Success", "success");
         } else {
-          await db.collection("users").doc(oldEmail).update({
-            name: newName,
-            phone: newPhone,
-            address: newAddress,
-            city: newCity,
-            pincode: newPincode,
-            nameChangedCount: nameChangedCount,
-            updatedAt: new Date().toISOString()
-          });
-
-          // If name was updated (1-time), also sync name in user's orders so return account holder matches
-          if (newName !== currentUser.name) {
-            const ordersSnap = await db.collection("orders").get();
-            const batch = db.batch();
-            ordersSnap.forEach(doc => {
-              const od = doc.data();
-              if ((od.email || od.userEmail || "").toLowerCase() === oldEmail) {
-                batch.update(doc.ref, { userName: newName });
-              }
-            });
-            await batch.commit();
-          }
-
-          await showAlert("Your profile & address details have been updated!", "Profile Updated", "success");
+          await db.collection("users").doc(oldEmail).update(updatedData);
+          await showAlert("Your profile details have been successfully updated.", "Updated", "success");
         }
 
         sessionStorage.setItem("currentLoggedInUser", JSON.stringify(updatedData));
         loadProfile(updatedData);
         toggleEditProfile(false);
       } catch (err) {
-        await showAlert("Error updating profile: " + err.message, "Update Error", "error");
+        await showAlert("Could not update profile right now. Please try again.", "Notice", "error");
       } finally {
         btn.disabled = false;
         btn.innerText = "Save Changes";
@@ -661,17 +586,17 @@
 
     async function logout() {
       sessionStorage.removeItem("currentLoggedInUser");
-      await showAlert("You have been successfully logged out!", "Logged Out", "success");
+      await showAlert("You have been successfully logged out. Have a wonderful day!", "Logged Out", "success");
       window.location.href = "index.html";
     }
 
-    // Resend Verification Link from Login screen (Updated to handle temporary sign-in)
+    // Soft Resend Verification Link from Login screen
     async function resendVerificationFromLogin() {
       const email = document.getElementById("login-email").value.trim().toLowerCase();
       const password = document.getElementById("login-password").value;
 
       if (!email || !password) {
-        await showAlert("Please enter your registered Email and Password first, then click Resend Verification Link.", "Enter Credentials", "error");
+        await showAlert("Please enter your Email and Password above first, then click resend link.", "Details Needed", "info");
         return;
       }
 
@@ -680,25 +605,25 @@
         const authUser = userCred.user;
 
         if (authUser.emailVerified) {
-          await showAlert("Your email is already verified! You can log in directly.", "Already Verified", "success");
+          await showAlert("Your email is already verified! You can sign in directly.", "Already Verified", "success");
         } else {
           await authUser.sendEmailVerification();
-          await showAlert("A fresh verification link has been sent to " + email + ". Please check your inbox and spam folder.", "Link Sent", "success");
+          await showAlert("We have sent a fresh verification link to your email. Please check your inbox and spam folder.", "Verification Link Sent", "success");
         }
         await firebase.auth().signOut();
       } catch (err) {
-        await showAlert("Error: " + err.message, "Failed", "error");
+        await showAlert("Please check your email and password, then try again.", "Notice", "error");
       }
     }
 
-    // Sign Up Submit
+    // Sign Up Form Submission
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
       signupForm.addEventListener("submit", async function(e) {
         e.preventDefault();
 
         if (!isPhoneVerified) {
-          await showAlert("Please verify your 10-digit Mobile Number via SMS OTP before creating your account.", "Mobile Verification Required", "error");
+          await showAlert("Please verify your 10-digit mobile number via SMS OTP first.", "Mobile Verification Required", "error");
           return;
         }
 
@@ -714,50 +639,40 @@
 
         const btn = document.getElementById("register-submit-btn");
         btn.disabled = true;
-        btn.innerText = "Creating Account & Sending Email...";
+        btn.innerText = "Creating Account...";
 
         try {
           const doc = await db.collection("users").doc(email).get();
           if (doc.exists) {
-            await showAlert("This email address is already registered!", "Already Registered", "error");
+            await showAlert("An account with this email already exists. Please sign in instead.", "Already Registered", "info");
           } else {
             const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
             await userCred.user.sendEmailVerification();
 
             const newUserData = {
-              name: name,
-              email: email,
-              password: password,
-              question: question,
-              answer: answer,
-              phone: phone,
-              phoneVerified: true,
-              address: address,
-              city: city,
-              pincode: pincode,
-              nameChangedCount: 0,
-              orders: [],
-              createdAt: new Date()
+              name, email, password, question, answer, phone,
+              phoneVerified: true, address, city, pincode,
+              nameChangedCount: 0, orders: [], createdAt: new Date()
             };
 
             await db.collection("users").doc(email).set(newUserData);
 
-            await showAlert("Account created successfully!\n\nWe have sent a verification link to your email (" + email + "). Please check your inbox and verify your email before logging in.", "Verification Email Sent", "success");
+            await showAlert("Your account has been created successfully!\n\nWe have sent a verification link to your email. Please verify your email before signing in.", "Welcome!", "success");
             
             await firebase.auth().signOut();
             signupForm.reset();
             showBox('login');
           }
         } catch (error) {
-          await showAlert("Error: " + error.message, "Registration Failed", "error");
+          await showAlert("Could not create account right now. Please check your details.", "Notice", "error");
         } finally {
           btn.disabled = false;
-          btn.innerText = "Register & Verify Account";
+          btn.innerText = "Create My Account";
         }
       });
     }
 
-    // Sign In with Strict Email Verification Check
+    // Sign In Form Submission with Soft Verification & Error Messages
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -767,7 +682,7 @@
         const password = document.getElementById("login-password").value;
 
         if (!email || !password) {
-          await showAlert("Please enter email and password!", "Missing Fields", "error");
+          await showAlert("Please enter both your email and password.", "Missing Details", "error");
           return;
         }
 
@@ -775,9 +690,10 @@
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
+          // Soft and clear message if email is not verified
           if (!authUser.emailVerified) {
             await firebase.auth().signOut();
-            await showAlert("Your email is not verified yet! Please click 'Resend Verification Link' above if your link expired.", "Email Not Verified", "error");
+            await showAlert("Please verify your email address before signing in. Check your inbox or click 'Resend Verification Link' above.", "Email Verification Required", "warning");
             return;
           }
 
@@ -785,13 +701,13 @@
           if (doc.exists && doc.data().password === password) {
             const userData = doc.data();
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
-            await showAlert("Login successful!", "Welcome Back", "success");
+            await showAlert("Welcome back! Glad to see you again.", "Success", "success");
             window.location.href = "index.html";
           } else {
-            await showAlert("Incorrect email or password! Please check again.", "Login Failed", "error");
+            await showAlert("Incorrect email or password. Please check your details and try again.", "Sign In Failed", "error");
           }
         } catch (error) {
-          await showAlert("Login error: " + error.message, "Error", "error");
+          await showAlert("Incorrect email or password. Please check your details and try again.", "Sign In Failed", "error");
         }
       });
     }
@@ -809,32 +725,29 @@
         try {
           const doc = await db.collection("users").doc(email).get();
           if (!doc.exists) {
-            await showAlert("This email address was not found in the system!", "Not Found", "error");
+            await showAlert("We couldn't find an account with this email address.", "Not Found", "error");
             return;
           }
           
           const user = doc.data();
           if (user.question === question && user.answer === answer) {
-            await db.collection("users").doc(email).update({
-              password: newPassword
-            });
-            await showAlert("Password changed successfully! Log in with your new password.", "Password Updated", "success");
+            await db.collection("users").doc(email).update({ password: newPassword });
+            await showAlert("Your password has been updated successfully. You can now sign in with your new password.", "Success", "success");
             forgotForm.reset();
             showBox('login');
           } else {
-            await showAlert("Security question or answer does not match!", "Verification Failed", "error");
+            await showAlert("The security answer you entered is incorrect. Please check and try again.", "Verification Failed", "error");
           }
         } catch (error) {
-          await showAlert("Error: " + error.message, "Error", "error");
+          await showAlert("Something went wrong. Please try again later.", "Notice", "error");
         }
       });
     }
 
-    // Check login state on page load
+    // Check login state on load
     const savedUser = sessionStorage.getItem("currentLoggedInUser");
     if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      loadProfile(userData);
+      loadProfile(JSON.parse(savedUser));
     }
   </script>
 </body>
