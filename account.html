@@ -44,8 +44,8 @@
     .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
     .toggle-text a { color: #db2777; text-decoration: none; font-weight: 600; cursor: pointer; }
     .toggle-text a:hover { text-decoration: underline; }
-    .profile-view { background: #f9fafb; padding: 18px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
-    .profile-view p { margin: 8px 0; color: #374151; font-size: 14px; }
+    .profile-view { background: #f9fafb; padding: 18px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 16px; word-break: break-word; }
+    .profile-view p { margin: 10px 0; color: #374151; font-size: 14px; line-height: 1.5; }
     .forgot-link { display: block; text-align: right; font-size: 12px; color: #db2777; text-decoration: none; margin-top: 4px; cursor: pointer; }
     @keyframes popScale {
       from { transform: scale(0.92); opacity: 0; }
@@ -182,29 +182,17 @@
 
     <!-- 4. Profile & Edit Box -->    
     <div id="profile-box" style="display: none;">  
-      <div class="flex justify-between items-center mb-3">
-        <div>
-          <h2 style="margin-bottom:2px;">My Account</h2>
-          <p class="text-xs text-stone-500">Manage your profile & delivery details</p>
-        </div>
-        <a href="orders.html" class="px-3 py-1.5 bg-pink-50 text-pink-700 font-bold rounded-lg text-xs border border-pink-200 hover:bg-pink-100">
-          <i class="fa-solid fa-box mr-1"></i>My Orders
-        </a>
+      <div class="mb-4">
+        <h2 style="margin-bottom:2px;">My Account</h2>
+        <p class="text-xs text-stone-500">Manage your profile & delivery details</p>
       </div>
 
       <!-- Current Profile View -->
       <div id="profile-view-card" class="profile-view">
-        <div class="flex justify-between items-start">
-          <div>
-            <p><strong>Name:</strong> <span id="user-display-name"></span></p>
-            <p><strong>Email:</strong> <span id="user-display-email"></span></p>
-            <p><strong>Mobile:</strong> <span id="user-display-phone"></span> <span class="text-xs text-emerald-600 font-bold">✓ Verified</span></p>
-            <p><strong>Address:</strong> <span id="user-display-address"></span></p>
-          </div>
-          <button onclick="toggleEditProfile(true)" class="px-3 py-1.5 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-lg transition shrink-0">
-            <i class="fa-solid fa-user-pen mr-1"></i>Edit Details
-          </button>
-        </div>
+        <p><strong>Name:</strong> <span id="user-display-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-display-email"></span></p>
+        <p><strong>Mobile:</strong> <span id="user-display-phone"></span> <span class="text-xs text-emerald-600 font-bold">✓ Verified</span></p>
+        <p><strong>Address:</strong> <span id="user-display-address"></span></p>
       </div>
 
       <!-- Edit Profile Form (Hidden by default) -->
@@ -264,21 +252,25 @@
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button type="button" onclick="toggleEditProfile(false)" class="flex-1 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-bold rounded-lg">
+          <button type="button" onclick="toggleEditProfile(false)" class="flex-1 py-2.5 bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-bold rounded-lg transition">
             Cancel
           </button>
-          <button type="button" id="save-profile-btn" onclick="saveProfileUpdates()" class="flex-1 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg shadow">
+          <button type="button" id="save-profile-btn" onclick="saveProfileUpdates()" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg shadow transition">
             Save Changes
           </button>
         </div>
       </div>
 
-      <div class="mt-4 flex flex-col sm:flex-row gap-3">
-        <a href="index.html" class="flex-1 text-center py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition flex items-center justify-center">
+      <!-- Action Buttons Stacked Cleanly at the Bottom -->
+      <div class="mt-4 flex flex-col gap-3">
+        <a href="index.html" class="w-full text-center py-3 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition flex items-center justify-center shadow-sm">
           <i class="fa-solid fa-house mr-2"></i>Home
         </a>
-        <button onclick="logout()" class="flex-1 py-2.5 bg-stone-800 text-white font-semibold rounded-lg hover:bg-stone-900 transition">
+        <button onclick="logout()" class="w-full py-3 bg-stone-900 text-white font-semibold rounded-xl hover:bg-stone-800 transition flex items-center justify-center shadow-sm">
           <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
+        </button>
+        <button id="open-edit-btn" onclick="toggleEditProfile(true)" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 font-semibold rounded-xl transition flex items-center justify-center">
+          <i class="fa-solid fa-user-pen mr-2 text-pink-600"></i>Edit Details
         </button>
       </div>
     </div>
@@ -472,9 +464,12 @@
     function toggleEditProfile(show) {
       const formBox = document.getElementById("edit-profile-form-box");
       const viewCard = document.getElementById("profile-view-card");
+      const openEditBtn = document.getElementById("open-edit-btn");
+
       if (!show) {
         formBox.classList.add("hidden");
         viewCard.classList.remove("hidden");
+        if (openEditBtn) openEditBtn.classList.remove("hidden");
         return;
       }
 
@@ -520,6 +515,7 @@
 
       viewCard.classList.add("hidden");
       formBox.classList.remove("hidden");
+      if (openEditBtn) openEditBtn.classList.add("hidden");
     }
 
     function handleEditPhoneChange() {
@@ -600,7 +596,6 @@
             return;
           }
 
-          // Create / update in Firebase Auth & send verification link to new email
           try {
             const cred = await firebase.auth().createUserWithEmailAndPassword(newEmail, currentUser.password);
             await cred.user.sendEmailVerification();
@@ -753,7 +748,7 @@
             const userData = doc.data();
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
             await showAlert("Login successful!", "Welcome Back", "success");
-            window.location.href = "index.html"; // 👈 OK दबाते ही सीधा होम फीड पर ले जाएगा
+            window.location.href = "index.html";
           } else {
             await showAlert("Incorrect email or password! Please check again.", "Login Failed", "error");
           }
@@ -797,7 +792,7 @@
       });
     }
 
-    // Check login state on page load (Shows Profile & Edit options when already logged in)
+    // Check login state on page load
     const savedUser = sessionStorage.getItem("currentLoggedInUser");
     if (savedUser) {
       const userData = JSON.parse(savedUser);
