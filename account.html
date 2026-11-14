@@ -687,23 +687,19 @@
         }
 
         try {
-          // 1. Pehle Firestore Database me check karo ki ye email exist karta hai ya nahi
           const userDoc = await db.collection("users").doc(email).get();
 
           if (!userDoc.exists) {
-            // Agar database me email nahi hai, matlab naya user hai -> Seedha Sign Up par bhejo
             await showAlert("This email is not registered yet. Let's create your account!", "Account Not Found", "info");
             loginForm.reset();
             showBox('signup');
-            document.getElementById("signup-email").value = email; // Email auto-fill ho jayega
+            document.getElementById("signup-email").value = email;
             return;
           }
 
-          // 2. Agar email mil gaya, toh Firebase Auth se login karo
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
-          // Check if email is verified
           if (!authUser.emailVerified) {
             await firebase.auth().signOut();
             await showAlert("Please verify your email address before signing in. Check your inbox or click 'Resend Verification Link' above.", "Email Verification Required", "warning");
@@ -720,13 +716,12 @@
           }
 
         } catch (error) {
-          // Agar password galat hai ya koi aur Auth error hai
           await showAlert("Incorrect password or login details. Please check your details and try again.", "Sign In Failed", "error");
         }
       });
     }
 
-    // Forgot Password
+    // Forgot Password (Updated to sync both Firestore & Firebase Auth)
     const forgotForm = document.getElementById("forgot-form");
     if (forgotForm) {
       forgotForm.addEventListener("submit", async function(e) {
@@ -736,16 +731,33 @@
         const answer = document.getElementById("forgot-answer").value.trim().toLowerCase();
         const newPassword = document.getElementById("forgot-new-password").value;
 
+        const btn = forgotForm.querySelector("button[type='submit']");
+        btn.disabled = true;
+        btn.innerText = "Updating...";
+
         try {
           const doc = await db.collection("users").doc(email).get();
           if (!doc.exists) {
             await showAlert("We couldn't find an account with this email address.", "Not Found", "error");
+            btn.disabled = false;
+            btn.innerText = "Update Password";
             return;
           }
           
           const user = doc.data();
           if (user.question === question && user.answer === answer) {
+            // 1. Firestore me password update karo
             await db.collection("users").doc(email).update({ password: newPassword });
+
+            // 2. Firebase Auth me bhi password sync karo
+            try {
+              const tempUserCred = await firebase.auth().signInWithEmailAndPassword(email, user.password);
+              await tempUserCred.user.updatePassword(newPassword);
+              await firebase.auth().signOut();
+            } catch (authErr) {
+              console.warn("Auth password update note:", authErr.message);
+            }
+
             await showAlert("Your password has been updated successfully. You can now sign in with your new password.", "Success", "success");
             forgotForm.reset();
             showBox('login');
@@ -754,6 +766,9 @@
           }
         } catch (error) {
           await showAlert("Something went wrong. Please try again later.", "Notice", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Update Password";
         }
       });
     }
