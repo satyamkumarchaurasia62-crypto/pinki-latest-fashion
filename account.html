@@ -665,7 +665,7 @@
       window.location.href = "index.html";
     }
 
-    // Resend Verification Link from Login screen
+    // Resend Verification Link from Login screen (Updated to handle temporary sign-in)
     async function resendVerificationFromLogin() {
       const email = document.getElementById("login-email").value.trim().toLowerCase();
       const password = document.getElementById("login-password").value;
@@ -677,11 +677,13 @@
 
       try {
         const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
-        if (userCred.user.emailVerified) {
+        const authUser = userCred.user;
+
+        if (authUser.emailVerified) {
           await showAlert("Your email is already verified! You can log in directly.", "Already Verified", "success");
         } else {
-          await userCred.user.sendEmailVerification();
-          await showAlert("A fresh verification link has been sent to " + email + ". Please check your inbox/spam.", "Link Sent", "success");
+          await authUser.sendEmailVerification();
+          await showAlert("A fresh verification link has been sent to " + email + ". Please check your inbox and spam folder.", "Link Sent", "success");
         }
         await firebase.auth().signOut();
       } catch (err) {
@@ -775,7 +777,7 @@
 
           if (!authUser.emailVerified) {
             await firebase.auth().signOut();
-            await showAlert("Your email is not verified yet! Please click 'Resend Verification Link' below if your link expired.", "Email Not Verified", "error");
+            await showAlert("Your email is not verified yet! Please click 'Resend Verification Link' above if your link expired.", "Email Not Verified", "error");
             return;
           }
 
