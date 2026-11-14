@@ -713,7 +713,7 @@
 
             await db.collection("users").doc(email).set(newUserData);
 
-            await showAlert("Account created successfully!\n\nWe have sent a verification link to your email (" + email + "). Please check your inbox and verify your email.", "Verification Email Sent", "success");
+            await showAlert("Account created successfully!\n\nWe have sent a verification link to your email (" + email + "). Please check your inbox and verify your email before logging in.", "Verification Email Sent", "success");
             
             await firebase.auth().signOut();
             signupForm.reset();
@@ -728,7 +728,7 @@
       });
     }
 
-    // Sign In (Auto-Redirects to index.html right after clicking OK)
+    // Sign In with Strict Email Verification Check
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -743,12 +743,23 @@
         }
 
         try {
+          // 1. First authenticate with Firebase Auth to check real-time email verification status
+          const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+          const authUser = userCred.user;
+
+          if (!authUser.emailVerified) {
+            await firebase.auth().signOut();
+            await showAlert("Your email is not verified yet! Please check your inbox/spam folder, click the verification link, and then try logging in.", "Email Not Verified", "error");
+            return;
+          }
+
+          // 2. Fetch user details from Firestore database
           const doc = await db.collection("users").doc(email).get();
           if (doc.exists && doc.data().password === password) {
             const userData = doc.data();
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
             await showAlert("Login successful!", "Welcome Back", "success");
-            window.location.href = "index.html";
+            window.location.href = "index.html"; // 👈 OK दबाते ही सीधा होम फीड पर रीडायरेक्ट हो जाएगा
           } else {
             await showAlert("Incorrect email or password! Please check again.", "Login Failed", "error");
           }
