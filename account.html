@@ -41,6 +41,39 @@
     button.main-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
     .btn-primary { background-color: #db2777; }
     .btn-primary:hover { background-color: #be185d; }
+    .google-btn {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: #374151;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .google-btn:hover { background-color: #f9fafb; border-color: #9ca3af; }
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 16px 0;
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .divider:not(:empty)::before { margin-right: 12px; }
+    .divider:not(:empty)::after { margin-left: 12px; }
     .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
     .toggle-text a { color: #db2777; text-decoration: none; font-weight: 600; cursor: pointer; }
     .toggle-text a:hover { text-decoration: underline; }
@@ -64,6 +97,7 @@
     <div id="login-box">
       <h2>Welcome Back</h2>
       <p class="subtitle">Please enter your details to sign in</p>
+
       <form id="login-form">
         <div class="form-group">
           <label>Email Address</label>
@@ -79,6 +113,14 @@
         </div>
         <button type="submit" class="main-btn btn-primary transition">Sign In</button>
       </form>
+
+      <!-- Google Login Button (Moved Below Form) -->
+      <div class="divider">OR</div>
+      <button type="button" onclick="handleGoogleAuth()" class="google-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+        Continue with Google
+      </button>
+
       <p class="toggle-text">Don't have an account? <a onclick="showBox('signup')">Sign Up</a></p>
     </div>
 
@@ -86,6 +128,16 @@
     <div id="signup-box" style="display: none;">
       <h2>Create Account</h2>
       <p class="subtitle">Join Pinki Latest Fashion today!</p>
+
+      <!-- Google Connected Banner (Shows at top only after user clicks Google Sign Up) -->
+      <div id="google-connected-banner" class="hidden mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4">
+          <span class="text-xs font-bold text-emerald-800">Google Email Verified! Complete details below.</span>
+        </div>
+        <button type="button" onclick="resetGoogleSignup()" class="text-[11px] text-rose-600 font-bold underline">Reset</button>
+      </div>
+
       <form id="signup-form">
         <div class="form-group">
           <label>Full Name *</label>
@@ -93,7 +145,7 @@
         </div>
 
         <div class="form-group">
-          <label>Email Address * (Verification link will be sent here)</label>
+          <label id="signup-email-label">Email Address * (Verification link will be sent here)</label>
           <input type="email" id="signup-email" placeholder="example@mail.com" required>
         </div>
 
@@ -119,7 +171,7 @@
         </div>
 
         <div class="form-group">
-          <label>Password *</label>
+          <label>Create Password * <span class="text-[11px] font-normal text-stone-500">(For direct email login too)</span></label>
           <input type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
         </div>
         <div class="form-group">
@@ -150,6 +202,16 @@
         </div>
         <button type="submit" id="register-submit-btn" class="main-btn btn-primary transition">Create My Account</button>
       </form>
+
+      <!-- Google Sign Up Button (Moved Below Form) -->
+      <div id="google-signup-section">
+        <div class="divider">OR</div>
+        <button type="button" onclick="handleGoogleAuth()" class="google-btn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+          Continue with Google
+        </button>
+      </div>
+
       <p class="toggle-text">Already have an account? <a onclick="showBox('login')">Sign In</a></p>
     </div>
 
@@ -338,6 +400,7 @@
     let isEditPhoneVerified = true;
     let phoneConfirmationResult = null;
     let verifiedPhoneNumber = "";
+    let isGoogleAuthFlow = false;
 
     window.addEventListener("load", () => {
       try {
@@ -347,6 +410,79 @@
         }
       } catch (e) {}
     });
+
+    // Google Sign-In & Sign-Up Handler
+    async function handleGoogleAuth() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        const googleUser = result.user;
+        const email = (googleUser.email || "").trim().toLowerCase();
+        const displayName = googleUser.displayName || "";
+
+        if (!email) {
+          await showAlert("Could not retrieve email from Google account.", "Error", "error");
+          return;
+        }
+
+        // Check if user already exists in Firestore
+        const userDoc = await db.collection("users").doc(email).get();
+
+        if (userDoc.exists) {
+          // Existing user -> Direct Login!
+          const userData = userDoc.data();
+          sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+          await showAlert(`Welcome back, ${userData.name || displayName}!`, "Signed In with Google", "success");
+          window.location.href = "index.html";
+        } else {
+          // New user -> Redirect to Sign Up form with pre-filled verified email & name
+          isGoogleAuthFlow = true;
+          showBox('signup');
+
+          const nameInput = document.getElementById("signup-name");
+          const emailInput = document.getElementById("signup-email");
+          const emailLabel = document.getElementById("signup-email-label");
+
+          nameInput.value = displayName;
+          emailInput.value = email;
+          emailInput.readOnly = true;
+          emailInput.style.background = "#ecfdf5";
+          emailInput.style.borderColor = "#10b981";
+          emailLabel.innerHTML = `Email Address * <span class="text-emerald-600 font-bold">(✓ Verified via Google)</span>`;
+
+          document.getElementById("google-signup-section").classList.add("hidden");
+          document.getElementById("google-connected-banner").classList.remove("hidden");
+
+          await showAlert(
+            "Your Google account is connected!\n\nPlease verify your mobile number and fill in your delivery address to finish creating your account.",
+            "Almost Done!",
+            "info"
+          );
+        }
+      } catch (error) {
+        console.error("Google Auth Error:", error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          await showAlert("Google Sign-In could not be completed. Make sure you are opening this page on your live website domain (https://) and not directly from file manager.", "Notice", "error");
+        }
+      }
+    }
+
+    function resetGoogleSignup() {
+      isGoogleAuthFlow = false;
+      const emailInput = document.getElementById("signup-email");
+      const emailLabel = document.getElementById("signup-email-label");
+
+      emailInput.value = "";
+      emailInput.readOnly = false;
+      emailInput.style.background = "#f9fafb";
+      emailInput.style.borderColor = "#d1d5db";
+      emailLabel.innerText = "Email Address * (Verification link will be sent here)";
+
+      document.getElementById("google-signup-section").classList.remove("hidden");
+      document.getElementById("google-connected-banner").classList.add("hidden");
+    }
 
     async function sendMobileOtp(mode = 'signup') {
       const inputId = mode === 'edit' ? "edit-phone" : "signup-phone";
@@ -647,32 +783,47 @@
           if (doc.exists) {
             await showAlert("An account with this email already exists. Please sign in instead.", "Already Registered", "info");
           } else {
-            let userCred;
-            try {
-              userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
-              await userCred.user.sendEmailVerification();
-            } catch (authErr) {
-              // Agar email Auth me pehle se bacha hua tha (jabki Firestore se delete ho chuka tha)
-              if (authErr.code === 'auth/email-already-in-use') {
-                userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
-              } else {
-                throw authErr;
+            if (!isGoogleAuthFlow) {
+              // Normal Email/Password Sign-Up
+              let userCred;
+              try {
+                userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                await userCred.user.sendEmailVerification();
+              } catch (authErr) {
+                if (authErr.code === 'auth/email-already-in-use') {
+                  userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+                } else {
+                  throw authErr;
+                }
               }
+            } else {
+              // Google Sign-Up Flow: Try setting up email/password in Firebase Auth as backup if needed
+              try {
+                await firebase.auth().createUserWithEmailAndPassword(email, password);
+              } catch (ignoreErr) {}
             }
 
             const newUserData = {
               name, email, password, question, answer, phone,
-              phoneVerified: true, address, city, pincode,
+              phoneVerified: true,
+              authProvider: isGoogleAuthFlow ? "google" : "password",
+              address, city, pincode,
               nameChangedCount: 0, orders: [], createdAt: new Date().toISOString()
             };
 
             await db.collection("users").doc(email).set(newUserData);
 
-            await showAlert("Your account has been created successfully!\n\nWe have sent a verification link to your email. Please verify your email before signing in.", "Welcome!", "success");
-            
-            await firebase.auth().signOut();
-            signupForm.reset();
-            showBox('login');
+            if (isGoogleAuthFlow) {
+              // Google email is already verified -> Direct Login!
+              sessionStorage.setItem("currentLoggedInUser", JSON.stringify(newUserData));
+              await showAlert("Your account has been created with Google! Welcome to Pinki Latest Fashion.", "Welcome!", "success");
+              window.location.href = "index.html";
+            } else {
+              await showAlert("Your account has been created successfully!\n\nWe have sent a verification link to your email. Please verify your email before signing in.", "Welcome!", "success");
+              await firebase.auth().signOut();
+              signupForm.reset();
+              showBox('login');
+            }
           }
         } catch (error) {
           await showAlert("Could not create account right now. Please check your details.", "Notice", "error");
@@ -698,7 +849,6 @@
         }
 
         try {
-          // 1. Pehle Firestore Database me check karo ki ye email exist karta hai ya nahi
           const userDoc = await db.collection("users").doc(email).get();
 
           if (!userDoc.exists) {
@@ -711,17 +861,23 @@
 
           const userData = userDoc.data();
 
-          // 2. Firebase Auth se login try karo
+          // If account was created via Google and user logs in via password matching Firestore
+          if (userData.authProvider === "google" && userData.password === password) {
+            sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+            await showAlert("Welcome back! Glad to see you again.", "Success", "success");
+            window.location.href = "index.html";
+            return;
+          }
+
           const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
           const authUser = userCred.user;
 
-          if (!authUser.emailVerified) {
+          if (!authUser.emailVerified && userData.authProvider !== "google") {
             await firebase.auth().signOut();
             await showAlert("Please verify your email address before signing in. Check your inbox or click 'Resend Verification Link' above.", "Email Verification Required", "warning");
             return;
           }
 
-          // Agar Auth login pass ho gaya par Firestore me purana password tha, toh Firestore ko auto-sync kar do
           if (userData.password !== password) {
             await db.collection("users").doc(email).update({ password: password });
             userData.password = password;
@@ -737,7 +893,7 @@
       });
     }
 
-    // Forgot Password - Sahi Order (1. Auth Update -> 2. Firestore Update)
+    // Forgot Password
     const forgotForm = document.getElementById("forgot-form");
     if (forgotForm) {
       forgotForm.addEventListener("submit", async function(e) {
@@ -752,7 +908,6 @@
         btn.innerText = "Updating...";
 
         try {
-          // 1. Database se user ki details nikalo
           const doc = await db.collection("users").doc(email).get();
           if (!doc.exists) {
             await showAlert("We couldn't find an account with this email address.", "Not Found", "error");
@@ -761,20 +916,17 @@
           
           const user = doc.data();
 
-          // 2. Security Question aur Answer match karo
           if (user.question === question && user.answer.trim().toLowerCase() === answer) {
+            try {
+              const tempUserCred = await firebase.auth().signInWithEmailAndPassword(email, user.password);
+              await tempUserCred.user.updatePassword(newPassword);
+            } catch (authSkip) {}
             
-            // 3. SABSE PEHLE: Purane password se background me Auth login karo aur Auth ka password badlo
-            const tempUserCred = await firebase.auth().signInWithEmailAndPassword(email, user.password);
-            await tempUserCred.user.updatePassword(newPassword);
-            
-            // 4. JAB AUTH UPDATE HO JAYE, TABHI Firestore database me naya password save karo
             await db.collection("users").doc(email).update({ 
               password: newPassword,
               updatedAt: new Date().toISOString()
             });
 
-            // 5. Background login ko sign out aur session clear kar do taaki user fresh login kar sake
             await firebase.auth().signOut();
             sessionStorage.removeItem("currentLoggedInUser");
 
@@ -787,7 +939,7 @@
           }
         } catch (error) {
           console.error("Reset Error:", error);
-          await showAlert("Could not update password. Make sure your account is in sync or try creating a fresh account.", "Notice", "error");
+          await showAlert("Could not update password. Make sure your account is in sync or try signing in with Google.", "Notice", "error");
         } finally {
           btn.disabled = false;
           btn.innerText = "Update Password";
