@@ -5,10 +5,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <!-- Firebase SDKs (App, Firestore & Auth) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pinki Latest Fashion - Account & Security</title>
@@ -115,7 +111,7 @@
         <button type="submit" class="main-btn btn-primary transition">Sign In</button>
       </form>
 
-      <!-- Google Login Button (Moved Below Form) -->
+      <!-- Google Login Button -->
       <div class="divider">OR</div>
       <button type="button" onclick="handleGoogleAuth()" class="google-btn">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
@@ -130,7 +126,6 @@
       <h2>Create Account</h2>
       <p class="subtitle">Join Pinki Latest Fashion today!</p>
 
-      <!-- Google Connected Banner (Shows at top only after user clicks Google Sign Up) -->
       <div id="google-connected-banner" class="hidden mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4">
@@ -162,7 +157,6 @@
               Send OTP
             </button>
           </div>
-          <!-- Mobile OTP Input Box -->
           <div id="mobile-otp-box" class="hidden mt-2 flex gap-2 bg-pink-50 p-2 rounded-lg border border-pink-200">
             <input type="text" id="mobile-otp-input" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="Enter 6-digit SMS OTP" class="text-xs font-mono font-bold bg-white">
             <button type="button" onclick="verifyMobileOtp('signup')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shrink-0 transition">
@@ -204,7 +198,6 @@
         <button type="submit" id="register-submit-btn" class="main-btn btn-primary transition">Create My Account</button>
       </form>
 
-      <!-- Google Sign Up Button (Moved Below Form) -->
       <div id="google-signup-section">
         <div class="divider">OR</div>
         <button type="button" onclick="handleGoogleAuth()" class="google-btn">
@@ -253,7 +246,6 @@
         <p class="text-xs text-stone-500">Manage your profile & delivery details</p>
       </div>
 
-      <!-- Current Profile View -->
       <div id="profile-view-card" class="profile-view">
         <p><strong>Name:</strong> <span id="user-display-name"></span></p>
         <p><strong>Email:</strong> <span id="user-display-email"></span></p>
@@ -261,7 +253,6 @@
         <p><strong>Address:</strong> <span id="user-display-address"></span></p>
       </div>
 
-      <!-- Edit Profile Form (Hidden by default) -->
       <div id="edit-profile-form-box" class="hidden bg-stone-50 p-4 rounded-xl border border-stone-200 mb-4 space-y-3">
         <div class="flex justify-between items-center border-b border-stone-200 pb-2">
           <span class="text-sm font-bold text-stone-800"><i class="fa-solid fa-pen-to-square text-pink-600 mr-1"></i>Update Profile</span>
@@ -323,7 +314,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
       <div class="mt-4 flex flex-col gap-3">
         <a href="index.html" class="w-full text-center py-3 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition flex items-center justify-center shadow-sm">
           <i class="fa-solid fa-house mr-2"></i>Home
@@ -352,8 +342,19 @@
     </div>
   </div>
 
+  <!-- Firebase JavaScript Modular Import -->
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    window.auth = auth;
+    window.db = db;
+  </script>
+
+  <!-- Firebase Compat libraries for compatibility -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
   <script>
-    // Custom Soft Alert Function
     window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
       return new Promise((resolve) => {
         const overlay = document.getElementById("customPopupOverlay");
@@ -381,22 +382,6 @@
       });
     };
 
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDSLRGEEt8Ig2oXLUcPR3YLohGnSDohZLw",
-      authDomain: "pinki-latest-fashion.firebaseapp.com",
-      projectId: "pinki-latest-fashion",
-      storageBucket: "pinki-latest-fashion.firebasestorage.app",
-      messagingSenderId: "432889531515",
-      appId: "1:432889531515:web:00d4e5f9e84369051ae6de",
-      measurementId: "G-CXSRMW6GVY"
-    };
-
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
     let isPhoneVerified = false;
     let isEditPhoneVerified = true;
     let phoneConfirmationResult = null;
@@ -405,14 +390,13 @@
 
     window.addEventListener("load", () => {
       try {
-        if (!window.recaptchaVerifier) {
+        if (!window.recaptchaVerifier && window.firebase) {
           window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
           window.recaptchaVerifier.render();
         }
       } catch (e) {}
     });
 
-    // Google Sign-In & Sign-Up Handler
     async function handleGoogleAuth() {
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
@@ -428,17 +412,14 @@
           return;
         }
 
-        // Check if user already exists in Firestore
         const userDoc = await db.collection("users").doc(email).get();
 
         if (userDoc.exists) {
-          // Existing user -> Direct Login!
           const userData = userDoc.data();
           sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
           await showAlert(`Welcome back, ${userData.name || displayName}!`, "Signed In with Google", "success");
           window.location.href = "index.html";
         } else {
-          // New user -> Redirect to Sign Up form with pre-filled verified email & name
           isGoogleAuthFlow = true;
           showBox('signup');
 
@@ -728,7 +709,6 @@
       window.location.href = "index.html";
     }
 
-    // Soft Resend Verification Link from Login screen
     async function resendVerificationFromLogin() {
       const email = document.getElementById("login-email").value.trim().toLowerCase();
       const password = document.getElementById("login-password").value;
@@ -754,7 +734,6 @@
       }
     }
 
-    // Sign Up Form Submission
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
       signupForm.addEventListener("submit", async function(e) {
@@ -785,7 +764,6 @@
             await showAlert("An account with this email already exists. Please sign in instead.", "Already Registered", "info");
           } else {
             if (!isGoogleAuthFlow) {
-              // Normal Email/Password Sign-Up
               let userCred;
               try {
                 userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
@@ -798,7 +776,6 @@
                 }
               }
             } else {
-              // Google Sign-Up Flow: Try setting up email/password in Firebase Auth as backup if needed
               try {
                 await firebase.auth().createUserWithEmailAndPassword(email, password);
               } catch (ignoreErr) {}
@@ -815,7 +792,6 @@
             await db.collection("users").doc(email).set(newUserData);
 
             if (isGoogleAuthFlow) {
-              // Google email is already verified -> Direct Login!
               sessionStorage.setItem("currentLoggedInUser", JSON.stringify(newUserData));
               await showAlert("Your account has been created with Google! Welcome to Pinki Latest Fashion.", "Welcome!", "success");
               window.location.href = "index.html";
@@ -835,7 +811,6 @@
       });
     }
 
-    // Sign In Form Submission with Direct Firestore Check & Auto-Sync
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
       loginForm.addEventListener("submit", async function(e) {
@@ -862,7 +837,6 @@
 
           const userData = userDoc.data();
 
-          // If account was created via Google and user logs in via password matching Firestore
           if (userData.authProvider === "google" && userData.password === password) {
             sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
             await showAlert("Welcome back! Glad to see you again.", "Success", "success");
@@ -894,7 +868,6 @@
       });
     }
 
-    // Forgot Password
     const forgotForm = document.getElementById("forgot-form");
     if (forgotForm) {
       forgotForm.addEventListener("submit", async function(e) {
@@ -948,7 +921,6 @@
       });
     }
 
-    // Check login state on load
     const savedUser = sessionStorage.getItem("currentLoggedInUser");
     if (savedUser) {
       loadProfile(JSON.parse(savedUser));
