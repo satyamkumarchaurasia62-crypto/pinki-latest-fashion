@@ -89,7 +89,9 @@ async function syncProductsAndLiveStock() {
         window[_0x5b2d(21)][pid][sz] = Math[_0x5b2d(43)](0, totalQty - alreadySold);
       });
 
-      refreshProductStockUI(pid);
+      if (typeof refreshProductStockUI === 'function') {
+        refreshProductStockUI(pid);
+      }
     });
   } catch (err) {
     console[_0x5b2d(47)](_0x5b2d(46), err);
