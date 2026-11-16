@@ -358,37 +358,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
-            return new Promise((resolve) => {
-                const overlay = document.getElementById("customPopupOverlay");
-                const icon = document.getElementById("customPopupIcon");
-                document.getElementById("customPopupTitle").innerText = title;
-                document.getElementById("customPopupMessage").innerText = message;
-                
-                if (type === "error") {
-                    icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
-                } else if (type === "success") {
-                    icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
-                } else {
-                    icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
-                }
-
-                const okBtn = document.getElementById("customPopupOkBtn");
-                okBtn.innerText = "OK";
-                overlay.style.display = "flex";
-
-                okBtn.onclick = () => {
-                    overlay.style.display = "none";
-                    resolve(true);
-                };
-            });
-        };
-
-        function copyTrackingId(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                showAlert("Tracking ID copied: " + code, "Copied", "success");
-            });
-        }
+        const _0x3b21=['showAlert','createElement','getElementById','classList','hidden','innerText','style','background','color','toUpperCase','trim','toLowerCase','value','disabled','innerHTML','appendChild','length','push','filter','includes','toString','floor','max','getTime','indexOf','parse','getItem','setItem','href','location','src','onload','readAsDataURL','target','files','getContext','drawImage','toDataURL','forEach','keys','values','map','from','match','split','replace','random','floor','abs','stringify','parse','keys','values','entries','now','setItem','getItem','removeItem','clear','keys','length','forEach','querySelector','querySelectorAll','addEventListener','removeEventListener','getAttribute','setAttribute','removeAttribute','classList','add','remove','contains','toggle'];(function(_0x51d5c2,_0x3b2164){const _0x227653=function(_0x1e3532){while(--_0x1e3532){_0x51d5c2['push'](_0x51d5c2['shift']());}};_0x227653(++_0x3b2164);}(_0x3b21,0x1b3));const _0x2276=function(_0x51d5c2,_0x3b2164){_0x51d5c2=_0x51d5c2-0x0;const _0x227653=_0x3b21[_0x51d5c2];return _0x227653;};
+        window[_0x2276('0x0')]=function(_0x323a07,_0x39a3e6="Pinki Latest Fashion",_0x3ed09b="info"){return new Promise((_0x5c8e31)=>{const _0x3d0b20=document[_0x2276('0x2')]("customPopupOverlay");const _0x1c8b32=document[_0x2276('0x2')]("customPopupIcon");document[_0x2276('0x2')]("customPopupTitle")[_0x2276('0x5')]=_0x39a3e6;document[_0x2276('0x2')]("customPopupMessage")[_0x2276('0x5')]=_0x323a07;if(_0x3ed09b==="error"){_0x1c8b32[_0x2276('0x6')][_0x2276('0x7')]="#fee2e2";_0x1c8b32[_0x2276('0x6')][_0x2276('0x8')]="#dc2626";_0x1c8b32[_0x2276('0x5')]="✕";}else if(_0x3ed09b==="success"){_0x1c8b32[_0x2276('0x6')][_0x2276('0x7')]="#dcfce7";_0x1c8b32[_0x2276('0x6')][_0x2276('0x8')]="#16a34a";_0x1c8b32[_0x2276('0x5')]="✓";}else{_0x1c8b32[_0x2276('0x6')][_0x2276('0x7')]="#fce7f3";_0x1c8b32[_0x2276('0x6')][_0x2276('0x8')]="#db2777";_0x1c8b32[_0x2276('0x5')]="!";}const _0x5346da=document[_0x2276('0x2')]("customPopupOkBtn");_0x5346da[_0x2276('0x5')]="OK";_0x3d0b20[_0x2276('0x6')]['display']="flex";_0x5346da['onclick']=()=>{_0x3d0b20[_0x2276('0x6')]['display']="none";_0x5c8e31(true);};});};function copyTrackingId(_0x5c421e){navigator['clipboard']['writeText'](_0x5c421e)['then'](()=>{window[_0x2276('0x0')]("Tracking ID copied: "+_0x5c421e,"Copied","success");});}
 
         function parseFlexibleDate(dateStr) {
             if (!dateStr) return null;
