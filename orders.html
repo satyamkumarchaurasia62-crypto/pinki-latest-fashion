@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <link rel="icon" type="image/jpeg" href="logo.jpeg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Pinki Latest Fashions</title>
@@ -12,6 +11,9 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         @keyframes popScale {
             from { transform: scale(0.92); opacity: 0; }
@@ -206,7 +208,7 @@
         </div>
     </div>
 
-    <!-- 1B. Cancel Order Modal -->
+    <!-- 1B. Cancel Order Modal (Supports Online Payment UTR & Screenshot for Instant Refund) -->
     <div id="cancel-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
@@ -220,6 +222,7 @@
                     <textarea id="cancel-reason-input" rows="2" placeholder="Write reason for cancelling..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
                 </div>
 
+                <!-- Shown only if Order was Online Paid -->
                 <div id="cancel-online-refund-box" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3.5 space-y-3 text-xs">
                     <div class="font-bold text-blue-900 flex items-center gap-1.5">
                         <i class="fa-solid fa-building-columns"></i> Online Payment Refund Details *
@@ -346,20 +349,38 @@
         </div>
     </div>
 
-    <!-- Firebase Modular Link -->
-    <script type="module">
-        import { auth, db } from './firebase.js';
-        window.auth = auth;
-        window.db = db;
-    </script>
-
-    <!-- Firebase Compat libraries -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
     <script>
-        const _0x3b21=['showAlert','createElement','getElementById','classList','hidden','innerText','style','background','color','toUpperCase','trim','toLowerCase','value','disabled','innerHTML','appendChild','length','push','filter','includes','toString','floor','max','getTime','indexOf','parse','getItem','setItem','href','location','src','onload','readAsDataURL','target','files','getContext','drawImage','toDataURL','forEach','keys','values','map','from','match','split','replace','random','floor','abs','stringify','parse','keys','values','entries','now','setItem','getItem','removeItem','clear','keys','length','forEach','querySelector','querySelectorAll','addEventListener','removeEventListener','getAttribute','setAttribute','removeAttribute','classList','add','remove','contains','toggle'];(function(_0x51d5c2,_0x3b2164){const _0x227653=function(_0x1e3532){while(--_0x1e3532){_0x51d5c2['push'](_0x51d5c2['shift']());}};_0x227653(++_0x3b2164);}(_0x3b21,0x1b3));const _0x2276=function(_0x51d5c2,_0x3b2164){_0x51d5c2=_0x51d5c2-0x0;const _0x227653=_0x3b21[_0x51d5c2];return _0x227653;};
-        window[_0x2276('0x0')]=function(_0x323a07,_0x39a3e6="Pinki Latest Fashion",_0x3ed09b="info"){return new Promise((_0x5c8e31)=>{const _0x3d0b20=document[_0x2276('0x2')]("customPopupOverlay");const _0x1c8b32=document[_0x2276('0x2')]("customPopupIcon");document[_0x2276('0x2')]("customPopupTitle")[_0x2276('0x5')]=_0x39a3e6;document[_0x2276('0x2')]("customPopupMessage")[_0x2276('0x5')]=_0x323a07;if(_0x3ed09b==="error"){_0x1c8b32[_0x2276('0x6')][_0x2276('0x7')]="#fee2e2";_0x1c8b32[_0x2276('0x6')][_0x2276('0x8')]="#dc2626";_0x1c8b32[_0x2276('0x5')]="✕";}else if(_0x3ed09b==="success"){_0x1c8b32[_0x2276('0x6')][_0x2276('0x7')]="#dcfce7";_0x1c8b32[_0x2276('0x6')][_0x2276('0x8')]="#16a34a";_0x1c8b32[_0x2276('0x5')]="✓";}else{_0x1c8b32[_0x2276('0x6')][_0x2276('0x7')]="#fce7f3";_0x1c8b32[_0x2276('0x6')][_0x2276('0x8')]="#db2777";_0x1c8b32[_0x2276('0x5')]="!";}const _0x5346da=document[_0x2276('0x2')]("customPopupOkBtn");_0x5346da[_0x2276('0x5')]="OK";_0x3d0b20[_0x2276('0x6')]['display']="flex";_0x5346da['onclick']=()=>{_0x3d0b20[_0x2276('0x6')]['display']="none";_0x5c8e31(true);};});};function copyTrackingId(_0x5c421e){navigator['clipboard']['writeText'](_0x5c421e)['then'](()=>{window[_0x2276('0x0')]("Tracking ID copied: "+_0x5c421e,"Copied","success");});}
+        window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("customPopupOverlay");
+                const icon = document.getElementById("customPopupIcon");
+                document.getElementById("customPopupTitle").innerText = title;
+                document.getElementById("customPopupMessage").innerText = message;
+                
+                if (type === "error") {
+                    icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
+                } else if (type === "success") {
+                    icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
+                } else {
+                    icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
+                }
+
+                const okBtn = document.getElementById("customPopupOkBtn");
+                okBtn.innerText = "OK";
+                overlay.style.display = "flex";
+
+                okBtn.onclick = () => {
+                    overlay.style.display = "none";
+                    resolve(true);
+                };
+            });
+        };
+
+        function copyTrackingId(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showAlert("Tracking ID copied: " + code, "Copied", "success");
+            });
+        }
 
         function parseFlexibleDate(dateStr) {
             if (!dateStr) return null;
@@ -394,6 +415,22 @@
                 daysLeft: Math.max(0, daysLeft)
             };
         }
+
+        // ✅ UPDATED CORRECT FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSLRGEEt8Ig2oXLUcPR3YLohGnSDohZLw",
+            authDomain: "pinki-latest-fashion.firebaseapp.com",
+            projectId: "pinki-latest-fashion",
+            storageBucket: "pinki-latest-fashion.firebasestorage.app",
+            messagingSenderId: "432889531515",
+            appId: "1:432889531515:web:00d4e5f9e84369051ae6de",
+            measurementId: "G-CXSRMW6GVY"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
         const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
@@ -617,6 +654,7 @@
                         `;
                     }
 
+                    // --- REJECTION REASON DISPLAY FOR CUSTOMER ---
                     let rejectionAlertHTML = "";
                     if (order.rejectionReason) {
                         rejectionAlertHTML = `
@@ -704,6 +742,7 @@
             }
         }
 
+        // --- CANCEL ORDER MODAL LOGIC (WITH UTR & SCREENSHOT FOR ONLINE ORDERS) ---
         function openCancelModal(docId) {
             selectedCancelDocId = docId;
             const orderObj = loadedOrdersMap[docId] || {};
@@ -788,6 +827,7 @@
             }
         }
 
+        // --- RETURN MODAL LOGIC ---
         function openReturnModal(docId) {
             const orderObj = loadedOrdersMap[docId] || {};
             const winStatus = getReturnWindowStatus(orderObj);
@@ -972,6 +1012,7 @@
             }
         }
 
+        // --- RATING & REVIEW MODAL LOGIC ---
         let selectedRating = 5;
         let currentReviewOrderId = "";
         let currentReviewProductId = "";
@@ -1066,5 +1107,6 @@
 
         loadUserOrders();
     </script>
+<script src="security.js"></script>
 </body>
 </html>
