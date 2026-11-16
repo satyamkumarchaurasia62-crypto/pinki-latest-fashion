@@ -1,3 +1,20 @@
+// नई Firebase Config (Pinki Latest Fashions के लिए)
+const firebaseConfig = {
+  apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+  authDomain: "pinki-latest-fashions.firebaseapp.com",
+  projectId: "pinki-latest-fashions",
+  storageBucket: "pinki-latest-fashions.firebasestorage.app",
+  messagingSenderId: "668264461811",
+  appId: "1:668264461811:web:d51468e474750e69634e86",
+  measurementId: "G-21HR2KLRJY"
+};
+
+// एरर से बचने के लिए चेक: अगर पहले से कनेक्ट नहीं है, तभी कनेक्ट करो
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+window.db = firebase.firestore();
+
 // review.js - Public Ratings & Multi-Angle Camera Photos System
 
 let selectedRating = 5;
