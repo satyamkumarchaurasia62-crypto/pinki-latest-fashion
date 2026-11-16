@@ -402,54 +402,59 @@
       provider.setCustomParameters({ prompt: 'select_account' });
 
       try {
-        const result = await firebase.auth().signInWithPopup(provider);
-        const googleUser = result.user;
-        const email = (googleUser.email || "").trim().toLowerCase();
-        const displayName = googleUser.displayName || "";
-
-        if (!email) {
-          await showAlert("Could not retrieve email from Google account.", "Error", "error");
-          return;
-        }
-
-        const userDoc = await db.collection("users").doc(email).get();
-
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
-          await showAlert(`Welcome back, ${userData.name || displayName}!`, "Signed In with Google", "success");
-          window.location.href = "index.html";
-        } else {
-          isGoogleAuthFlow = true;
-          showBox('signup');
-
-          const nameInput = document.getElementById("signup-name");
-          const emailInput = document.getElementById("signup-email");
-          const emailLabel = document.getElementById("signup-email-label");
-
-          nameInput.value = displayName;
-          emailInput.value = email;
-          emailInput.readOnly = true;
-          emailInput.style.background = "#ecfdf5";
-          emailInput.style.borderColor = "#10b981";
-          emailLabel.innerHTML = `Email Address * <span class="text-emerald-600 font-bold">(✓ Verified via Google)</span>`;
-
-          document.getElementById("google-signup-section").classList.add("hidden");
-          document.getElementById("google-connected-banner").classList.remove("hidden");
-
-          await showAlert(
-            "Your Google account is connected!\n\nPlease verify your mobile number and fill in your delivery address to finish creating your account.",
-            "Almost Done!",
-            "info"
-          );
-        }
+        await firebase.auth().signInWithRedirect(provider);
       } catch (error) {
         console.error("Google Auth Error:", error);
-        if (error.code !== 'auth/popup-closed-by-user') {
-          await showAlert("Google Sign-In could not be completed. Make sure you are opening this page on your live website domain (https://) and not directly from file manager.", "Notice", "error");
-        }
+        await showAlert("Asli Error: " + error.code + " - " + error.message, "Debug Error", "error");
       }
     }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const result = await firebase.auth().getRedirectResult();
+        if (result && result.user) {
+          const googleUser = result.user;
+          const email = (googleUser.email || "").trim().toLowerCase();
+          const displayName = googleUser.displayName || "";
+
+          if (!email) return;
+
+          const userDoc = await db.collection("users").doc(email).get();
+
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+            await showAlert(`Welcome back, ${userData.name || displayName}!`, "Signed In with Google", "success");
+            window.location.href = "index.html";
+          } else {
+            isGoogleAuthFlow = true;
+            showBox('signup');
+
+            const nameInput = document.getElementById("signup-name");
+            const emailInput = document.getElementById("signup-email");
+            const emailLabel = document.getElementById("signup-email-label");
+
+            nameInput.value = displayName;
+            emailInput.value = email;
+            emailInput.readOnly = true;
+            emailInput.style.background = "#ecfdf5";
+            emailInput.style.borderColor = "#10b981";
+            emailLabel.innerHTML = `Email Address * <span class="text-emerald-600 font-bold">(✓ Verified via Google)</span>`;
+
+            document.getElementById("google-signup-section").classList.add("hidden");
+            document.getElementById("google-connected-banner").classList.remove("hidden");
+
+            await showAlert(
+              "Your Google account is connected!\n\nPlease verify your mobile number and fill in your delivery address to finish creating your account.",
+              "Almost Done!",
+              "info"
+            );
+          }
+        }
+      } catch (redirectErr) {
+        console.error("Redirect Result Error:", redirectErr);
+      }
+    });
 
     function resetGoogleSignup() {
       isGoogleAuthFlow = false;
