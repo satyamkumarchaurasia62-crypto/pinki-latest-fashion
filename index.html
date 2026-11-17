@@ -249,6 +249,23 @@
           </div>
         </div>
 
+        <!-- Return, Refund & Unboxing Policy Agreement Box Added Here -->
+        <div class="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-3 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-stone-900">📜 Return, Refund & Cancellation Policy</span>
+            <a href="privacy.html" target="_blank" class="text-pink-600 font-bold underline hover:text-pink-700">
+              View Rules ↗
+            </a>
+          </div>
+          
+          <div class="flex items-start gap-2.5">
+            <input type="checkbox" id="policy-agree-checkbox" class="mt-0.5 w-4 h-4 text-pink-600 rounded border-stone-300 focus:ring-pink-500 cursor-pointer">
+            <label for="policy-agree-checkbox" class="text-stone-700 leading-relaxed cursor-pointer font-medium">
+              मैंने रिटर्न, रिफंड, कैंसिलेशन और <span class="font-bold text-stone-900">अनबॉक्सिंग वीडियो (Unboxing Video)</span> के नियम पढ़ लिए हैं और मैं इनसे सहमत हूँ। (बिना वीडियो के डैमेज/रिटर्न मान्य नहीं होगा)।
+            </label>
+          </div>
+        </div>
+
         <div class="space-y-1.5 text-xs">
           <div class="font-bold text-stone-700">Select Payment Method:</div>
           <div class="grid grid-cols-2 gap-2">
@@ -369,7 +386,7 @@
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
-     authDomain: "auth.pinkilatestfashions.in",
+      authDomain: "auth.pinkilatestfashions.in",
       projectId: "pinki-latest-fashions",
       storageBucket: "pinki-latest-fashions.firebasestorage.app",
       messagingSenderId: "668264461811",
@@ -462,7 +479,6 @@
       document.getElementById("productZoomModal").classList.add("hidden"); 
     }
 
-    // Live Stock Badge Update Function
     window.refreshProductStockUI = function(productId) {
       const badge = document.getElementById(`stock-badge-${productId}`);
       const sizeElem = document.getElementById(`size-${productId}`);
@@ -509,7 +525,6 @@
       if (badge) badge.innerText = totalItems;
     }
 
-    // BLACK BUTTON: Add to Cart
     async function addToCart(productId, openModalAfter = false) {
       if (typeof PRODUCTS === 'undefined') {
         await showAlert("Products list is still loading. Please check product.js for syntax errors.", "Error", "error");
@@ -566,7 +581,6 @@
       return true;
     }
 
-    // PINK BUTTON: Buy Now (Adds to cart & immediately opens checkout modal)
     async function buyNowNow(productId) {
       await addToCart(productId, true);
     }
@@ -645,11 +659,9 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                  <!-- BLACK BUTTON: ADD TO CART -->
                   <button type="button" id="add-cart-btn-${product.id}" onclick="addToCart(${product.id}, false)" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
                     <i class="fa-solid fa-cart-plus"></i> ADD TO CART
                   </button>
-                  <!-- PINK BUTTON: BUY NOW -->
                   <button type="button" id="buy-btn-${product.id}" onclick="buyNowNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
                     <i class="fa-solid fa-bolt"></i> BUY NOW
                   </button>
@@ -907,6 +919,13 @@
 
     async function checkoutCart() {
       if (shoppingCart.length === 0) return;
+
+      // Policy Checkbox Validation Added Here
+      const isPolicyChecked = document.getElementById("policy-agree-checkbox").checked;
+      if (!isPolicyChecked) {
+        await showAlert("कृपया आगे बढ़ने से पहले Return, Refund & Unboxing Video Policy के चेकबॉक्स पर टिक (Agree) करें!", "Policy Agreement Required", "error");
+        return;
+      }
 
       const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
       if (!loggedInRaw) {
