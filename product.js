@@ -53,21 +53,52 @@ const PRODUCTS = [
   }
 ];
 
+// नई Firebase Config (Pinki Latest Fashions के लिए)
+const firebaseConfig = {
+  apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+  authDomain: "pinki-latest-fashions.firebaseapp.com",
+  projectId: "pinki-latest-fashions",
+  storageBucket: "pinki-latest-fashions.firebasestorage.app",
+  messagingSenderId: "668264461811",
+  appId: "1:668264461811:web:d51468e474750e69634e86",
+  measurementId: "G-21HR2KLRJY"
+};
+
+// एरर से बचने के लिए चेक: अगर पहले से कनेक्ट नहीं है, तभी कनेक्ट करो
+if (!window.firebase || !window.firebase.apps.length) {
+  // Initialize Firebase (Assuming Firebase scripts are loaded in your HTML)
+  if(window.firebase) {
+      window.firebase.initializeApp(firebaseConfig);
+      window.db = window.firebase.firestore();
+  } else {
+      console.error("Firebase is not loaded.");
+  }
+} else if (window.firebase) {
+    window.db = window.firebase.firestore();
+}
+
 window[_0x5b2d(21)] = {};
 async function syncProductsAndLiveStock() {
   if (typeof PRODUCTS === _0x5b2d(22)) return;
 
   try {
-    const database = window[_0x5b2d(23)] || firebase[_0x5b2d(25)]();
-    const ordersSnap = await database[_0x5b2d(26)](_0x5b2d(51))[_0x5b2d(27)]();
+    const database = window[_0x5b2d(23)] || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+    
+    if(!database) {
+        console.error("Firestore database not initialized.");
+        return;
+    }
+
+    // Use string literal 'orders' instead of obfuscated index 51 which is missing
+    const ordersSnap = await database[_0x5b2d(26)]('orders')[_0x5b2d(27)]();
 
     const soldCount = {};
     ordersSnap[_0x5b2d(34)](doc => {
       const ord = doc[_0x5b2d(28)]();
       const status = (ord[_0x5b2d(29)] || ord[_0x5b2d(30)] || "")[_0x5b2d(31)]();
       
-      const isCancelled = status[_0x5b2d(44)](_0x5b2d(32)) || ord[_0x5b2d(29)] === _0x5b2d(33);
-      const isReturned = status[_0x5b2d(44)](_0x5b2d(34)) || status[_0x5b2d(44)](_0x5b2d(35)) || status === _0x5b2d(36);
+      const isCancelled = status.includes(_0x5b2d(32)) || ord[_0x5b2d(29)] === _0x5b2d(33);
+      const isReturned = status.includes(_0x5b2d(34)) || status.includes(_0x5b2d(35)) || status === _0x5b2d(36);
 
       if (!isCancelled && !isReturned) {
         const pid = String(ord[_0x5b2d(37)] || "");
@@ -78,12 +109,14 @@ async function syncProductsAndLiveStock() {
       }
     });
 
-    PRODUCTS[_0x5b2d(40)](product => {
+    // Use regular array forEach instead of obfuscated index 40 which maps to 'console'
+    PRODUCTS.forEach(product => {
       const pid = String(product[_0x5b2d(0)]);
-      const stockObj = product[_0x5b2d(41)] || {};
+      // Index 41 maps to nothing in the array, using string literal 'stock'
+      const stockObj = product['stock'] || {};
       window[_0x5b2d(21)][pid] = {};
 
-      (product[_0x5b2d(6)] || [])[_0x5b2d(40)](sz => {
+      (product[_0x5b2d(6)] || []).forEach(sz => {
         const totalQty = (stockObj[sz] !== undefined) ? Number(stockObj[sz]) : 10;
         const alreadySold = soldCount[`${pid}_${sz}`] || 0;
         window[_0x5b2d(21)][pid][sz] = Math[_0x5b2d(43)](0, totalQty - alreadySold);
