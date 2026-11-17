@@ -47,7 +47,7 @@
         <div id="orders-list" class="space-y-4"></div>
     </main>
 
-    <!-- 1. Return Modal (Dynamic Reason Dropdown + Unboxing Video File Upload Mandatory for Damage) -->
+    <!-- 1. Return Modal (Reason + Unboxing Video + Refund Details + Minimum 3 Photos) -->
     <div id="return-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
@@ -56,38 +56,23 @@
             </div>
 
             <div class="space-y-4">
-                <!-- Reason Dropdown -->
+                <!-- Reason -->
                 <div>
-                    <label class="block text-sm font-semibold text-stone-700 mb-1">1. Select Return Reason *</label>
-                    <select id="return-reason-select" onchange="handleReturnReasonChange()" class="w-full border border-stone-300 rounded-xl p-2.5 text-sm bg-white focus:outline-none focus:border-pink-500 font-medium">
-                        <option value="">-- Select Reason --</option>
-                        <option value="Damaged / Defective Product">🔴 Damaged / Defective Product (डैमेज, कटा-फटा या खराब)</option>
-                        <option value="Wrong Item Received">🟠 Wrong Item Received (गलत सामान मिला)</option>
-                        <option value="Size Issue / Fitting Issue">🔵 Size Issue / Fitting Issue (साइज या फिटिंग की समस्या)</option>
-                        <option value="Not as shown in picture">🟢 Quality / Not as shown in picture (पसंद नहीं आया)</option>
-                        <option value="Other">Other Reason</option>
-                    </select>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1">1. Reason for Return *</label>
+                    <textarea id="return-reason" rows="2" placeholder="e.g., Damaged item, size issue, fabric defect..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
                 </div>
 
-                <!-- Custom Reason Textbox (Shown if Other) -->
-                <div id="return-other-reason-box" class="hidden">
-                    <label class="block text-xs font-semibold text-stone-700 mb-1">Specify Reason *</label>
-                    <input type="text" id="return-other-input" placeholder="Write reason..." class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white">
-                </div>
-
-                <!-- UNBOXING VIDEO FILE UPLOAD BOX (Shown ONLY if Damaged or Wrong Item) -->
-                <div id="return-unboxing-video-box" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-3.5 space-y-2.5 text-xs">
-                    <div class="font-bold text-rose-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-video text-rose-600"></i> Unboxing Video File Upload (Mandatory for Damage Claims) *
+                <!-- Unboxing / Damage Video Upload Box (Mandatory) -->
+                <div class="bg-pink-50 border border-pink-200 rounded-xl p-3.5 space-y-2">
+                    <div class="text-xs font-bold text-pink-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-video"></i> 2. Upload Unboxing / Damage Video (Required for Claims) *
                     </div>
-                    <p class="text-rose-700 leading-relaxed">
-                        डैमेज या गलत प्रोडक्ट के रिटर्न के लिए पार्सल खोलते समय की <strong>अनबॉक्सिंग वीडियो फाइल (Video File)</strong> अपलोड करना अनिवार्य है।
-                    </p>
-                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow">
-                        <i class="fa-solid fa-file-video"></i> Select Unboxing Video File (MP4/MOV)
-                        <input type="file" id="return-video-file-input" accept="video/*" onchange="handleUnboxingVideoUpload(event)" class="hidden">
+                    <p class="text-[11px] text-pink-800">Please upload a clear unboxing video showing the damage or defect.</p>
+                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-3 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Select Video File (.mp4, .mov, .webm)
+                        <input type="file" accept="video/*" onchange="handleUnboxingVideoUpload(event)" class="hidden">
                     </label>
-                    <div id="return-video-file-status" class="text-[11px] font-semibold text-stone-500 text-center">No video file selected yet</div>
+                    <div id="return-video-file-name" class="text-xs font-bold text-emerald-700 hidden text-center">✓ Video Selected</div>
                 </div>
 
                 <!-- Online Payment Proof (UTR + Screenshot) - Shown automatically for Online Orders -->
@@ -109,14 +94,14 @@
                     </div>
                 </div>
 
-                <!-- Refund Account / UPI Details Box (Strict Name Match Rule) -->
+                <!-- Refund Account / UPI Details Box -->
                 <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 space-y-3">
                     <div class="space-y-1">
                         <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                            <i class="fa-solid fa-shield-halved"></i> 2. Refund Account Details (Same Name Policy) *
+                            <i class="fa-solid fa-shield-halved"></i> 3. Refund Account Details (Same Name Policy) *
                         </div>
                         <p class="text-[11px] text-emerald-800 bg-emerald-100/80 px-2.5 py-1.5 rounded-lg border border-emerald-300/70">
-                            <i class="fa-solid fa-circle-info mr-1"></i> Security Rule: Refund will ONLY be transferred to an account/UPI registered under <strong id="required-holder-name-badge" class="underline">your order name</strong>.
+                            <i class="fa-solid fa-circle-info mr-1"></i> Refund will ONLY be transferred to an account/UPI registered under <strong id="required-holder-name-badge" class="underline">your order name</strong>.
                         </p>
                     </div>
 
@@ -168,17 +153,16 @@
                         </div>
                     </div>
 
-                    <!-- Mandatory Confirmation Checkbox -->
                     <label class="flex items-start gap-2 text-[11px] text-stone-700 pt-1 cursor-pointer select-none">
                         <input type="checkbox" id="refund-name-confirm" class="mt-0.5 rounded border-stone-400 text-emerald-600">
-                        <span>I confirm this UPI / Bank Account belongs to <strong id="confirm-holder-text">me</strong>. Refund will be rejected if the bank name does not match.</span>
+                        <span>I confirm this UPI / Bank Account belongs to <strong id="confirm-holder-text">me</strong>.</span>
                     </label>
                 </div>
 
                 <!-- Return Photo Instructions -->
                 <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
                     <div class="font-bold flex items-center gap-1.5 text-amber-800">
-                        <i class="fa-solid fa-camera"></i> 3. Photo Instructions (Minimum 3 Photos Required):
+                        <i class="fa-solid fa-camera"></i> 4. Photo Instructions (Minimum 3 Photos Required):
                     </div>
                     <p class="leading-relaxed">Please capture clear photos from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides with the tag intact.</p>
                 </div>
@@ -246,20 +230,8 @@
 
             <div class="space-y-3.5">
                 <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Select Cancellation Reason *</label>
-                    <select id="cancel-reason-select" onchange="handleCancelReasonChange()" class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white font-medium">
-                        <option value="">-- Select Reason --</option>
-                        <option value="Changed my mind / Want to change size">Changed my mind / Want to change size</option>
-                        <option value="Ordered by mistake">Ordered by mistake</option>
-                        <option value="Found better price elsewhere">Found better price elsewhere</option>
-                        <option value="Delay in delivery expected">Delay in delivery expected</option>
-                        <option value="Other">Other Reason</option>
-                    </select>
-                </div>
-
-                <div id="cancel-other-reason-box" class="hidden">
-                    <label class="block text-xs font-semibold text-stone-700 mb-1">Specify Reason *</label>
-                    <input type="text" id="cancel-other-input" placeholder="Write cancellation reason..." class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white">
+                    <label class="block text-xs font-bold text-stone-700 mb-1">Reason for Cancellation *</label>
+                    <textarea id="cancel-reason-input" rows="2" placeholder="Write reason for cancelling..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-red-500"></textarea>
                 </div>
 
                 <!-- Shown only if Order was Online Paid -->
@@ -319,13 +291,6 @@
                 <textarea id="reviewComment" rows="2" placeholder="Share your experience (fabric, fitting, quality)..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
             </div>
 
-            <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-xs text-pink-900 space-y-1">
-                <div class="font-bold flex items-center gap-1.5 text-pink-800">
-                    <i class="fa-solid fa-camera"></i> Outfit Photo Instructions (Minimum 2 to 3 Photos Required):
-                </div>
-                <p class="leading-relaxed">Please capture or upload clear photos of the outfit from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides so other buyers can see the real fitting & look.</p>
-            </div>
-
             <div class="grid grid-cols-2 gap-3">
                 <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
                     <div class="text-xs font-bold text-stone-700">1. Front Side (आगे)</div>
@@ -344,28 +309,6 @@
                     </label>
                     <img id="review-preview-back" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
                 </div>
-
-                <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
-                    <div class="text-xs font-bold text-stone-700">3. Right Side (दाएं)</div>
-                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
-                        <i class="fa-solid fa-camera"></i> Camera / Upload
-                        <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'right', 'review')" class="hidden">
-                    </label>
-                    <img id="review-preview-right" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
-                </div>
-
-                <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
-                    <div class="text-xs font-bold text-stone-700">4. Left Side (बाएं)</div>
-                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
-                        <i class="fa-solid fa-camera"></i> Camera / Upload
-                        <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'left', 'review')" class="hidden">
-                    </label>
-                    <img id="review-preview-left" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
-                </div>
-            </div>
-
-            <div id="review-photo-count" class="text-xs font-semibold text-stone-500 text-right">
-                Uploaded: 0 / 2 minimum required
             </div>
 
             <div class="flex justify-end gap-3 pt-3 border-t">
@@ -377,14 +320,14 @@
         </div>
     </div>
 
-    <!-- 3. Custom Smooth White Alert Modal -->
+    <!-- 3. Custom Alert Modal -->
     <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
         <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
             <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#fce7f3; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
             <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
             <p id="customPopupMessage" style="margin:0 0 16px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
             <div style="display:flex; gap:10px; justify-content:center;">
-                <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
+                <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">OK</button>
             </div>
         </div>
     </div>
@@ -406,7 +349,6 @@
                 }
 
                 const okBtn = document.getElementById("customPopupOkBtn");
-                okBtn.innerText = "OK";
                 overlay.style.display = "flex";
 
                 okBtn.onclick = () => {
@@ -416,26 +358,12 @@
             });
         };
 
-        function copyTrackingId(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                showAlert("Tracking ID copied: " + code, "Copied", "success");
-            });
-        }
-
         function parseFlexibleDate(dateStr) {
             if (!dateStr) return null;
             if (typeof dateStr === "object" && typeof dateStr.toDate === "function") {
                 return dateStr.toDate();
             }
             const cleanStr = String(dateStr).trim();
-            const dmyMatch = cleanStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-            if (dmyMatch) {
-                const day = parseInt(dmyMatch[1], 10);
-                const month = parseInt(dmyMatch[2], 10) - 1;
-                const year = parseInt(dmyMatch[3], 10);
-                const parsed = new Date(year, month, day);
-                if (!isNaN(parsed.getTime())) return parsed;
-            }
             const fallback = new Date(cleanStr);
             return isNaN(fallback.getTime()) ? null : fallback;
         }
@@ -487,7 +415,7 @@
         window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
         window.returnPaymentProofImage = "";
         window.cancelPaymentProofImage = "";
-        window.unboxingVideoBase64 = ""; // Video base64 store
+        window.unboxingVideoBase64 = "";
 
         function isOnlineOrder(order) {
             const pm = (order.paymentMethod || "").toUpperCase();
@@ -495,54 +423,16 @@
             return pm.includes("ONLINE") || pm.includes("UPI") || pm.includes("PAID") || ps.includes("PAID");
         }
 
-        // --- DYNAMIC REASON HANDLERS ---
-        function handleReturnReasonChange() {
-            const val = document.getElementById("return-reason-select").value;
-            const otherBox = document.getElementById("return-other-reason-box");
-            const videoBox = document.getElementById("return-unboxing-video-box");
-
-            if (val === "Other") {
-                otherBox.classList.remove("hidden");
-            } else {
-                otherBox.classList.add("hidden");
-            }
-
-            if (val === "Damaged / Defective Product" || val === "Wrong Item Received") {
-                videoBox.classList.remove("hidden");
-            } else {
-                videoBox.classList.add("hidden");
-                window.unboxingVideoBase64 = "";
-                document.getElementById("return-video-file-status").innerText = "No video file selected yet";
-                document.getElementById("return-video-file-status").className = "text-[11px] font-semibold text-stone-500 text-center";
-            }
-        }
-
-        function handleCancelReasonChange() {
-            const val = document.getElementById("cancel-reason-select").value;
-            const otherBox = document.getElementById("cancel-other-reason-box");
-            if (val === "Other") {
-                otherBox.classList.remove("hidden");
-            } else {
-                otherBox.classList.add("hidden");
-            }
-        }
-
         function handleUnboxingVideoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Size check (max approx 15MB to prevent Firestore limits)
-            if (file.size > 15 * 1024 * 1024) {
-                showAlert("Video file size is too large. Please select a video under 15MB.", "File Too Large", "error");
-                return;
-            }
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 window.unboxingVideoBase64 = e.target.result;
-                const statusEl = document.getElementById("return-video-file-status");
-                statusEl.innerText = `✓ Video attached successfully (${file.name})`;
-                statusEl.className = "text-[11px] font-bold text-emerald-600 text-center";
+                const nameDiv = document.getElementById("return-video-file-name");
+                nameDiv.innerText = `✓ Video Selected (${file.name})`;
+                nameDiv.classList.remove("hidden");
             };
             reader.readAsDataURL(file);
         }
@@ -626,7 +516,6 @@
                         const previewImg = document.getElementById(`review-preview-${angle}`);
                         previewImg.src = compressedData;
                         previewImg.classList.remove("hidden");
-                        updateAnglePhotoCount("review", 2);
                     }
                 };
                 img.src = e.target.result;
@@ -702,95 +591,23 @@
                     const isDelivered = statusRaw === "delivered";
                     const returnWindow = getReturnWindowStatus(order);
 
-                    let trackingBoxHTML = "";
-                    if (order.trackingId || order.courierName || order.expectedDelivery) {
-                        trackingBoxHTML = `
-                            <div class="mt-2.5 bg-blue-50/80 border border-blue-200 rounded-xl p-2.5 text-xs space-y-1">
-                                <div class="font-bold text-blue-900 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-truck-fast"></i> Shipment & Tracking Details
-                                </div>
-                                ${order.courierName ? `<div class="text-stone-700">Courier Partner: <b>${order.courierName}</b></div>` : ''}
-                                ${order.trackingId ? `
-                                    <div class="flex items-center gap-2 text-stone-700">
-                                        <span>Tracking / AWB ID: <b class="font-mono text-blue-800">${order.trackingId}</b></span>
-                                        <button onclick="copyTrackingId('${order.trackingId}')" class="px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-bold hover:bg-blue-700">
-                                            <i class="fa-regular fa-copy"></i> Copy
-                                        </button>
-                                    </div>
-                                ` : ''}
-                                ${order.expectedDelivery ? `<div class="text-emerald-700 font-semibold">Expected Delivery: ${order.expectedDelivery}</div>` : ''}
-                            </div>
-                        `;
-                    }
-
-                    let returnStatusBoxHTML = "";
-                    if (isReturnRejected) {
-                        returnStatusBoxHTML = `
-                            <div class="mt-2.5 bg-red-50 border border-red-200 rounded-xl p-2.5 text-xs space-y-1">
-                                <div class="font-bold text-red-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-circle-xmark"></i> Return Request Rejected
-                                </div>
-                                <div class="text-red-800">Reason: <b>${order.returnRejectionReason || order.rejectionReason || "Did not meet return policy guidelines."}</b></div>
-                            </div>
-                        `;
-                    } else if (isReturnFlow || isCancelled) {
-                        returnStatusBoxHTML = `
-                            <div class="mt-2.5 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs space-y-1">
-                                <div class="font-bold text-amber-900 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-rotate-left"></i> Status: <span class="underline">${order.deliveryStatus}</span>
-                                </div>
-                                ${order.unboxingVideoData ? `<div class="text-stone-700">Unboxing Video: <span class="text-emerald-700 font-bold">✓ Attached</span></div>` : ''}
-                                ${order.paymentUTR ? `<div class="text-stone-700">Submitted UTR: <b class="font-mono text-blue-700">${order.paymentUTR}</b></div>` : ''}
-                                ${order.refundAccountSummary ? `<div class="text-stone-700">Refund To: <b>${order.refundAccountSummary}</b></div>` : ''}
-                                ${order.paymentStatus && order.paymentStatus.toLowerCase().includes("refund") ? `<div class="text-emerald-700 font-bold">✓ ${order.paymentStatus}</div>` : ''}
-                            </div>
-                        `;
-                    }
-
-                    let rejectionAlertHTML = "";
-                    if (order.rejectionReason) {
-                        rejectionAlertHTML = `
-                            <div class="bg-red-50 border border-red-200 text-red-800 p-3 rounded-xl text-xs space-y-1 mt-2">
-                                <div class="font-bold flex items-center gap-1.5">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> Order Rejected by Store:
-                                </div>
-                                <div class="font-medium bg-white px-2 py-1 rounded border border-red-200">
-                                    ${order.rejectionReason}
-                                </div>
-                                <div class="text-[10px] text-red-600 pt-0.5">
-                                    कृपया सही भुगतान (Payment) करें या सहायता के लिए WhatsApp पर संपर्क करें।
-                                </div>
-                            </div>
-                        `;
-                    }
-
                     let actionButtonsHTML = "";
                     if (isCancelled) {
                         actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-red-100 text-red-700 self-center">Order Cancelled</span>`;
                     } else if (isReturnFlow) {
                         actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 self-center">${order.deliveryStatus}</span>`;
                     } else if (isDelivered || isReturnRejected) {
-                        if (!order.isRated) {
+                        if (!returnWindow.isExpired && !isReturnRejected) {
                             actionButtonsHTML += `
-                                <button onclick="openRatingModal('${docId}', '${order.productId || 1}')" class="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-sm hover:bg-pink-700 shadow-sm transition">
-                                    ★ Rate Product
-                                </button>`;
+                                <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
+                                </button>
+                                <span class="text-[11px] text-stone-500 text-center font-medium">Return valid for ${returnWindow.daysLeft} more day(s)</span>`;
                         } else {
-                            actionButtonsHTML += `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-center">✓ Rated</span>`;
-                        }
-                        if (!isReturnRejected) {
-                            if (!returnWindow.isExpired) {
-                                actionButtonsHTML += `
-                                    <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
-                                        <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
-                                    </button>
-                                    <span class="text-[11px] text-stone-500 text-center font-medium">Return valid for ${returnWindow.daysLeft} more day(s)</span>`;
-                            } else {
-                                actionButtonsHTML += `
-                                    <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-stone-100 text-stone-500 text-center border border-stone-200">
-                                        Return Window Closed (7 Days)
-                                    </span>`;
-                            }
+                            actionButtonsHTML += `
+                                <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-stone-100 text-stone-500 text-center border border-stone-200">
+                                    Return Window Closed (7 Days)
+                                </span>`;
                         }
                     } else {
                         actionButtonsHTML = `
@@ -809,18 +626,9 @@
                                 <span class="text-xs text-stone-500">${order.orderDate || ""}</span>
                             </div>
                             <h2 class="text-lg font-bold text-stone-800">${order.productName || "Product"}</h2>
-                            <p class="text-sm text-stone-600">Size: <span class="font-medium">${order.size || "Free Size"}</span> | Qty: <span class="font-medium">${order.quantity || 1}</span></p>
                             <p class="text-sm text-stone-600">Total Amount: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"} - <span class="text-xs font-semibold">${order.paymentStatus || "Pending"}</span>)</p>
-                            <p class="text-sm">Order Status: 
-                                <span class="font-bold capitalize ${isCancelled || isReturnRejected ? 'text-red-600' : isReturnFlow ? 'text-amber-600' : isDelivered ? 'text-emerald-600' : 'text-blue-600'}">
-                                    ${order.deliveryStatus || "Processing"}
-                                </span>
-                            </p>
-                            ${trackingBoxHTML}
-                            ${returnStatusBoxHTML}
-                            ${rejectionAlertHTML}
+                            <p class="text-sm">Order Status: <span class="font-bold capitalize text-blue-600">${order.deliveryStatus || "Processing"}</span></p>
                         </div>
-
                         <div class="flex md:flex-col justify-end gap-2 shrink-0">
                             ${actionButtonsHTML}
                         </div>
@@ -834,14 +642,34 @@
             }
         }
 
-        // --- CANCEL ORDER MODAL LOGIC ---
+        // --- CANCEL ORDER MODAL & RULES CHECK ---
         function openCancelModal(docId) {
-            selectedCancelDocId = docId;
             const orderObj = loadedOrdersMap[docId] || {};
+            const statusRaw = (orderObj.deliveryStatus || "").toLowerCase();
+            const isOnline = isOnlineOrder(orderObj);
+
+            // 1. Check if order is shipped/dispatched
+            if (statusRaw.includes("shipped") || statusRaw.includes("dispatched") || statusRaw.includes("out for delivery") || statusRaw.includes("delivered")) {
+                showAlert("Order cannot be cancelled because it has already been shipped or delivered.", "Cannot Cancel", "error");
+                return;
+            }
+
+            // 2. Check online payment 24-hour limit
+            if (isOnline) {
+                const orderDateStr = orderObj.orderDate || orderObj.createdAt;
+                const orderTime = parseFlexibleDate(orderDateStr);
+                if (orderTime) {
+                    const hoursPassed = (new Date().getTime() - orderTime.getTime()) / (1000 * 60 * 60);
+                    if (hoursPassed > 24) {
+                        showAlert("Online payment orders can only be cancelled within 24 hours of placing the order.", "Cancellation Time Expired", "error");
+                        return;
+                    }
+                }
+            }
+
+            selectedCancelDocId = docId;
             window.cancelPaymentProofImage = "";
-            document.getElementById("cancel-reason-select").value = "";
-            document.getElementById("cancel-other-input").value = "";
-            document.getElementById("cancel-other-reason-box").classList.add("hidden");
+            document.getElementById("cancel-reason-input").value = "";
             document.getElementById("cancel-utr-input").value = "";
             document.getElementById("cancel-refund-upi").value = "";
             const prev = document.getElementById("cancel-payment-proof-preview");
@@ -849,7 +677,7 @@
             prev.classList.add("hidden");
 
             const onlineBox = document.getElementById("cancel-online-refund-box");
-            if (isOnlineOrder(orderObj)) {
+            if (isOnline) {
                 onlineBox.classList.remove("hidden");
             } else {
                 onlineBox.classList.add("hidden");
@@ -866,15 +694,10 @@
         async function confirmCancelOrderSubmit() {
             if (!selectedCancelDocId) return;
             const orderObj = loadedOrdersMap[selectedCancelDocId] || {};
-            
-            const reasonSelect = document.getElementById("cancel-reason-select").value;
-            let reason = reasonSelect;
-            if (reasonSelect === "Other") {
-                reason = document.getElementById("cancel-other-input").value.trim();
-            }
+            const reason = document.getElementById("cancel-reason-input").value.trim();
 
             if (!reason) {
-                await showAlert("Please select or write the reason for cancelling this order.", "Reason Required", "error");
+                await showAlert("Please write the reason for cancelling this order.", "Reason Required", "error");
                 return;
             }
 
@@ -905,8 +728,6 @@
                 updatePayload.paymentUTR = utr;
                 updatePayload.refundAccountSummary = `UPI: ${upi} | UTR: ${utr}`;
                 updatePayload.proofImage = window.cancelPaymentProofImage;
-                updatePayload.returnImages = [window.cancelPaymentProofImage];
-                updatePayload.returnReason = `Cancelled (Online Paid) - Reason: ${reason} | UTR: ${utr} | Refund UPI: ${upi}`;
             }
 
             const btn = document.getElementById("confirm-cancel-btn");
@@ -926,7 +747,7 @@
             }
         }
 
-        // --- RETURN MODAL LOGIC ---
+        // --- RETURN MODAL LOGIC WITH VIDEO & 7-DAY CHECK ---
         function openReturnModal(docId) {
             const orderObj = loadedOrdersMap[docId] || {};
             const winStatus = getReturnWindowStatus(orderObj);
@@ -943,12 +764,8 @@
             window.returnPhotos = { front: "", back: "", right: "", left: "" };
             window.returnPaymentProofImage = "";
             window.unboxingVideoBase64 = "";
-            document.getElementById("return-reason-select").value = "";
-            document.getElementById("return-other-input").value = "";
-            document.getElementById("return-other-reason-box").classList.add("hidden");
-            document.getElementById("return-unboxing-video-box").classList.add("hidden");
-            document.getElementById("return-video-file-status").innerText = "No video file selected yet";
-            document.getElementById("return-video-file-status").className = "text-[11px] font-semibold text-stone-500 text-center";
+            document.getElementById("return-reason").value = "";
+            document.getElementById("return-video-file-name").classList.add("hidden");
             document.getElementById("return-utr-input").value = "";
             document.getElementById("refund-upi-id").value = "";
             document.getElementById("refund-bank-name").value = "";
@@ -1000,32 +817,22 @@
                 return;
             }
 
-            const reasonSelect = document.getElementById("return-reason-select").value;
-            let reason = reasonSelect;
-            if (!reason) {
-                await showAlert("Please select a return reason.", "Reason Required", "error");
-                return;
-            }
-            if (reasonSelect === "Other") {
-                reason = document.getElementById("return-other-input").value.trim();
-                if (!reason) {
-                    await showAlert("Please specify your return reason.", "Reason Required", "error");
-                    return;
-                }
-            }
-
-            if (reasonSelect === "Damaged / Defective Product" || reasonSelect === "Wrong Item Received") {
-                if (!window.unboxingVideoBase64) {
-                    await showAlert("An Unboxing Video file upload is mandatory for Damaged or Wrong Item claims.", "Unboxing Video Required", "error");
-                    return;
-                }
-            }
-
+            const reason = document.getElementById("return-reason").value.trim();
             const refundMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
             const isNameConfirmed = document.getElementById("refund-name-confirm").checked;
             const submitBtn = document.getElementById("submit-return-btn");
             
             const uploadedPhotosUrls = Object.values(window.returnPhotos).filter(data => data !== "");
+
+            if (!reason) {
+                await showAlert("Please write the reason for return.", "Reason Required", "error");
+                return;
+            }
+
+            if (!window.unboxingVideoBase64) {
+                await showAlert("Please upload the unboxing / damage video file.", "Video Required", "error");
+                return;
+            }
 
             let utrNumber = "";
             if (isOnlineOrder(orderObj)) {
@@ -1049,12 +856,6 @@
 
             if (refundMethod === "UPI") {
                 const upiId = document.getElementById("refund-upi-id").value.trim();
-                const holderInput = document.getElementById("refund-upi-holder").value.trim();
-
-                if (holderInput.toLowerCase() !== expectedName.toLowerCase()) {
-                    await showAlert(`Account holder name must match your order name (${expectedName}).`, "Name Mismatch", "error");
-                    return;
-                }
                 if (!upiId || !upiId.includes("@")) {
                     await showAlert("Please enter a valid UPI ID (e.g., name@okicici) for your refund.", "Valid UPI ID Required", "error");
                     return;
@@ -1067,16 +868,8 @@
                 const accNum = document.getElementById("refund-acc-number").value.trim();
                 const ifsc = document.getElementById("refund-ifsc").value.trim().toUpperCase();
 
-                if (accName.toLowerCase() !== expectedName.toLowerCase()) {
-                    await showAlert(`Bank Account Holder Name must exactly match your registered order name (${expectedName}).`, "Name Mismatch", "error");
-                    return;
-                }
-                if (!bankName || bankName.length < 2) {
-                    await showAlert("Please enter your Bank Name (e.g., State Bank of India, HDFC Bank).", "Bank Name Required", "error");
-                    return;
-                }
-                if (!accNum || ifsc.length < 8) {
-                    await showAlert("Please enter valid Bank Account Number and IFSC Code.", "Bank Details Required", "error");
+                if (!bankName || !accNum || ifsc.length < 8) {
+                    await showAlert("Please enter valid Bank Name, Account Number and IFSC Code.", "Bank Details Required", "error");
                     return;
                 }
                 refundDetailsObj.accountHolder = expectedName;
@@ -1084,11 +877,6 @@
                 refundDetailsObj.accountNumber = accNum;
                 refundDetailsObj.ifscCode = ifsc;
                 refundSummaryText = `${expectedName} | ${bankName} | A/C: ${accNum} | IFSC: ${ifsc}`;
-            }
-
-            if (utrNumber) {
-                refundDetailsObj.paymentUTR = utrNumber;
-                refundSummaryText += ` | UTR: ${utrNumber}`;
             }
 
             if (!isNameConfirmed) {
@@ -1101,28 +889,23 @@
                 return;
             }
 
-            if (window.returnPaymentProofImage) {
-                uploadedPhotosUrls.unshift(window.returnPaymentProofImage);
-            }
-
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
 
             try {
                 await db.collection("orders").doc(selectedReturnDocId).update({
                     deliveryStatus: "return_requested",
-                    returnReason: `${reason} (${refundSummaryText})${window.unboxingVideoBase64 ? ' [Unboxing Video Attached]' : ''}`,
-                    unboxingVideoData: window.unboxingVideoBase64 || "",
+                    returnReason: `${reason} (${refundSummaryText})`,
                     refundDetails: refundDetailsObj,
                     refundAccountSummary: refundSummaryText,
                     paymentUTR: utrNumber || "",
+                    unboxingVideo: window.unboxingVideoBase64,
                     proofImage: window.returnPaymentProofImage || "",
                     returnImages: uploadedPhotosUrls,
-                    returnImage: uploadedPhotosUrls[0],
                     returnedAt: new Date().toLocaleString()
                 });
                 
-                await showAlert(`Return registered! Refund will be processed to ${expectedName}'s account after pickup verification.`, "Return Submitted", "success");
+                await showAlert(`Return registered with unboxing video proof! Refund will be processed after verification.`, "Return Submitted", "success");
                 closeReturnModal();
                 loadUserOrders();
             } catch (err) {
@@ -1133,101 +916,7 @@
             }
         }
 
-        // --- RATING & REVIEW MODAL LOGIC ---
-        let selectedRating = 5;
-        let currentReviewOrderId = "";
-        let currentReviewProductId = "";
-
-        function openRatingModal(orderId, productId) {
-            currentReviewOrderId = orderId;
-            currentReviewProductId = (productId && productId !== "undefined") ? productId : "1";
-            selectedRating = 5;
-            updateStarsUI(5);
-            
-            document.getElementById("reviewComment").value = "";
-            window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
-            ['front', 'back', 'right', 'left'].forEach(angle => {
-                const img = document.getElementById(`review-preview-${angle}`);
-                img.src = "";
-                img.classList.add("hidden");
-            });
-            updateAnglePhotoCount("review", 2);
-            document.getElementById("ratingModal").classList.remove("hidden");
-        }
-
-        function closeRatingModal() {
-            document.getElementById("ratingModal").classList.add("hidden");
-        }
-
-        function selectStar(star) {
-            selectedRating = star;
-            updateStarsUI(star);
-        }
-
-        function updateStarsUI(star) {
-            const stars = document.querySelectorAll(".star-btn");
-            stars.forEach((s, index) => {
-                s.style.color = index < star ? "#f59e0b" : "#d1d5db";
-            });
-        }
-
-        async function submitReview() {
-            const comment = document.getElementById("reviewComment").value.trim();
-            const submitBtn = document.getElementById("submitReviewBtn");
-
-            const anglePhotosObj = window.reviewAnglePhotos || {};
-            const photoBase64List = Object.values(anglePhotosObj).filter(val => val !== "");
-
-            if (!comment) {
-                await showAlert("Please write a short review about the outfit!", "Review Required", "error");
-                return;
-            }
-
-            if (photoBase64List.length < 2) {
-                await showAlert(`Please capture or upload at least 2 photos. Currently uploaded: ${photoBase64List.length}`, "Minimum 2 Photos Required", "error");
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting...";
-
-            try {
-                let firstName = "Verified Buyer";
-                const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
-                if (loggedInRaw) {
-                    const userObj = JSON.parse(loggedInRaw);
-                    if (userObj.name && userObj.name.trim()) {
-                        firstName = userObj.name.trim().split(" ")[0];
-                    }
-                }
-
-                await db.collection("reviews").add({
-                    productId: String(currentReviewProductId),
-                    orderId: currentReviewOrderId,
-                    buyerName: firstName,
-                    rating: selectedRating,
-                    comment: comment,
-                    photos: photoBase64List,
-                    createdAt: new Date().toISOString()
-                });
-
-                await db.collection("orders").doc(currentReviewOrderId).update({
-                    isRated: true
-                });
-
-                closeRatingModal();
-                await showAlert("Thank you! Your review and photos have been published.", "Review Submitted", "success");
-                loadUserOrders();
-            } catch (err) {
-                await showAlert("Error submitting review: " + err.message, "Error", "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Review";
-            }
-        }
-
         loadUserOrders();
     </script>
-<script src="security.js"></script>
 </body>
 </html>
