@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Pinki Latest Fashions</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        @keyframes popScale {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-[#fcfaf9] text-stone-800 min-h-screen">
+
+    <header class="bg-white shadow-sm border-b border-stone-200 px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="text-pink-600 hover:text-pink-700 font-bold text-lg">
+                <i class="fa-solid fa-arrow-left mr-2"></i>Home
+            </a>
+            <h1 class="text-lg font-bold text-stone-800 border-l-2 border-stone-200 pl-3">My Orders</h1>
+        </div>
+        <div id="user-info" class="text-sm font-semibold text-stone-600"></div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-6">
+        <div id="loading" class="text-center py-10 font-medium text-stone-500">
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600 block"></i> Loading orders...
+        </div>
+
+        <div id="no-orders" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-stone-200">
+            <i class="fa-solid fa-box-open text-5xl text-stone-300 mb-3"></i>
+            <p class="text-lg font-semibold text-stone-600">No past orders found.</p>
+            <a href="index.html" class="inline-block mt-4 px-6 py-2.5 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition">Start Shopping</a>
+        </div>
+
+        <div id="orders-list" class="space-y-4"></div>
+    </main>
+
+    <!-- 1. Return Modal (Dynamic Reason Dropdown + Unboxing Video File Upload Mandatory for Damage) -->
+    <div id="return-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-stone-800"><i class="fa-solid fa-rotate-left text-amber-500 mr-2"></i>Return Product & Refund Details</h3>
+                <button onclick="closeReturnModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Reason Dropdown -->
+                <div>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1">1. Select Return Reason *</label>
+                    <select id="return-reason-select" onchange="handleReturnReasonChange()" class="w-full border border-stone-300 rounded-xl p-2.5 text-sm bg-white focus:outline-none focus:border-pink-500 font-medium">
+                        <option value="">-- Select Reason --</option>
+                        <option value="Damaged / Defective Product">🔴 Damaged / Defective Product (डैमेज, कटा-फटा या खराब)</option>
+                        <option value="Wrong Item Received">🟠 Wrong Item Received (गलत सामान मिला)</option>
+                        <option value="Size Issue / Fitting Issue">🔵 Size Issue / Fitting Issue (साइज या फिटिंग की समस्या)</option>
+                        <option value="Not as shown in picture">🟢 Quality / Not as shown in picture (पसंद नहीं आया)</option>
+                        <option value="Other">Other Reason</option>
+                    </select>
+                </div>
+
+                <!-- Custom Reason Textbox (Shown if Other) -->
+                <div id="return-other-reason-box" class="hidden">
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Specify Reason *</label>
+                    <input type="text" id="return-other-input" placeholder="Write reason..." class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white">
+                </div>
+
+                <!-- UNBOXING VIDEO FILE UPLOAD BOX (Shown ONLY if Damaged or Wrong Item) -->
+                <div id="return-unboxing-video-box" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-3.5 space-y-2.5 text-xs">
+                    <div class="font-bold text-rose-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-video text-rose-600"></i> Unboxing Video File Upload (Mandatory for Damage Claims) *
+                    </div>
+                    <p class="text-rose-700 leading-relaxed">
+                        डैमेज या गलत प्रोडक्ट के रिटर्न के लिए पार्सल खोलते समय की <strong>अनबॉक्सिंग वीडियो फाइल (Video File)</strong> अपलोड करना अनिवार्य है।
+                    </p>
+                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow">
+                        <i class="fa-solid fa-file-video"></i> Select Unboxing Video File (MP4/MOV)
+                        <input type="file" id="return-video-file-input" accept="video/*" onchange="handleUnboxingVideoUpload(event)" class="hidden">
+                    </label>
+                    <div id="return-video-file-status" class="text-[11px] font-semibold text-stone-500 text-center">No video file selected yet</div>
+                </div>
+
+                <!-- Online Payment Proof (UTR + Screenshot) - Shown automatically for Online Orders -->
+                <div id="return-online-proof-box" class="hidden bg-blue-50/80 border border-blue-200 rounded-xl p-3.5 space-y-3">
+                    <div class="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt"></i> Online Payment Verification (UTR & Screenshot) *
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">12-Digit UTR / UPI Transaction ID *</label>
+                        <input type="text" id="return-utr-input" placeholder="Enter 12-digit UTR / Ref No." class="w-full border border-blue-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-600 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Upload Payment Screenshot *</label>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-upload"></i> Select Payment Screenshot
+                            <input type="file" accept="image/*" onchange="handlePaymentProofUpload(event, 'return')" class="hidden">
+                        </label>
+                        <img id="return-payment-proof-preview" src="" class="hidden mt-2 w-full max-h-36 object-contain rounded-lg border bg-white p-1">
+                    </div>
+                </div>
+
+                <!-- Refund Account / UPI Details Box (Strict Name Match Rule) -->
+                <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 space-y-3">
+                    <div class="space-y-1">
+                        <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved"></i> 2. Refund Account Details (Same Name Policy) *
+                        </div>
+                        <p class="text-[11px] text-emerald-800 bg-emerald-100/80 px-2.5 py-1.5 rounded-lg border border-emerald-300/70">
+                            <i class="fa-solid fa-circle-info mr-1"></i> Security Rule: Refund will ONLY be transferred to an account/UPI registered under <strong id="required-holder-name-badge" class="underline">your order name</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Refund Mode Selector -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <label class="flex items-center gap-2 bg-white border border-emerald-300 rounded-lg p-2 cursor-pointer font-semibold">
+                            <input type="radio" name="refund-method" value="UPI" checked onchange="toggleRefundFields()">
+                            <span>UPI ID (Fastest)</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-white border border-emerald-300 rounded-lg p-2 cursor-pointer font-semibold">
+                            <input type="radio" name="refund-method" value="Bank Account" onchange="toggleRefundFields()">
+                            <span>Bank Account</span>
+                        </label>
+                    </div>
+
+                    <!-- UPI Input Field -->
+                    <div id="refund-upi-box" class="space-y-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-0.5">Registered Account Holder Name (Locked)</label>
+                            <input type="text" id="refund-upi-holder" readonly class="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-xs bg-stone-100 text-stone-700 font-bold cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-0.5">Enter Your UPI ID *</label>
+                            <input type="text" id="refund-upi-id" placeholder="e.g., 9876543210@ybl or name@okicici" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-emerald-600">
+                        </div>
+                    </div>
+
+                    <!-- Bank Account Input Fields -->
+                    <div id="refund-bank-box" class="hidden space-y-2 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">Account Holder Name (Locked) *</label>
+                                <input type="text" id="refund-acc-name" readonly class="w-full border border-stone-200 rounded-lg px-3 py-2 bg-stone-100 text-stone-800 font-bold cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">Bank Name *</label>
+                                <input type="text" id="refund-bank-name" placeholder="e.g., State Bank of India, HDFC" class="w-full border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-emerald-600">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">Bank Account Number *</label>
+                                <input type="text" id="refund-acc-number" placeholder="Enter Account Number" class="w-full border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-emerald-600">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-stone-700 mb-0.5">IFSC Code *</label>
+                                <input type="text" id="refund-ifsc" placeholder="e.g., SBIN0001234" class="w-full uppercase border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-emerald-600">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mandatory Confirmation Checkbox -->
+                    <label class="flex items-start gap-2 text-[11px] text-stone-700 pt-1 cursor-pointer select-none">
+                        <input type="checkbox" id="refund-name-confirm" class="mt-0.5 rounded border-stone-400 text-emerald-600">
+                        <span>I confirm this UPI / Bank Account belongs to <strong id="confirm-holder-text">me</strong>. Refund will be rejected if the bank name does not match.</span>
+                    </label>
+                </div>
+
+                <!-- Return Photo Instructions -->
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+                    <div class="font-bold flex items-center gap-1.5 text-amber-800">
+                        <i class="fa-solid fa-camera"></i> 3. Photo Instructions (Minimum 3 Photos Required):
+                    </div>
+                    <p class="leading-relaxed">Please capture clear photos from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides with the tag intact.</p>
+                </div>
+
+                <!-- 4 Angle Camera/Upload Slots for Return -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                        <div class="text-xs font-bold text-stone-700">1. Front Side (आगे)</div>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-camera"></i> Camera / Upload
+                            <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'front', 'return')" class="hidden">
+                        </label>
+                        <img id="return-preview-front" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                    </div>
+
+                    <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                        <div class="text-xs font-bold text-stone-700">2. Back Side (पीछे)</div>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-camera"></i> Camera / Upload
+                            <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'back', 'return')" class="hidden">
+                        </label>
+                        <img id="return-preview-back" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                    </div>
+
+                    <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                        <div class="text-xs font-bold text-stone-700">3. Right Side (दाएं)</div>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-camera"></i> Camera / Upload
+                            <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'right', 'return')" class="hidden">
+                        </label>
+                        <img id="return-preview-right" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                    </div>
+
+                    <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                        <div class="text-xs font-bold text-stone-700">4. Left Side (बाएं)</div>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-camera"></i> Camera / Upload
+                            <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'left', 'return')" class="hidden">
+                        </label>
+                        <img id="return-preview-left" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                    </div>
+                </div>
+                
+                <div id="return-photo-count" class="text-xs font-semibold text-stone-500 text-right">
+                    Uploaded: 0 / 3 minimum required
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t">
+                <button onclick="closeReturnModal()" class="px-4 py-2 bg-stone-200 text-stone-800 rounded-xl text-sm font-semibold hover:bg-stone-300 transition">Cancel</button>
+                <button id="submit-return-btn" onclick="submitReturnRequest()" class="px-5 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow transition">
+                    Submit Return
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1B. Cancel Order Modal -->
+    <div id="cancel-modal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-red-600"><i class="fa-solid fa-ban mr-2"></i>Cancel Order</h3>
+                <button onclick="closeCancelModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">Select Cancellation Reason *</label>
+                    <select id="cancel-reason-select" onchange="handleCancelReasonChange()" class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white font-medium">
+                        <option value="">-- Select Reason --</option>
+                        <option value="Changed my mind / Want to change size">Changed my mind / Want to change size</option>
+                        <option value="Ordered by mistake">Ordered by mistake</option>
+                        <option value="Found better price elsewhere">Found better price elsewhere</option>
+                        <option value="Delay in delivery expected">Delay in delivery expected</option>
+                        <option value="Other">Other Reason</option>
+                    </select>
+                </div>
+
+                <div id="cancel-other-reason-box" class="hidden">
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Specify Reason *</label>
+                    <input type="text" id="cancel-other-input" placeholder="Write cancellation reason..." class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white">
+                </div>
+
+                <!-- Shown only if Order was Online Paid -->
+                <div id="cancel-online-refund-box" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3.5 space-y-3 text-xs">
+                    <div class="font-bold text-blue-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-building-columns"></i> Online Payment Refund Details *
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">12-Digit Payment UTR / Transaction ID *</label>
+                        <input type="text" id="cancel-utr-input" placeholder="Enter 12-digit UTR Number" class="w-full border border-blue-300 rounded-lg px-3 py-2 bg-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">Refund UPI ID (Where you want refund) *</label>
+                        <input type="text" id="cancel-refund-upi" placeholder="e.g., 9876543210@ybl" class="w-full border border-blue-300 rounded-lg px-3 py-2 bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">Upload Payment Screenshot *</label>
+                        <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                            <i class="fa-solid fa-camera"></i> Upload Payment Screenshot
+                            <input type="file" accept="image/*" onchange="handlePaymentProofUpload(event, 'cancel')" class="hidden">
+                        </label>
+                        <img id="cancel-payment-proof-preview" src="" class="hidden mt-2 w-full max-h-36 object-contain rounded-lg border bg-white p-1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2.5 pt-3 border-t">
+                <button onclick="closeCancelModal()" class="px-4 py-2 bg-stone-200 text-stone-800 rounded-xl text-xs font-bold hover:bg-stone-300">Close</button>
+                <button id="confirm-cancel-btn" onclick="confirmCancelOrderSubmit()" class="px-5 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow">
+                    Confirm Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Rate Product Modal -->
+    <div id="ratingModal" class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-stone-800">★ Rate This Outfit</h3>
+                <button onclick="closeRatingModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-stone-700">Your Rating:</span>
+                <div style="font-size:28px; cursor:pointer; user-select:none; line-height:1;">
+                    <span class="star-btn" onclick="selectStar(1)" style="color:#f59e0b;">★</span>
+                    <span class="star-btn" onclick="selectStar(2)" style="color:#f59e0b;">★</span>
+                    <span class="star-btn" onclick="selectStar(3)" style="color:#f59e0b;">★</span>
+                    <span class="star-btn" onclick="selectStar(4)" style="color:#f59e0b;">★</span>
+                    <span class="star-btn" onclick="selectStar(5)" style="color:#f59e0b;">★</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-stone-700 mb-1">Write Your Review *</label>
+                <textarea id="reviewComment" rows="2" placeholder="Share your experience (fabric, fitting, quality)..." class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
+            </div>
+
+            <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-xs text-pink-900 space-y-1">
+                <div class="font-bold flex items-center gap-1.5 text-pink-800">
+                    <i class="fa-solid fa-camera"></i> Outfit Photo Instructions (Minimum 2 to 3 Photos Required):
+                </div>
+                <p class="leading-relaxed">Please capture or upload clear photos of the outfit from <strong>Front (आगे)</strong>, <strong>Back (पीछे)</strong>, <strong>Right (दाएं)</strong>, and <strong>Left (बाएं)</strong> sides so other buyers can see the real fitting & look.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                    <div class="text-xs font-bold text-stone-700">1. Front Side (आगे)</div>
+                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fa-solid fa-camera"></i> Camera / Upload
+                        <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'front', 'review')" class="hidden">
+                    </label>
+                    <img id="review-preview-front" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                </div>
+
+                <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                    <div class="text-xs font-bold text-stone-700">2. Back Side (पीछे)</div>
+                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fa-solid fa-camera"></i> Camera / Upload
+                        <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'back', 'review')" class="hidden">
+                    </label>
+                    <img id="review-preview-back" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                </div>
+
+                <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                    <div class="text-xs font-bold text-stone-700">3. Right Side (दाएं)</div>
+                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fa-solid fa-camera"></i> Camera / Upload
+                        <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'right', 'review')" class="hidden">
+                    </label>
+                    <img id="review-preview-right" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                </div>
+
+                <div class="border border-stone-200 rounded-xl p-2.5 bg-stone-50 text-center space-y-2">
+                    <div class="text-xs font-bold text-stone-700">4. Left Side (बाएं)</div>
+                    <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2 px-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fa-solid fa-camera"></i> Camera / Upload
+                        <input type="file" accept="image/*" capture="environment" onchange="handleAnglePhoto(event, 'left', 'review')" class="hidden">
+                    </label>
+                    <img id="review-preview-left" src="" class="hidden w-full h-24 object-cover rounded-lg border bg-white">
+                </div>
+            </div>
+
+            <div id="review-photo-count" class="text-xs font-semibold text-stone-500 text-right">
+                Uploaded: 0 / 2 minimum required
+            </div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t">
+                <button onclick="closeRatingModal()" class="px-4 py-2 bg-stone-200 text-stone-800 rounded-xl text-sm font-semibold hover:bg-stone-300 transition">Cancel</button>
+                <button id="submitReviewBtn" onclick="submitReview()" class="px-5 py-2 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 shadow transition">
+                    Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Custom Smooth White Alert Modal -->
+    <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
+        <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
+            <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#fce7f3; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
+            <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
+            <p id="customPopupMessage" style="margin:0 0 16px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("customPopupOverlay");
+                const icon = document.getElementById("customPopupIcon");
+                document.getElementById("customPopupTitle").innerText = title;
+                document.getElementById("customPopupMessage").innerText = message;
+                
+                if (type === "error") {
+                    icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
+                } else if (type === "success") {
+                    icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
+                } else {
+                    icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
+                }
+
+                const okBtn = document.getElementById("customPopupOkBtn");
+                okBtn.innerText = "OK";
+                overlay.style.display = "flex";
+
+                okBtn.onclick = () => {
+                    overlay.style.display = "none";
+                    resolve(true);
+                };
+            });
+        };
+
+        function copyTrackingId(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showAlert("Tracking ID copied: " + code, "Copied", "success");
+            });
+        }
+
+        function parseFlexibleDate(dateStr) {
+            if (!dateStr) return null;
+            if (typeof dateStr === "object" && typeof dateStr.toDate === "function") {
+                return dateStr.toDate();
+            }
+            const cleanStr = String(dateStr).trim();
+            const dmyMatch = cleanStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (dmyMatch) {
+                const day = parseInt(dmyMatch[1], 10);
+                const month = parseInt(dmyMatch[2], 10) - 1;
+                const year = parseInt(dmyMatch[3], 10);
+                const parsed = new Date(year, month, day);
+                if (!isNaN(parsed.getTime())) return parsed;
+            }
+            const fallback = new Date(cleanStr);
+            return isNaN(fallback.getTime()) ? null : fallback;
+        }
+
+        function getReturnWindowStatus(order) {
+            const refDateStr = order.deliveredAt || order.updatedAt || order.orderDate;
+            const refDate = parseFlexibleDate(refDateStr);
+            if (!refDate) {
+                return { isExpired: false, daysLeft: 7 };
+            }
+            const now = new Date();
+            const msInDay = 24 * 60 * 60 * 1000;
+            const daysPassed = Math.floor((now.getTime() - refDate.getTime()) / msInDay);
+            const daysLeft = 7 - daysPassed;
+            return {
+                isExpired: daysPassed >= 7,
+                daysLeft: Math.max(0, daysLeft)
+            };
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+            authDomain: "pinki-latest-fashions.firebaseapp.com",
+            projectId: "pinki-latest-fashions",
+            storageBucket: "pinki-latest-fashions.firebasestorage.app",
+            messagingSenderId: "668264461811",
+            appId: "1:668264461811:web:d51468e474750e69634e86",
+            measurementId: "G-21HR2KLRJY"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+        if (!loggedInRaw) {
+            window.location.href = "account.html";
+        }
+        
+        const currentUser = loggedInRaw ? JSON.parse(loggedInRaw) : {};
+        document.getElementById("user-info").innerText = currentUser.name ? `Hello, ${currentUser.name}` : "";
+
+        let selectedReturnDocId = null;
+        let selectedReturnOrderName = "";
+        let selectedCancelDocId = null;
+        let loadedOrdersMap = {};
+        window.returnPhotos = { front: "", back: "", right: "", left: "" };
+        window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
+        window.returnPaymentProofImage = "";
+        window.cancelPaymentProofImage = "";
+        window.unboxingVideoBase64 = ""; // Video base64 store
+
+        function isOnlineOrder(order) {
+            const pm = (order.paymentMethod || "").toUpperCase();
+            const ps = (order.paymentStatus || "").toUpperCase();
+            return pm.includes("ONLINE") || pm.includes("UPI") || pm.includes("PAID") || ps.includes("PAID");
+        }
+
+        // --- DYNAMIC REASON HANDLERS ---
+        function handleReturnReasonChange() {
+            const val = document.getElementById("return-reason-select").value;
+            const otherBox = document.getElementById("return-other-reason-box");
+            const videoBox = document.getElementById("return-unboxing-video-box");
+
+            if (val === "Other") {
+                otherBox.classList.remove("hidden");
+            } else {
+                otherBox.classList.add("hidden");
+            }
+
+            if (val === "Damaged / Defective Product" || val === "Wrong Item Received") {
+                videoBox.classList.remove("hidden");
+            } else {
+                videoBox.classList.add("hidden");
+                window.unboxingVideoBase64 = "";
+                document.getElementById("return-video-file-status").innerText = "No video file selected yet";
+                document.getElementById("return-video-file-status").className = "text-[11px] font-semibold text-stone-500 text-center";
+            }
+        }
+
+        function handleCancelReasonChange() {
+            const val = document.getElementById("cancel-reason-select").value;
+            const otherBox = document.getElementById("cancel-other-reason-box");
+            if (val === "Other") {
+                otherBox.classList.remove("hidden");
+            } else {
+                otherBox.classList.add("hidden");
+            }
+        }
+
+        function handleUnboxingVideoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Size check (max approx 15MB to prevent Firestore limits)
+            if (file.size > 15 * 1024 * 1024) {
+                showAlert("Video file size is too large. Please select a video under 15MB.", "File Too Large", "error");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window.unboxingVideoBase64 = e.target.result;
+                const statusEl = document.getElementById("return-video-file-status");
+                statusEl.innerText = `✓ Video attached successfully (${file.name})`;
+                statusEl.className = "text-[11px] font-bold text-emerald-600 text-center";
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handlePaymentProofUpload(event, mode) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 600;
+                    const scaleSize = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
+                    canvas.width = img.width * scaleSize;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedData = canvas.toDataURL("image/jpeg", 0.7);
+
+                    if (mode === "return") {
+                        window.returnPaymentProofImage = compressedData;
+                        const prev = document.getElementById("return-payment-proof-preview");
+                        prev.src = compressedData;
+                        prev.classList.remove("hidden");
+                    } else {
+                        window.cancelPaymentProofImage = compressedData;
+                        const prev = document.getElementById("cancel-payment-proof-preview");
+                        prev.src = compressedData;
+                        prev.classList.remove("hidden");
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function toggleRefundFields() {
+            const selectedMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
+            const upiBox = document.getElementById("refund-upi-box");
+            const bankBox = document.getElementById("refund-bank-box");
+
+            if (selectedMethod === "UPI") {
+                upiBox.classList.remove("hidden");
+                bankBox.classList.add("hidden");
+            } else {
+                upiBox.classList.add("hidden");
+                bankBox.classList.remove("hidden");
+            }
+        }
+
+        function handleAnglePhoto(event, angle, mode) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 500;
+                    const scaleSize = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
+                    canvas.width = img.width * scaleSize;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const compressedData = canvas.toDataURL("image/jpeg", 0.65);
+
+                    if (mode === "return") {
+                        window.returnPhotos[angle] = compressedData;
+                        const previewImg = document.getElementById(`return-preview-${angle}`);
+                        previewImg.src = compressedData;
+                        previewImg.classList.remove("hidden");
+                        updateAnglePhotoCount("return", 3);
+                    } else if (mode === "review") {
+                        window.reviewAnglePhotos[angle] = compressedData;
+                        const previewImg = document.getElementById(`review-preview-${angle}`);
+                        previewImg.src = compressedData;
+                        previewImg.classList.remove("hidden");
+                        updateAnglePhotoCount("review", 2);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateAnglePhotoCount(mode, minRequired) {
+            const store = (mode === "return") ? window.returnPhotos : window.reviewAnglePhotos;
+            const count = Object.values(store).filter(val => val !== "").length;
+            const statusElem = document.getElementById(`${mode}-photo-count`);
+            if (!statusElem) return;
+
+            statusElem.innerText = `Uploaded: ${count} / ${minRequired} minimum required`;
+            if (count >= minRequired) {
+                statusElem.className = "text-xs font-bold text-emerald-600 text-right";
+            } else {
+                statusElem.className = "text-xs font-semibold text-stone-500 text-right";
+            }
+        }
+
+        async function loadUserOrders() {
+            const ordersList = document.getElementById("orders-list");
+            const loading = document.getElementById("loading");
+            const noOrders = document.getElementById("no-orders");
+
+            if (!currentUser.email) {
+                loading.classList.add("hidden");
+                noOrders.classList.remove("hidden");
+                return;
+            }
+
+            const loggedEmail = currentUser.email.trim().toLowerCase();
+
+            try {
+                const snapshot = await db.collection("orders").get();
+                loading.classList.add("hidden");
+
+                const matchedOrders = [];
+                loadedOrdersMap = {};
+
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    const dbEmail = (order.email || order.userEmail || "").trim().toLowerCase();
+                    
+                    if (dbEmail === loggedEmail) {
+                        const item = { id: doc.id, ...order };
+                        matchedOrders.push(item);
+                        loadedOrdersMap[doc.id] = item;
+                    }
+                });
+
+                if (matchedOrders.length === 0) {
+                    noOrders.classList.remove("hidden");
+                    ordersList.innerHTML = "";
+                    return;
+                }
+
+                noOrders.classList.add("hidden");
+                ordersList.innerHTML = "";
+
+                matchedOrders.forEach(order => {
+                    const docId = order.id;
+                    const statusRaw = (order.deliveryStatus || order.status || "packing").toLowerCase();
+                    const isCancelled = statusRaw.includes("cancel") || order.deliveryStatus === "कैंसिल किया गया";
+                    const isReturnRejected = statusRaw === "return_rejected" || statusRaw === "return rejected";
+                    const isReturnFlow = !isReturnRejected && !isCancelled && (
+                        statusRaw.includes("return") || 
+                        statusRaw.includes("pickup") || 
+                        statusRaw.includes("picked") || 
+                        order.deliveryStatus === "रिटर्न रिक्वेस्ट दर्ज"
+                    );
+                    const isDelivered = statusRaw === "delivered";
+                    const returnWindow = getReturnWindowStatus(order);
+
+                    let trackingBoxHTML = "";
+                    if (order.trackingId || order.courierName || order.expectedDelivery) {
+                        trackingBoxHTML = `
+                            <div class="mt-2.5 bg-blue-50/80 border border-blue-200 rounded-xl p-2.5 text-xs space-y-1">
+                                <div class="font-bold text-blue-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-truck-fast"></i> Shipment & Tracking Details
+                                </div>
+                                ${order.courierName ? `<div class="text-stone-700">Courier Partner: <b>${order.courierName}</b></div>` : ''}
+                                ${order.trackingId ? `
+                                    <div class="flex items-center gap-2 text-stone-700">
+                                        <span>Tracking / AWB ID: <b class="font-mono text-blue-800">${order.trackingId}</b></span>
+                                        <button onclick="copyTrackingId('${order.trackingId}')" class="px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-bold hover:bg-blue-700">
+                                            <i class="fa-regular fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                ` : ''}
+                                ${order.expectedDelivery ? `<div class="text-emerald-700 font-semibold">Expected Delivery: ${order.expectedDelivery}</div>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    let returnStatusBoxHTML = "";
+                    if (isReturnRejected) {
+                        returnStatusBoxHTML = `
+                            <div class="mt-2.5 bg-red-50 border border-red-200 rounded-xl p-2.5 text-xs space-y-1">
+                                <div class="font-bold text-red-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-xmark"></i> Return Request Rejected
+                                </div>
+                                <div class="text-red-800">Reason: <b>${order.returnRejectionReason || order.rejectionReason || "Did not meet return policy guidelines."}</b></div>
+                            </div>
+                        `;
+                    } else if (isReturnFlow || isCancelled) {
+                        returnStatusBoxHTML = `
+                            <div class="mt-2.5 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs space-y-1">
+                                <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-rotate-left"></i> Status: <span class="underline">${order.deliveryStatus}</span>
+                                </div>
+                                ${order.unboxingVideoData ? `<div class="text-stone-700">Unboxing Video: <span class="text-emerald-700 font-bold">✓ Attached</span></div>` : ''}
+                                ${order.paymentUTR ? `<div class="text-stone-700">Submitted UTR: <b class="font-mono text-blue-700">${order.paymentUTR}</b></div>` : ''}
+                                ${order.refundAccountSummary ? `<div class="text-stone-700">Refund To: <b>${order.refundAccountSummary}</b></div>` : ''}
+                                ${order.paymentStatus && order.paymentStatus.toLowerCase().includes("refund") ? `<div class="text-emerald-700 font-bold">✓ ${order.paymentStatus}</div>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    let rejectionAlertHTML = "";
+                    if (order.rejectionReason) {
+                        rejectionAlertHTML = `
+                            <div class="bg-red-50 border border-red-200 text-red-800 p-3 rounded-xl text-xs space-y-1 mt-2">
+                                <div class="font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Order Rejected by Store:
+                                </div>
+                                <div class="font-medium bg-white px-2 py-1 rounded border border-red-200">
+                                    ${order.rejectionReason}
+                                </div>
+                                <div class="text-[10px] text-red-600 pt-0.5">
+                                    कृपया सही भुगतान (Payment) करें या सहायता के लिए WhatsApp पर संपर्क करें।
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    let actionButtonsHTML = "";
+                    if (isCancelled) {
+                        actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-red-100 text-red-700 self-center">Order Cancelled</span>`;
+                    } else if (isReturnFlow) {
+                        actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 self-center">${order.deliveryStatus}</span>`;
+                    } else if (isDelivered || isReturnRejected) {
+                        if (!order.isRated) {
+                            actionButtonsHTML += `
+                                <button onclick="openRatingModal('${docId}', '${order.productId || 1}')" class="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-sm hover:bg-pink-700 shadow-sm transition">
+                                    ★ Rate Product
+                                </button>`;
+                        } else {
+                            actionButtonsHTML += `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-center">✓ Rated</span>`;
+                        }
+                        if (!isReturnRejected) {
+                            if (!returnWindow.isExpired) {
+                                actionButtonsHTML += `
+                                    <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
+                                        <i class="fa-solid fa-rotate-left mr-1"></i> Return Product
+                                    </button>
+                                    <span class="text-[11px] text-stone-500 text-center font-medium">Return valid for ${returnWindow.daysLeft} more day(s)</span>`;
+                            } else {
+                                actionButtonsHTML += `
+                                    <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-stone-100 text-stone-500 text-center border border-stone-200">
+                                        Return Window Closed (7 Days)
+                                    </span>`;
+                            }
+                        }
+                    } else {
+                        actionButtonsHTML = `
+                            <button onclick="openCancelModal('${docId}')" class="px-4 py-2 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 shadow-sm transition">
+                                <i class="fa-solid fa-xmark mr-1"></i> Cancel Order
+                            </button>`;
+                    }
+
+                    const card = document.createElement("div");
+                    card.className = "bg-white p-5 rounded-2xl shadow-sm border border-stone-200 flex flex-col md:flex-row justify-between gap-4";
+
+                    card.innerHTML = `
+                        <div class="space-y-1 flex-grow">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-xs bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full">ID: ${order.orderId || docId}</span>
+                                <span class="text-xs text-stone-500">${order.orderDate || ""}</span>
+                            </div>
+                            <h2 class="text-lg font-bold text-stone-800">${order.productName || "Product"}</h2>
+                            <p class="text-sm text-stone-600">Size: <span class="font-medium">${order.size || "Free Size"}</span> | Qty: <span class="font-medium">${order.quantity || 1}</span></p>
+                            <p class="text-sm text-stone-600">Total Amount: <span class="font-bold text-pink-600">₹${order.totalAmount}</span> (${order.paymentMethod || "COD"} - <span class="text-xs font-semibold">${order.paymentStatus || "Pending"}</span>)</p>
+                            <p class="text-sm">Order Status: 
+                                <span class="font-bold capitalize ${isCancelled || isReturnRejected ? 'text-red-600' : isReturnFlow ? 'text-amber-600' : isDelivered ? 'text-emerald-600' : 'text-blue-600'}">
+                                    ${order.deliveryStatus || "Processing"}
+                                </span>
+                            </p>
+                            ${trackingBoxHTML}
+                            ${returnStatusBoxHTML}
+                            ${rejectionAlertHTML}
+                        </div>
+
+                        <div class="flex md:flex-col justify-end gap-2 shrink-0">
+                            ${actionButtonsHTML}
+                        </div>
+                    `;
+
+                    ordersList.appendChild(card);
+                });
+
+            } catch (err) {
+                loading.innerText = "Error loading orders: " + err.message;
+            }
+        }
+
+        // --- CANCEL ORDER MODAL LOGIC ---
+        function openCancelModal(docId) {
+            selectedCancelDocId = docId;
+            const orderObj = loadedOrdersMap[docId] || {};
+            window.cancelPaymentProofImage = "";
+            document.getElementById("cancel-reason-select").value = "";
+            document.getElementById("cancel-other-input").value = "";
+            document.getElementById("cancel-other-reason-box").classList.add("hidden");
+            document.getElementById("cancel-utr-input").value = "";
+            document.getElementById("cancel-refund-upi").value = "";
+            const prev = document.getElementById("cancel-payment-proof-preview");
+            prev.src = "";
+            prev.classList.add("hidden");
+
+            const onlineBox = document.getElementById("cancel-online-refund-box");
+            if (isOnlineOrder(orderObj)) {
+                onlineBox.classList.remove("hidden");
+            } else {
+                onlineBox.classList.add("hidden");
+            }
+
+            document.getElementById("cancel-modal").classList.remove("hidden");
+        }
+
+        function closeCancelModal() {
+            document.getElementById("cancel-modal").classList.add("hidden");
+            selectedCancelDocId = null;
+        }
+
+        async function confirmCancelOrderSubmit() {
+            if (!selectedCancelDocId) return;
+            const orderObj = loadedOrdersMap[selectedCancelDocId] || {};
+            
+            const reasonSelect = document.getElementById("cancel-reason-select").value;
+            let reason = reasonSelect;
+            if (reasonSelect === "Other") {
+                reason = document.getElementById("cancel-other-input").value.trim();
+            }
+
+            if (!reason) {
+                await showAlert("Please select or write the reason for cancelling this order.", "Reason Required", "error");
+                return;
+            }
+
+            const updatePayload = {
+                deliveryStatus: "cancelled",
+                returnReason: `Cancelled: ${reason}`,
+                cancelReason: reason,
+                cancelledAt: new Date().toLocaleString()
+            };
+
+            if (isOnlineOrder(orderObj)) {
+                const utr = document.getElementById("cancel-utr-input").value.trim();
+                const upi = document.getElementById("cancel-refund-upi").value.trim();
+
+                if (!utr || utr.length < 6) {
+                    await showAlert("Please enter your Online Payment UTR / Transaction ID for refund verification.", "UTR Required", "error");
+                    return;
+                }
+                if (!upi || !upi.includes("@")) {
+                    await showAlert("Please enter a valid UPI ID where you want your refund.", "Refund UPI Required", "error");
+                    return;
+                }
+                if (!window.cancelPaymentProofImage) {
+                    await showAlert("Please upload your Payment Screenshot for refund verification.", "Screenshot Required", "error");
+                    return;
+                }
+
+                updatePayload.paymentUTR = utr;
+                updatePayload.refundAccountSummary = `UPI: ${upi} | UTR: ${utr}`;
+                updatePayload.proofImage = window.cancelPaymentProofImage;
+                updatePayload.returnImages = [window.cancelPaymentProofImage];
+                updatePayload.returnReason = `Cancelled (Online Paid) - Reason: ${reason} | UTR: ${utr} | Refund UPI: ${upi}`;
+            }
+
+            const btn = document.getElementById("confirm-cancel-btn");
+            btn.disabled = true;
+            btn.innerText = "Cancelling...";
+
+            try {
+                await db.collection("orders").doc(selectedCancelDocId).update(updatePayload);
+                closeCancelModal();
+                await showAlert("Your order has been cancelled successfully.", "Order Cancelled", "success");
+                loadUserOrders();
+            } catch (err) {
+                await showAlert("Error occurred: " + err.message, "Error", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Confirm Cancel";
+            }
+        }
+
+        // --- RETURN MODAL LOGIC ---
+        function openReturnModal(docId) {
+            const orderObj = loadedOrdersMap[docId] || {};
+            const winStatus = getReturnWindowStatus(orderObj);
+            if (winStatus.isExpired) {
+                showAlert("The 7-day return window for this order has expired.", "Return Window Closed", "error");
+                loadUserOrders();
+                return;
+            }
+
+            selectedReturnDocId = docId;
+            const registeredName = (orderObj.userName || currentUser.name || "").trim();
+            selectedReturnOrderName = registeredName;
+
+            window.returnPhotos = { front: "", back: "", right: "", left: "" };
+            window.returnPaymentProofImage = "";
+            window.unboxingVideoBase64 = "";
+            document.getElementById("return-reason-select").value = "";
+            document.getElementById("return-other-input").value = "";
+            document.getElementById("return-other-reason-box").classList.add("hidden");
+            document.getElementById("return-unboxing-video-box").classList.add("hidden");
+            document.getElementById("return-video-file-status").innerText = "No video file selected yet";
+            document.getElementById("return-video-file-status").className = "text-[11px] font-semibold text-stone-500 text-center";
+            document.getElementById("return-utr-input").value = "";
+            document.getElementById("refund-upi-id").value = "";
+            document.getElementById("refund-bank-name").value = "";
+            document.getElementById("refund-acc-number").value = "";
+            document.getElementById("refund-ifsc").value = "";
+            document.getElementById("refund-name-confirm").checked = false;
+
+            const proofPrev = document.getElementById("return-payment-proof-preview");
+            proofPrev.src = "";
+            proofPrev.classList.add("hidden");
+
+            const onlineProofBox = document.getElementById("return-online-proof-box");
+            if (isOnlineOrder(orderObj)) {
+                onlineProofBox.classList.remove("hidden");
+            } else {
+                onlineProofBox.classList.add("hidden");
+            }
+
+            document.getElementById("required-holder-name-badge").innerText = registeredName || "your registered name";
+            document.getElementById("confirm-holder-text").innerText = registeredName || "me";
+            document.getElementById("refund-upi-holder").value = registeredName;
+            document.getElementById("refund-acc-name").value = registeredName;
+
+            const upiRadio = document.querySelector('input[name="refund-method"][value="UPI"]');
+            if (upiRadio) upiRadio.checked = true;
+            toggleRefundFields();
+            
+            ['front', 'back', 'right', 'left'].forEach(angle => {
+                const img = document.getElementById(`return-preview-${angle}`);
+                img.src = "";
+                img.classList.add("hidden");
+            });
+            updateAnglePhotoCount("return", 3);
+            document.getElementById("return-modal").classList.remove("hidden");
+        }
+
+        function closeReturnModal() {
+            document.getElementById("return-modal").classList.add("hidden");
+            selectedReturnDocId = null;
+            selectedReturnOrderName = "";
+        }
+
+        async function submitReturnRequest() {
+            const orderObj = loadedOrdersMap[selectedReturnDocId] || {};
+            if (getReturnWindowStatus(orderObj).isExpired) {
+                await showAlert("Sorry, the 7-day return window has expired.", "Return Window Closed", "error");
+                closeReturnModal();
+                loadUserOrders();
+                return;
+            }
+
+            const reasonSelect = document.getElementById("return-reason-select").value;
+            let reason = reasonSelect;
+            if (!reason) {
+                await showAlert("Please select a return reason.", "Reason Required", "error");
+                return;
+            }
+            if (reasonSelect === "Other") {
+                reason = document.getElementById("return-other-input").value.trim();
+                if (!reason) {
+                    await showAlert("Please specify your return reason.", "Reason Required", "error");
+                    return;
+                }
+            }
+
+            if (reasonSelect === "Damaged / Defective Product" || reasonSelect === "Wrong Item Received") {
+                if (!window.unboxingVideoBase64) {
+                    await showAlert("An Unboxing Video file upload is mandatory for Damaged or Wrong Item claims.", "Unboxing Video Required", "error");
+                    return;
+                }
+            }
+
+            const refundMethod = document.querySelector('input[name="refund-method"]:checked')?.value || "UPI";
+            const isNameConfirmed = document.getElementById("refund-name-confirm").checked;
+            const submitBtn = document.getElementById("submit-return-btn");
+            
+            const uploadedPhotosUrls = Object.values(window.returnPhotos).filter(data => data !== "");
+
+            let utrNumber = "";
+            if (isOnlineOrder(orderObj)) {
+                utrNumber = document.getElementById("return-utr-input").value.trim();
+                if (!utrNumber || utrNumber.length < 6) {
+                    await showAlert("Please enter your 12-digit Online Payment UTR / Transaction ID.", "UTR Required", "error");
+                    return;
+                }
+                if (!window.returnPaymentProofImage) {
+                    await showAlert("Please upload your Online Payment Screenshot.", "Screenshot Required", "error");
+                    return;
+                }
+            }
+
+            const expectedName = (selectedReturnOrderName || currentUser.name || "").trim();
+            let refundDetailsObj = {
+                method: refundMethod,
+                verifiedAccountHolder: expectedName
+            };
+            let refundSummaryText = "";
+
+            if (refundMethod === "UPI") {
+                const upiId = document.getElementById("refund-upi-id").value.trim();
+                const holderInput = document.getElementById("refund-upi-holder").value.trim();
+
+                if (holderInput.toLowerCase() !== expectedName.toLowerCase()) {
+                    await showAlert(`Account holder name must match your order name (${expectedName}).`, "Name Mismatch", "error");
+                    return;
+                }
+                if (!upiId || !upiId.includes("@")) {
+                    await showAlert("Please enter a valid UPI ID (e.g., name@okicici) for your refund.", "Valid UPI ID Required", "error");
+                    return;
+                }
+                refundDetailsObj.upiId = upiId;
+                refundSummaryText = `UPI: ${upiId} (Holder: ${expectedName})`;
+            } else {
+                const accName = document.getElementById("refund-acc-name").value.trim();
+                const bankName = document.getElementById("refund-bank-name").value.trim();
+                const accNum = document.getElementById("refund-acc-number").value.trim();
+                const ifsc = document.getElementById("refund-ifsc").value.trim().toUpperCase();
+
+                if (accName.toLowerCase() !== expectedName.toLowerCase()) {
+                    await showAlert(`Bank Account Holder Name must exactly match your registered order name (${expectedName}).`, "Name Mismatch", "error");
+                    return;
+                }
+                if (!bankName || bankName.length < 2) {
+                    await showAlert("Please enter your Bank Name (e.g., State Bank of India, HDFC Bank).", "Bank Name Required", "error");
+                    return;
+                }
+                if (!accNum || ifsc.length < 8) {
+                    await showAlert("Please enter valid Bank Account Number and IFSC Code.", "Bank Details Required", "error");
+                    return;
+                }
+                refundDetailsObj.accountHolder = expectedName;
+                refundDetailsObj.bankName = bankName;
+                refundDetailsObj.accountNumber = accNum;
+                refundDetailsObj.ifscCode = ifsc;
+                refundSummaryText = `${expectedName} | ${bankName} | A/C: ${accNum} | IFSC: ${ifsc}`;
+            }
+
+            if (utrNumber) {
+                refundDetailsObj.paymentUTR = utrNumber;
+                refundSummaryText += ` | UTR: ${utrNumber}`;
+            }
+
+            if (!isNameConfirmed) {
+                await showAlert(`Please tick the confirmation box verifying that this account belongs to ${expectedName}.`, "Confirmation Required", "error");
+                return;
+            }
+
+            if (uploadedPhotosUrls.length < 3) {
+                await showAlert(`Please capture or upload at least 3 outfit photos. Currently uploaded: ${uploadedPhotosUrls.length}`, "Minimum 3 Photos Required", "error");
+                return;
+            }
+
+            if (window.returnPaymentProofImage) {
+                uploadedPhotosUrls.unshift(window.returnPaymentProofImage);
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
+            try {
+                await db.collection("orders").doc(selectedReturnDocId).update({
+                    deliveryStatus: "return_requested",
+                    returnReason: `${reason} (${refundSummaryText})${window.unboxingVideoBase64 ? ' [Unboxing Video Attached]' : ''}`,
+                    unboxingVideoData: window.unboxingVideoBase64 || "",
+                    refundDetails: refundDetailsObj,
+                    refundAccountSummary: refundSummaryText,
+                    paymentUTR: utrNumber || "",
+                    proofImage: window.returnPaymentProofImage || "",
+                    returnImages: uploadedPhotosUrls,
+                    returnImage: uploadedPhotosUrls[0],
+                    returnedAt: new Date().toLocaleString()
+                });
+                
+                await showAlert(`Return registered! Refund will be processed to ${expectedName}'s account after pickup verification.`, "Return Submitted", "success");
+                closeReturnModal();
+                loadUserOrders();
+            } catch (err) {
+                await showAlert("Problem occurred: " + err.message, "Error", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Return";
+            }
+        }
+
+        // --- RATING & REVIEW MODAL LOGIC ---
+        let selectedRating = 5;
+        let currentReviewOrderId = "";
+        let currentReviewProductId = "";
+
+        function openRatingModal(orderId, productId) {
+            currentReviewOrderId = orderId;
+            currentReviewProductId = (productId && productId !== "undefined") ? productId : "1";
+            selectedRating = 5;
+            updateStarsUI(5);
+            
+            document.getElementById("reviewComment").value = "";
+            window.reviewAnglePhotos = { front: "", back: "", right: "", left: "" };
+            ['front', 'back', 'right', 'left'].forEach(angle => {
+                const img = document.getElementById(`review-preview-${angle}`);
+                img.src = "";
+                img.classList.add("hidden");
+            });
+            updateAnglePhotoCount("review", 2);
+            document.getElementById("ratingModal").classList.remove("hidden");
+        }
+
+        function closeRatingModal() {
+            document.getElementById("ratingModal").classList.add("hidden");
+        }
+
+        function selectStar(star) {
+            selectedRating = star;
+            updateStarsUI(star);
+        }
+
+        function updateStarsUI(star) {
+            const stars = document.querySelectorAll(".star-btn");
+            stars.forEach((s, index) => {
+                s.style.color = index < star ? "#f59e0b" : "#d1d5db";
+            });
+        }
+
+        async function submitReview() {
+            const comment = document.getElementById("reviewComment").value.trim();
+            const submitBtn = document.getElementById("submitReviewBtn");
+
+            const anglePhotosObj = window.reviewAnglePhotos || {};
+            const photoBase64List = Object.values(anglePhotosObj).filter(val => val !== "");
+
+            if (!comment) {
+                await showAlert("Please write a short review about the outfit!", "Review Required", "error");
+                return;
+            }
+
+            if (photoBase64List.length < 2) {
+                await showAlert(`Please capture or upload at least 2 photos. Currently uploaded: ${photoBase64List.length}`, "Minimum 2 Photos Required", "error");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
+            try {
+                let firstName = "Verified Buyer";
+                const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+                if (loggedInRaw) {
+                    const userObj = JSON.parse(loggedInRaw);
+                    if (userObj.name && userObj.name.trim()) {
+                        firstName = userObj.name.trim().split(" ")[0];
+                    }
+                }
+
+                await db.collection("reviews").add({
+                    productId: String(currentReviewProductId),
+                    orderId: currentReviewOrderId,
+                    buyerName: firstName,
+                    rating: selectedRating,
+                    comment: comment,
+                    photos: photoBase64List,
+                    createdAt: new Date().toISOString()
+                });
+
+                await db.collection("orders").doc(currentReviewOrderId).update({
+                    isRated: true
+                });
+
+                closeRatingModal();
+                await showAlert("Thank you! Your review and photos have been published.", "Review Submitted", "success");
+                loadUserOrders();
+            } catch (err) {
+                await showAlert("Error submitting review: " + err.message, "Error", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Review";
+            }
+        }
+
+        loadUserOrders();
+    </script>
+<script src="security.js"></script>
+</body>
+</html>
