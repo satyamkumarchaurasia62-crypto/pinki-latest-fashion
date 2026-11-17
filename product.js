@@ -1,7 +1,7 @@
 // product.js - Clean & Fixed Version
 const firebaseConfig = {
   apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
-  pinki-latest-fashions.firebaseapp.com
+  authDomain: "pinki-latest-fashions.firebaseapp.com",
   projectId: "pinki-latest-fashions",
   storageBucket: "pinki-latest-fashions.firebasestorage.app",
   messagingSenderId: "668264461811",
