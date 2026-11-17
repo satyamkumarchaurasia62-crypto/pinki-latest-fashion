@@ -56,7 +56,7 @@ const PRODUCTS = [
 // नई Firebase Config (Pinki Latest Fashions के लिए)
 const firebaseConfig = {
   apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
-  authDomain: "pinkilatestfashions.in"
+  authDomain: "auth.pinkilatestfashions.in",
   projectId: "pinki-latest-fashions",
   storageBucket: "pinki-latest-fashions.firebasestorage.app",
   messagingSenderId: "668264461811",
