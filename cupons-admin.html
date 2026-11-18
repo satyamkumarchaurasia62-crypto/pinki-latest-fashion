@@ -86,6 +86,12 @@
           <input type="number" id="c-min-qty" value="3" min="1" placeholder="जैसे: 3" class="w-full font-bold border border-stone-300 rounded-xl px-3 py-2.5 bg-stone-50 focus:bg-white focus:border-pink-600 outline-none">
         </div>
 
+        <!-- NEW: Minimum Product Price (Min Item Price ₹) -->
+        <div>
+          <label class="block font-bold text-stone-700 mb-1">न्यूनतम प्रोडक्ट रेट (Min Product Price ₹) *</label>
+          <input type="number" id="c-min-product-price" value="499" min="0" placeholder="जैसे: 499" class="w-full font-bold border border-stone-300 rounded-xl px-3 py-2.5 bg-stone-50 focus:bg-white focus:border-pink-600 outline-none">
+        </div>
+
         <div>
           <label class="block font-bold text-stone-700 mb-1">कूपन की वैलिडिटी (Validity Type) *</label>
           <select id="c-type" onchange="toggleExpiryField()" class="w-full font-bold border border-stone-300 rounded-xl px-3 py-2.5 bg-stone-50 focus:bg-white focus:border-pink-600 outline-none">
@@ -241,6 +247,7 @@
       const discount = Number(document.getElementById("c-discount").value);
       const maxDiscount = Number(document.getElementById("c-max-discount").value) || 0;
       const minQty = Number(document.getElementById("c-min-qty").value) || 1;
+      const minProductPrice = Number(document.getElementById("c-min-product-price").value) || 0;
       const couponType = document.getElementById("c-type").value;
       const expiryDate = document.getElementById("c-expiry").value;
 
@@ -278,6 +285,7 @@
           discount: discount,
           maxDiscount: discType === "percent" ? maxDiscount : 0,
           minQty: minQty,
+          minProductPrice: minProductPrice,
           type: couponType,
           isUsed: false,
           createdAt: new Date().toLocaleString()
@@ -341,10 +349,11 @@
         listEl.innerHTML = items.map(c => {
           const isExpired = c.computedIsExpired;
           const minQ = c.minQty ?? 3;
+          const minPrice = c.minProductPrice ?? 0;
           const discText = c.discType === "percent" ? `${c.discount}% OFF (Max ₹${c.maxDiscount || 0})` : `Flat ₹${c.discount} OFF`;
           const typeText = c.type === "festival" ? "Festival (Date Expiry)" : "Lifetime (Never Expire)";
           const expiryText = c.expiryDate ? `Exp: ${new Date(c.expiryDate).toLocaleString()}` : "Never Expires";
-          const shareMsg = encodeURIComponent(`🎉 Special Offer from *Pinki Latest Fashion*!\nUse Coupon Code: *${c.id}*\nGet *${discText}* on ${minQ}+ outfits!`);
+          const shareMsg = encodeURIComponent(`🎉 Special Offer from *Pinki Latest Fashion*!\nUse Coupon Code: *${c.id}*\nGet *${discText}* on min item price ₹${minPrice} (${minQ}+ outfits)!`);
 
           return `
             <div class="border ${isExpired ? 'border-stone-200 bg-stone-50 opacity-80' : 'border-emerald-200 bg-emerald-50/40'} rounded-xl p-3.5 flex flex-col justify-between gap-2.5">
@@ -354,7 +363,8 @@
                     <span class="font-mono font-extrabold text-sm ${isExpired ? 'text-stone-500 line-through' : 'text-stone-900'}">${c.id}</span>
                     ${isExpired ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-200 text-stone-700">EXPIRED / USED</span>` : `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">ACTIVE</span>`}
                   </div>
-                  <div class="text-pink-600 font-extrabold mt-1">${discText} <span class="text-stone-600 font-medium">(Min ${minQ} outfits)</span></div>
+                  <div class="text-pink-600 font-extrabold mt-1">${discText}</div>
+                  <div class="text-[11px] text-stone-600 font-medium mt-0.5">Min Product Price: <b>₹${minPrice}</b> | Min Qty: <b>${minQ} outfits</b></div>
                   <div class="text-[11px] text-stone-500 mt-0.5">Type: <b>${typeText}</b></div>
                   <div class="text-[11px] text-stone-500">${expiryText}</div>
                   ${c.isUsed && c.usedBy ? `<div class="text-[11px] text-stone-500">Used by: <b>${c.usedBy}</b></div>` : ''}
