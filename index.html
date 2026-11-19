@@ -843,7 +843,7 @@
           activeCartCoupon = null;
           discountRow.classList.add("hidden");
         } else {
-          discountAmount = Math.min(subtotal + deliveryCharge, activeCartCoupon.discount);
+          discountAmount = activeCartCoupon.discount;
           discountRow.classList.remove("hidden");
           document.getElementById("bill-coupon-name").innerText = activeCartCoupon.code;
           document.getElementById("bill-discount").innerText = `-₹${discountAmount}`;
@@ -890,7 +890,7 @@
 
         const coupon = couponDoc.data();
 
-        // 2. एक्सपायरी स्टेटस चेक करें (ग्लोबल isUsed चेक हटा दिया गया है ताकि कूपन दूसरे यूजर्ज के लिए चालू रहे)
+        // 2. एक्सपायरी स्टेटस चेक करें
         if (coupon.type === "festival" && coupon.expiryDate) {
           if (new Date() > new Date(coupon.expiryDate)) {
             msgEl.innerHTML = `<span class="text-red-600">❌ इस कूपन की समय सीमा समाप्त हो चुकी है।</span>`;
@@ -900,10 +900,20 @@
           }
         }
 
-        // 3. प्रोडक्ट की न्यूनतम प्राइस रेंज चेक करें (नुकसान से बचाव)
-        const minAllowedPrice = coupon.minProdPrice || 0;
+        // 3. कम से कम कितने पीस (Min Outfits) चेक करें
+        const minRequiredQty = Number(coupon.minQty || 1);
+        const totalCartQty = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+        if (totalCartQty < minRequiredQty) {
+          msgEl.innerHTML = `<span class="text-red-600">❌ इस कूपन के लिए कार्ट में कम से कम ${minRequiredQty} आउटफिट्स होना ज़रूरी है!</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        // 4. न्यूनतम प्रोडक्ट रेट (Min Product Price) चेक करें (एडमिन पैनल के 'minProductPrice' फील्ड के साथ)
+        const minAllowedPrice = Number(coupon.minProductPrice || coupon.minProdPrice || 0);
         for (let item of shoppingCart) {
-          if (item.price < minAllowedPrice) {
+          if (Number(item.price) < minAllowedPrice) {
             msgEl.innerHTML = `<span class="text-red-600">❌ यह कूपन केवल ₹${minAllowedPrice} या उससे महंगे प्रोडक्ट्स पर लागू होता है!</span>`;
             activeCartCoupon = null;
             renderCartModal();
@@ -911,14 +921,14 @@
           }
         }
 
-        // 4. मोबाइल नंबर / यूजर की लिमिट चेक करें (पर-यूजर सिर्फ एक बार)
+        // 5. मोबाइल नंबर / यूजर की लिमिट चेक करें (पर-यूजर सिर्फ एक बार)
         const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
           msgEl.innerHTML = `<span class="text-red-600">कृपया कूपन लगाने से पहले लॉगिन करें!</span>`;
           return;
         }
         const user = JSON.parse(loggedInRaw);
-        const userMobile = user.phone || user.email; // मोबाइल या ईमेल से ट्रैकिंग
+        const userMobile = user.phone || user.email;
 
         const usageCheck = await db.collection("coupon_usages")
           .where("mobile", "==", userMobile)
@@ -932,14 +942,40 @@
           return;
         }
 
-        // सब कुछ सही होने पर कूपन एक्टिव करें
+        // 6. डिस्काउंट और अधिकतम छूट सीमा (Max Discount Cap) की सही गणना
+        let subtotal = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let discountVal = Number(coupon.discount) || 0;
+        let dType = (coupon.discType || coupon.discountType || "").toLowerCase();
+        
+        // एडमिन पैनल 'maxDiscount' नाम से सेव कर रहा है
+        let maxCapLimit = Number(coupon.maxDiscount ?? coupon.maxCap ?? 0);
+
+        let finalDiscount = 0;
+        let labelText = "";
+
+        if (dType === "flat" || dType === "rupees") {
+          finalDiscount = discountVal;
+          labelText = `₹${finalDiscount} फ्लैट छूट`;
+        } else {
+          // प्रतिशत (Percentage %) कैलकुलेशन
+          let rawPercentDiscount = Math.round((subtotal * discountVal) / 100);
+          if (maxCapLimit > 0) {
+            finalDiscount = Math.min(rawPercentDiscount, maxCapLimit);
+            labelText = `${discountVal}% छूट, अधिकतम ₹${maxCapLimit} तक`;
+          } else {
+            finalDiscount = rawPercentDiscount;
+            labelText = `${discountVal}% छूट`;
+          }
+        }
+
         activeCartCoupon = {
           code: coupon.code || inputCouponCode,
-          discount: Number(coupon.discount) || 10, // जैसे 10%
+          discount: finalDiscount,
+          minQty: minRequiredQty,
           minProdPrice: minAllowedPrice
         };
 
-        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ कूपन '${activeCartCoupon.code}' लागू हो गया है (${activeCartCoupon.discount}% छूट)!</span>`;
+        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ कूपन '${activeCartCoupon.code}' लागू हो गया है (${labelText})!</span>`;
         renderCartModal();
 
       } catch (err) {
@@ -950,7 +986,6 @@
     async function checkoutCart() {
       if (shoppingCart.length === 0) return;
 
-      // Policy Checkbox Validation Added Here
       const isPolicyChecked = document.getElementById("policy-agree-checkbox").checked;
       if (!isPolicyChecked) {
         await showAlert("कृपया आगे बढ़ने से पहले Return, Refund & Unboxing Video Policy के चेकबॉक्स पर टिक (Agree) करें!", "Policy Agreement Required", "error");
@@ -995,7 +1030,6 @@
           return;
         }
         
-        // चेक करें कि यूजर ने इस कूपन का पहले इस्तेमाल किया है या नहीं
         const userMobile = user.phone || user.email;
         const usageCheck = await db.collection("coupon_usages")
           .where("mobile", "==", userMobile)
@@ -1009,7 +1043,7 @@
           return;
         }
 
-        discountAmount = Math.min(subtotal + deliveryCharge, (subtotal * activeCartCoupon.discount) / 100);
+        discountAmount = activeCartCoupon.discount;
         appliedCode = activeCartCoupon.code;
       }
 
@@ -1173,7 +1207,6 @@
           });
         }
 
-        // केवल पर-यूजर यूसेज सेव होगा, ग्लोबल isUsed बंद नहीं किया जाएगा
         if (ctx.appliedCode) {
           const userMobile = ctx.user.phone || ctx.user.email;
           
