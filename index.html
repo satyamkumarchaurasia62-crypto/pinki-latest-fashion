@@ -866,10 +866,9 @@
     async function applyCartCoupon() {
       const input = document.getElementById("cart-coupon-input");
       const msgEl = document.getElementById("cart-coupon-msg");
-      const code = (input.value || "").trim().toUpperCase();
-      const totalCartQty = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+      const inputCouponCode = (input.value || "").trim().toUpperCase();
 
-      if (!code) {
+      if (!inputCouponCode) {
         msgEl.innerHTML = `<span class="text-red-600">Please enter a coupon code.</span>`;
         activeCartCoupon = null;
         renderCartModal();
@@ -879,41 +878,72 @@
       msgEl.innerHTML = `<span class="text-stone-500">Verifying coupon...</span>`;
 
       try {
-        const docSnap = await db.collection("coupons").doc(code).get();
-        if (!docSnap.exists) {
-          msgEl.innerHTML = `<span class="text-red-600">✕ Invalid coupon code.</span>`;
+        // 1. डेटाबेस से कूपन कोड ढूंढें
+        const couponDoc = await db.collection("coupons").doc(inputCouponCode).get();
+
+        if (!couponDoc.exists) {
+          msgEl.innerHTML = `<span class="text-red-600">❌ यह कूपन कोड गलत है!</span>`;
           activeCartCoupon = null;
           renderCartModal();
           return;
         }
 
-        const cData = docSnap.data();
-        if (cData.isUsed === true) {
-          msgEl.innerHTML = `<span class="text-red-600">✕ This coupon has already been used/expired.</span>`;
+        const coupon = couponDoc.data();
+
+        // 2. एक्सपायरी स्टेटस चेक करें (ग्लोबल isUsed चेक हटा दिया गया है ताकि कूपन दूसरे यूजर्ज के लिए चालू रहे)
+        if (coupon.type === "festival" && coupon.expiryDate) {
+          if (new Date() > new Date(coupon.expiryDate)) {
+            msgEl.innerHTML = `<span class="text-red-600">❌ इस कूपन की समय सीमा समाप्त हो चुकी है।</span>`;
+            activeCartCoupon = null;
+            renderCartModal();
+            return;
+          }
+        }
+
+        // 3. प्रोडक्ट की न्यूनतम प्राइस रेंज चेक करें (नुकसान से बचाव)
+        const minAllowedPrice = coupon.minProdPrice || 0;
+        for (let item of shoppingCart) {
+          if (item.price < minAllowedPrice) {
+            msgEl.innerHTML = `<span class="text-red-600">❌ यह कूपन केवल ₹${minAllowedPrice} या उससे महंगे प्रोडक्ट्स पर लागू होता है!</span>`;
+            activeCartCoupon = null;
+            renderCartModal();
+            return;
+          }
+        }
+
+        // 4. मोबाइल नंबर / यूजर की लिमिट चेक करें (पर-यूजर सिर्फ एक बार)
+        const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+        if (!loggedInRaw) {
+          msgEl.innerHTML = `<span class="text-red-600">कृपया कूपन लगाने से पहले लॉगिन करें!</span>`;
+          return;
+        }
+        const user = JSON.parse(loggedInRaw);
+        const userMobile = user.phone || user.email; // मोबाइल या ईमेल से ट्रैकिंग
+
+        const usageCheck = await db.collection("coupon_usages")
+          .where("mobile", "==", userMobile)
+          .where("couponCode", "==", coupon.code || inputCouponCode)
+          .get();
+
+        if (!usageCheck.empty) {
+          msgEl.innerHTML = `<span class="text-red-600">❌ आप इस कूपन का इस्तेमाल पहले ही कर चुके हैं, यह दोबारा लागू नहीं होगा!</span>`;
           activeCartCoupon = null;
           renderCartModal();
           return;
         }
 
-        const minRequiredQty = Number(cData.minQty ?? cData.min_order_quantity ?? 3);
-        if (totalCartQty < minRequiredQty) {
-          msgEl.innerHTML = `<span class="text-red-600 font-semibold">✕ Add at least ${minRequiredQty} outfits in cart to apply this coupon! (Currently: ${totalCartQty})</span>`;
-          activeCartCoupon = null;
-          renderCartModal();
-          return;
-        }
-
-        const discountAmt = Number(cData.discount) || 0;
+        // सब कुछ सही होने पर कूपन एक्टिव करें
         activeCartCoupon = {
-          code: code,
-          discount: discountAmt,
-          minQty: minRequiredQty
+          code: coupon.code || inputCouponCode,
+          discount: Number(coupon.discount) || 10, // जैसे 10%
+          minProdPrice: minAllowedPrice
         };
 
-        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Coupon '${code}' applied! ₹${discountAmt} deducted from total bill.</span>`;
+        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ कूपन '${activeCartCoupon.code}' लागू हो गया है (${activeCartCoupon.discount}% छूट)!</span>`;
         renderCartModal();
+
       } catch (err) {
-        msgEl.innerHTML = `<span class="text-red-600">Error verifying coupon.</span>`;
+        msgEl.innerHTML = `<span class="text-red-600">Error verifying coupon: ${err.message}</span>`;
       }
     }
 
@@ -957,18 +987,29 @@
       let appliedCode = "";
 
       if (activeCartCoupon) {
-        if (totalQty < activeCartCoupon.minQty) {
-          await showAlert(`Coupon '${activeCartCoupon.code}' requires at least ${activeCartCoupon.minQty} items in cart.`, "Condition Not Met", "error");
-          return;
-        }
         const freshSnap = await db.collection("coupons").doc(activeCartCoupon.code).get();
-        if (!freshSnap.exists || freshSnap.data().isUsed === true) {
-          await showAlert("Sorry! This coupon was just used/expired. Please remove it or try another.", "Coupon Expired", "error");
+        if (!freshSnap.exists) {
+          await showAlert("Sorry! This coupon is no longer available. Please remove it or try another.", "Coupon Invalid", "error");
           activeCartCoupon = null;
           renderCartModal();
           return;
         }
-        discountAmount = Math.min(subtotal + deliveryCharge, activeCartCoupon.discount);
+        
+        // चेक करें कि यूजर ने इस कूपन का पहले इस्तेमाल किया है या नहीं
+        const userMobile = user.phone || user.email;
+        const usageCheck = await db.collection("coupon_usages")
+          .where("mobile", "==", userMobile)
+          .where("couponCode", "==", activeCartCoupon.code)
+          .get();
+
+        if (!usageCheck.empty) {
+          await showAlert("❌ आप इस कूपन का इस्तेमाल पहले ही कर चुके हैं!", "Coupon Already Used", "error");
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        discountAmount = Math.min(subtotal + deliveryCharge, (subtotal * activeCartCoupon.discount) / 100);
         appliedCode = activeCartCoupon.code;
       }
 
@@ -1132,12 +1173,14 @@
           });
         }
 
+        // केवल पर-यूजर यूसेज सेव होगा, ग्लोबल isUsed बंद नहीं किया जाएगा
         if (ctx.appliedCode) {
-          await db.collection("coupons").doc(ctx.appliedCode).update({
-            isUsed: true,
-            usedBy: (ctx.user.email || "Customer"),
-            usedInOrder: ctx.batchOrderGroup,
-            usedAt: new Date().toLocaleString()
+          const userMobile = ctx.user.phone || ctx.user.email;
+          
+          await db.collection("coupon_usages").add({
+            mobile: userMobile,
+            couponCode: ctx.appliedCode,
+            usedAt: new Date().toISOString()
           });
         }
 
