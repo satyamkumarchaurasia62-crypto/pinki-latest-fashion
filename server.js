@@ -19,7 +19,9 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 
-// अगर डेटाबेस एक्सपोर्ट करना है तो ठीक है, बाकी सर्वर चालू रखने के लिए नीचे कोड है:
+// **यह लाइन यहाँ जोड़नी है:**
+app.use(express.static(__dirname));
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
