@@ -17,3 +17,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 module.exports = { db };
+PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
