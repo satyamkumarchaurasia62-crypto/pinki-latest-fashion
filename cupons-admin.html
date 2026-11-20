@@ -2,6 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Coupon Code Generator | Pinki Latest Fashions</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -141,14 +142,6 @@
   <script>
     const ADMIN_PASSCODE = "Satyam@2409";
     const ADMIN_EMAIL = "shyamk54124@gmail.com";
-
-  fetch('http://localhost:3000/api/products')
-    .then(response => response.json())
-    .then(result => {
-      console.log("Firebase se aaya data:", result);
-      // यहाँ तू अपना डेटा HTML में दिखा सकता है
-    })
-    .catch(err => console.error("Error:", err));
 
     const auth = firebase.auth();
 
