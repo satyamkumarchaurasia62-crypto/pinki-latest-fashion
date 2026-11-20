@@ -379,14 +379,13 @@
             };
         }
 
-    
-  fetch('http://localhost:3000/api/products')
-    .then(response => response.json())
-    .then(result => {
-      console.log("Firebase se aaya data:", result);
-      // यहाँ तू अपना डेटा HTML में दिखा सकता है
-    })
-    .catch(err => console.error("Error:", err));
+        // Correct API call using relative path
+        fetch('/api/products')
+          .then(response => response.json())
+          .then(result => {
+            console.log("Server se aaya data:", result);
+          })
+          .catch(err => console.error("Server API Error:", err));
 
         const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
