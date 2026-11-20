@@ -1,6 +1,9 @@
+const express = require("express");
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
 require('dotenv').config();
+
+const app = express();
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
@@ -13,12 +16,14 @@ const firebaseConfig = {
 };
 
 // Firebase ऐप इनिशियलाइज करें
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
-module.exports = { db };
+// अगर डेटाबेस एक्सपोर्ट करना है तो ठीक है, बाकी सर्वर चालू रखने के लिए नीचे कोड है:
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = { db };
