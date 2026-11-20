@@ -382,21 +382,14 @@
       });
     };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
-      authDomain: "auth.pinkilatestfashions.in",
-      projectId: "pinki-latest-fashions",
-      storageBucket: "pinki-latest-fashions.firebasestorage.app",
-      messagingSenderId: "668264461811",
-      appId: "1:668264461811:web:d51468e474750e69634e86",
-      measurementId: "G-21HR2KLRJY"
-    };
-
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
+  fetch('http://localhost:3000/api/products')
+    .then(response => response.json())
+    .then(result => {
+      console.log("Firebase se aaya data:", result);
+      // यहाँ तू अपना डेटा HTML में दिखा सकता है
+    })
+    .catch(err => console.error("Error:", err));
+    
     let isPhoneVerified = false;
     let isEditPhoneVerified = true;
     let phoneConfirmationResult = null;
