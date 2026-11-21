@@ -379,13 +379,20 @@
             };
         }
 
-        // Correct API call using relative path
-        fetch('/api/products')
-          .then(response => response.json())
-          .then(result => {
-            console.log("Server se aaya data:", result);
-          })
-          .catch(err => console.error("Server API Error:", err));
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+            authDomain: "pinki-latest-fashions.firebaseapp.com",
+            projectId: "pinki-latest-fashions",
+            storageBucket: "pinki-latest-fashions.firebasestorage.app",
+            messagingSenderId: "668264461811",
+            appId: "1:668264461811:web:d51468e474750e69634e86",
+            measurementId: "G-21HR2KLRJY"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
         const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
