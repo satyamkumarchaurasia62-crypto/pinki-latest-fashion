@@ -335,11 +335,9 @@
     <div class="mt-6 text-center border-t border-stone-100 pt-4">
       <a href="privacy-policy.html" class="text-xs text-stone-500 hover:text-pink-600 font-medium transition">Privacy Policy</a>
     </div>
-    <div class="mt-2 text-center">
-      <a href="about.html" class="inline-flex items-center px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-full transition whitespace-nowrap">
-        <i class="fa-solid fa-circle-info mr-1"></i> About Us / हमारे बारे में
-      </a>
-    </div>
+<a href="about.html" class="inline-flex items-center px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-full transition whitespace-nowrap">
+    <i class="fa-solid fa-circle-info mr-1"></i> About Us / हमारे बारे में
+</a>
 
   </div>
 
@@ -384,14 +382,21 @@
       });
     };
 
-    // Correct API call using relative path so it works seamlessly on Render / Custom Domain
-    fetch('/api/products')
-      .then(response => response.json())
-      .then(result => {
-        console.log("Server se aaya data:", result);
-      })
-      .catch(err => console.error("Server API Error:", err));
-    
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+      authDomain: "auth.pinkilatestfashions.in",
+      projectId: "pinki-latest-fashions",
+      storageBucket: "pinki-latest-fashions.firebasestorage.app",
+      messagingSenderId: "668264461811",
+      appId: "1:668264461811:web:d51468e474750e69634e86",
+      measurementId: "G-21HR2KLRJY"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
     let isPhoneVerified = false;
     let isEditPhoneVerified = true;
     let phoneConfirmationResult = null;
@@ -422,7 +427,6 @@
           return;
         }
 
-        // Fetch user directly from Firestore
         const userDoc = await db.collection("users").doc(email).get();
 
         if (userDoc.exists) {
