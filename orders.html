@@ -75,11 +75,25 @@
                     <div id="return-video-file-name" class="text-xs font-bold text-emerald-700 hidden text-center">✓ Video Selected</div>
                 </div>
 
-                <!-- Online Payment Proof Box -->
+                <!-- Online Payment Proof & Direct Payment Info Box -->
                 <div id="return-online-proof-box" class="hidden bg-blue-50/80 border border-blue-200 rounded-xl p-3.5 space-y-3">
                     <div class="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-receipt"></i> Online Payment Verification (UTR & Screenshot) *
+                        <i class="fa-solid fa-receipt"></i> Online Payment Verification & Account Details *
                     </div>
+
+                    <!-- Payment Info Display (UPI, A/c, IFSC & QR) -->
+                    <div class="bg-white p-3 rounded-lg border border-blue-200 space-y-2 text-xs">
+                        <div class="font-bold text-stone-700 text-center mb-1">Our Official Payment Details:</div>
+                        <div class="flex justify-between items-center bg-stone-50 p-2 rounded">
+                            <span><strong>UPI ID:</strong> paytm.s3e76cq@pty</span>
+                            <button type="button" onclick="copyText('paytm.s3e76cq@pty', this)" class="bg-pink-600 text-white px-2 py-1 rounded text-[10px] font-bold">Copy</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-stone-50 p-2 rounded">
+                            <span><strong>A/c No:</strong> 2747311708 | <strong>IFSC:</strong> KKBK0005028</span>
+                            <button type="button" onclick="copyText('2747311708', this)" class="bg-stone-800 text-white px-2 py-1 rounded text-[10px] font-bold">Copy A/c</button>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-stone-700 mb-1">12-Digit UTR / UPI Transaction ID *</label>
                         <input type="text" id="return-utr-input" placeholder="Enter 12-digit UTR / Ref No." class="w-full border border-blue-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-600 font-mono">
@@ -234,6 +248,14 @@
                     <div class="font-bold text-blue-900 flex items-center gap-1.5">
                         <i class="fa-solid fa-building-columns"></i> Online Payment Refund Details *
                     </div>
+
+                    <!-- Payment Info Display -->
+                    <div class="bg-white p-2.5 rounded-lg border border-blue-200 space-y-1.5 text-xs">
+                        <div class="font-bold text-stone-700">Our Official Payment Details:</div>
+                        <div><strong>UPI ID:</strong> paytm.s3e76cq@pty</div>
+                        <div><strong>A/c No:</strong> 2747311708 | <strong>IFSC:</strong> KKBK0005028</div>
+                    </div>
+
                     <div>
                         <label class="block font-semibold text-stone-700 mb-1">12-Digit Payment UTR / Transaction ID *</label>
                         <input type="text" id="cancel-utr-input" placeholder="Enter 12-digit UTR Number" class="w-full border border-blue-300 rounded-lg px-3 py-2 bg-white font-mono">
@@ -352,6 +374,18 @@
                 };
             });
         };
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = btn.innerText;
+                btn.innerText = "Copied!";
+                btn.style.backgroundColor = "#10b981";
+                setTimeout(() => {
+                    btn.innerText = orig;
+                    btn.style.backgroundColor = "";
+                }, 2000);
+            });
+        }
 
         function parseFlexibleDate(dateStr) {
             if (!dateStr) return null;
@@ -592,7 +626,6 @@
                     } else if (isReturnFlow) {
                         actionButtonsHTML = `<span class="text-sm font-bold px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 self-center">${order.deliveryStatus}</span>`;
                     } else if (isDelivered || isReturnRejected) {
-                        // Rate Product Button
                         if (!order.isRated) {
                             actionButtonsHTML += `
                                 <button onclick="openRatingModal('${docId}', '${order.productId || 1}')" class="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-sm hover:bg-pink-700 shadow-sm transition">
@@ -602,7 +635,6 @@
                             actionButtonsHTML += `<span class="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-center">✓ Rated</span>`;
                         }
 
-                        // Return Button & Window Check
                         if (!returnWindow.isExpired && !isReturnRejected) {
                             actionButtonsHTML += `
                                 <button onclick="openReturnModal('${docId}')" class="px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 shadow-sm transition">
@@ -648,7 +680,6 @@
             }
         }
 
-        // --- CANCEL ORDER MODAL & RULES ---
         function openCancelModal(docId) {
             const orderObj = loadedOrdersMap[docId] || {};
             const statusRaw = (orderObj.deliveryStatus || "").toLowerCase();
@@ -751,7 +782,6 @@
             }
         }
 
-        // --- RETURN MODAL ---
         function openReturnModal(docId) {
             const orderObj = loadedOrdersMap[docId] || {};
             const winStatus = getReturnWindowStatus(orderObj);
@@ -920,7 +950,6 @@
             }
         }
 
-        // --- RATING & REVIEW MODAL ---
         let selectedRating = 5;
         let currentReviewOrderId = "";
         let currentReviewProductId = "";
