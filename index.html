@@ -253,7 +253,7 @@
           </div>
         </div>
 
-        <!-- Return, Refund & Unboxing Policy Agreement Box Added Here -->
+        <!-- Return, Refund & Unboxing Policy Agreement Box -->
         <div class="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-3 text-xs">
           <div class="flex items-center justify-between">
             <span class="font-bold text-stone-900">📜 Return, Refund & Cancellation Policy</span>
@@ -296,7 +296,7 @@
     </div>
   </div>
 
-  <!-- ONLINE UPI PAYMENT POPUP -->
+  <!-- ONLINE UPI PAYMENT POPUP (Updated with New QR / Details) -->
   <div id="upiPaymentModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       
@@ -308,12 +308,26 @@
       </div>
 
       <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2.5 text-center">
-        <div class="text-xs font-bold text-emerald-900">Step 1: Pay Amount to Store UPI</div>
+        <div class="text-xs font-bold text-emerald-900">Step 1: Pay Amount to Store UPI / QR</div>
         <div class="text-2xl font-extrabold text-pink-600" id="upi-modal-amount">₹0</div>
-        <div class="bg-white border border-emerald-300 rounded-lg py-1.5 px-3 inline-flex items-center gap-2">
-          <span class="font-mono font-bold text-xs text-stone-800">8130748293@pthdfc</span>
-          <button type="button" onclick="copyStoreUpiId()" class="text-[11px] font-bold text-emerald-700 hover:underline">Copy</button>
+        
+        <!-- QR Code Image Added Here -->
+        <div class="flex justify-center my-2">
+          <img src="26332.jpg" alt="Payment QR Code" class="w-40 h-40 object-contain rounded-xl border border-emerald-300 p-1 bg-white shadow-sm">
         </div>
+
+        <div class="bg-white border border-emerald-300 rounded-lg py-1.5 px-3 inline-flex items-center gap-2">
+          <span class="font-mono font-bold text-xs text-stone-800">paytm.s3e76cq@pty</span>
+          <button type="button" onclick="copyStoreUpiId()" class="text-[11px] font-bold text-emerald-700 hover:underline">Copy UPI</button>
+        </div>
+
+        <!-- Bank Details Display Inside UPI Modal -->
+        <div class="bg-white p-2.5 rounded-lg border border-emerald-200 text-left text-xs space-y-1 text-stone-700">
+          <div class="font-bold text-stone-900">Direct Bank Transfer Also Available:</div>
+          <div><strong>A/c No:</strong> 2747311708</div>
+          <div><strong>IFSC Code:</strong> KKBK0005028</div>
+        </div>
+
         <div>
           <button type="button" onclick="openUpiAppForPendingOrder()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-mobile-screen-button"></i> Open UPI App (GPay / PhonePe / Paytm)
@@ -384,7 +398,7 @@
     }
   </style>
 
-  <!-- 1. Firebase Scripts Sabse Pehle Load Hongi -->
+  <!-- 1. Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script>
@@ -735,8 +749,8 @@
     }
 
     function copyStoreUpiId() {
-      navigator.clipboard.writeText("8130748293@pthdfc").then(() => {
-        showAlert("UPI ID copied: 8130748293@pthdfc", "Copied", "success");
+      navigator.clipboard.writeText("paytm.s3e76cq@pty").then(() => {
+        showAlert("UPI ID copied: paytm.s3e76cq@pty", "Copied", "success");
       });
     }
 
@@ -882,7 +896,6 @@
       msgEl.innerHTML = `<span class="text-stone-500">Verifying coupon...</span>`;
 
       try {
-        // 1. डेटाबेस से कूपन कोड ढूंढें
         const couponDoc = await db.collection("coupons").doc(inputCouponCode).get();
 
         if (!couponDoc.exists) {
@@ -894,7 +907,6 @@
 
         const coupon = couponDoc.data();
 
-        // 2. एक्सपायरी स्टेटस चेक करें
         if (coupon.type === "festival" && coupon.expiryDate) {
           if (new Date() > new Date(coupon.expiryDate)) {
             msgEl.innerHTML = `<span class="text-red-600">❌ इस कूपन की समय सीमा समाप्त हो चुकी है।</span>`;
@@ -904,7 +916,6 @@
           }
         }
 
-        // 3. कम से कम कितने पीस (Min Outfits) चेक करें
         const minRequiredQty = Number(coupon.minQty || 1);
         const totalCartQty = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
         if (totalCartQty < minRequiredQty) {
@@ -914,7 +925,6 @@
           return;
         }
 
-        // 4. न्यूनतम प्रोडक्ट रेट (Min Product Price) चेक करें (एडमिन पैनल के 'minProductPrice' फील्ड के साथ)
         const minAllowedPrice = Number(coupon.minProductPrice || coupon.minProdPrice || 0);
         for (let item of shoppingCart) {
           if (Number(item.price) < minAllowedPrice) {
@@ -925,7 +935,6 @@
           }
         }
 
-        // 5. मोबाइल नंबर / यूजर की लिमिट चेक करें (पर-यूजर सिर्फ एक बार)
         const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
         if (!loggedInRaw) {
           msgEl.innerHTML = `<span class="text-red-600">कृपया कूपन लगाने से पहले लॉगिन करें!</span>`;
@@ -946,12 +955,9 @@
           return;
         }
 
-        // 6. डिस्काउंट और अधिकतम छूट सीमा (Max Discount Cap) की सही गणना
         let subtotal = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         let discountVal = Number(coupon.discount) || 0;
         let dType = (coupon.discType || coupon.discountType || "").toLowerCase();
-        
-        // एडमिन पैनल 'maxDiscount' नाम से सेव कर रहा है
         let maxCapLimit = Number(coupon.maxDiscount ?? coupon.maxCap ?? 0);
 
         let finalDiscount = 0;
@@ -961,7 +967,6 @@
           finalDiscount = discountVal;
           labelText = `₹${finalDiscount} फ्लैट छूट`;
         } else {
-          // प्रतिशत (Percentage %) कैलकुलेशन
           let rawPercentDiscount = Math.round((subtotal * discountVal) / 100);
           if (maxCapLimit > 0) {
             finalDiscount = Math.min(rawPercentDiscount, maxCapLimit);
@@ -1092,7 +1097,7 @@
 
     function openUpiAppForPendingOrder() {
       if (!pendingUpiOrderPayload) return;
-      const myUpiId = "8130748293@pthdfc";
+      const myUpiId = "paytm.s3e76cq@pty";
       const merchantName = "Pinki Latest Fashion";
       const amt = pendingUpiOrderPayload.grandTotal;
       const ref = pendingUpiOrderPayload.batchOrderGroup;
