@@ -55,6 +55,31 @@
       </div>
     </div>
 
+    <!-- CUSTOM DATE RANGE GST EXPORT PANEL -->
+    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 sm:p-5 border border-emerald-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+          <span>GSTR-1 Tax Report Generator (Custom Date)</span>
+        </div>
+        <p class="text-xs text-emerald-700">तारीख चुनें और सीधे GSTR-1 फाइलिंग के लिए तैयार Excel/CSV फाइल डाउनलोड करें (Cancelled/Returned ऑर्डर्स अपने आप हट जाएंगे)।</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+        <div class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-emerald-200">
+          <label class="text-[11px] font-bold text-stone-500">From:</label>
+          <input type="date" id="gst-from-date" class="text-xs font-bold text-stone-800 outline-none">
+        </div>
+        <div class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-emerald-200">
+          <label class="text-[11px] font-bold text-stone-500">To:</label>
+          <input type="date" id="gst-to-date" class="text-xs font-bold text-stone-800 outline-none">
+        </div>
+        <button onclick="downloadGSTReport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-download"></i> Download GST File
+        </button>
+      </div>
+    </div>
+
     <!-- Live Summary Stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5">
       <div class="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm">
@@ -126,7 +151,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   
   <script>
-    // यहाँ आपकी सही ईमेल आईडी सेट कर दी गई है
     const AUTHORIZED_ADMIN_EMAIL = "shyamk54124@gmail.com";
 
     const firebaseConfig = {
@@ -146,19 +170,26 @@
     let allOrders = [];
     let currentFilter = 'new';
 
-    // 1. चेक करें कि क्या यूजर रीडायरेक्ट होकर वापस आया है
+    // डिफ़ॉल्ट रूप से चालू महीने की 1 तारीख से आज की तारीख तक डेट सेट करें
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = new Date();
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      const formatDate = (d) => d.toISOString().split('T')[0];
+      
+      const fromEl = document.getElementById('gst-from-date');
+      const toEl = document.getElementById('gst-to-date');
+      if (fromEl) fromEl.value = formatDate(firstDay);
+      if (toEl) toEl.value = formatDate(today);
+    });
+
     auth.getRedirectResult().then((result) => {
-      if (result.user) {
-        handleUserData(result.user);
-      }
+      if (result.user) handleUserData(result.user);
     }).catch((err) => {
       showLoginError("लॉगिन एरर: " + err.message);
     });
 
     auth.onAuthStateChanged((user) => {
-      if (user) {
-        handleUserData(user);
-      }
+      if (user) handleUserData(user);
     });
 
     function handleUserData(user) {
@@ -172,7 +203,6 @@
       }
     }
 
-    // 2. मोबाइल फ्रेंडली गूगल लॉगिन (Redirect Method)
     function loginWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithRedirect(provider).catch((err) => {
@@ -187,9 +217,7 @@
     }
 
     function logoutAdmin() {
-      auth.signOut().then(() => {
-        location.reload();
-      });
+      auth.signOut().then(() => location.reload());
     }
 
     function openImageZoom(src) {
@@ -255,6 +283,7 @@
               deliveryCharge: Number(o.deliveryCharge || 0),
               deliveryStatus: o.deliveryStatus || 'new',
               orderDate: o.orderDate,
+              createdAt: o.createdAt,
               returnReason: o.returnReason,
               cancelReason: o.cancelReason,
               rejectionReason: o.rejectionReason,
@@ -315,6 +344,138 @@
       } catch (err) {
         if (listEl) listEl.innerHTML = `<div class="text-center py-8 text-red-600 text-sm">Error: ${err.message}</div>`;
       }
+    }
+
+    // कस्टमाइज डेट रेंज के अनुसार GST CSV/Excel फाइल डाउनलोड करने का फंक्शन
+    function downloadGSTReport() {
+      const fromVal = document.getElementById('gst-from-date').value;
+      const toVal = document.getElementById('gst-to-date').value;
+
+      if (!fromVal || !toVal) {
+        alert("⚠️ कृपया From Date और To Date दोनों चुनें!");
+        return;
+      }
+
+      const startDate = new Date(fromVal);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(toVal);
+      endDate.setHours(23, 59, 59, 999);
+
+      const orders = window.cachedGroupedOrders || [];
+      const validOrders = orders.filter(group => {
+        const st = (group.deliveryStatus || '').toLowerCase();
+        // Cancelled और Returned ऑर्डर्स को जीएसटी सेल में नहीं जोड़ते
+        if (st.includes('cancel') || st.includes('returned')) return false;
+
+        let oDate = null;
+        if (group.createdAt && group.createdAt.toDate) {
+          oDate = group.createdAt.toDate();
+        } else if (group.orderDate) {
+          oDate = new Date(group.orderDate);
+        }
+
+        if (!oDate || isNaN(oDate.getTime())) return false;
+        return oDate >= startDate && oDate <= endDate;
+      });
+
+      if (validOrders.length === 0) {
+        alert("❌ चुनी गई तारीखों के बीच कोई वैध (Valid) ऑर्डर नहीं मिला!");
+        return;
+      }
+
+      // CSV हेडर (GSTR-1 के हिसाब से)
+      let csvRows = [
+        [
+          "Invoice / Order No",
+          "Invoice Date",
+          "Customer Name",
+          "Place of Supply",
+          "Invoice Value (Incl. GST)",
+          "Taxable Value",
+          "GST Rate (%)",
+          "CGST (2.5%)",
+          "SGST (2.5%)",
+          "IGST (5%)",
+          "Total Tax",
+          "Payment Mode"
+        ].join(",")
+      ];
+
+      let sumInvoice = 0, sumTaxable = 0, sumCGST = 0, sumSGST = 0, sumIGST = 0, sumTotalTax = 0;
+
+      validOrders.forEach(group => {
+        const invNo = `"${group.items[0]?.orderId || group.groupOrderId}"`;
+        let invDateStr = group.orderDate || "";
+        if (group.createdAt && group.createdAt.toDate) {
+          invDateStr = group.createdAt.toDate().toLocaleDateString('en-IN');
+        }
+        const custName = `"${(group.userName || 'Customer').replace(/"/g, '""')}"`;
+        const addr = (group.shippingAddress || "").toLowerCase();
+        
+        // चेक करें कि ऑर्डर उत्तर प्रदेश (09) का है या किसी दूसरे राज्य का
+        const isUP = addr.includes('uttar pradesh') || addr.includes('noida') || addr.includes('ghaziabad') || addr.includes('lucknow') || addr.includes('kanpur') || addr.includes('varanasi') || addr.includes('agra') || addr.includes('meerut') || addr.includes('up') || addr === "";
+        
+        const placeOfSupply = isUP ? `"09-Uttar Pradesh"` : `"Inter-State (Other)"`;
+        const grandTotal = Number(group.totalGroupAmount || 0);
+        const taxable = grandTotal / 1.05;
+        const totalTax = grandTotal - taxable;
+
+        let cgst = 0, sgst = 0, igst = 0;
+        if (isUP) {
+          cgst = totalTax / 2;
+          sgst = totalTax / 2;
+        } else {
+          igst = totalTax;
+        }
+
+        sumInvoice += grandTotal;
+        sumTaxable += taxable;
+        sumCGST += cgst;
+        sumSGST += sgst;
+        sumIGST += igst;
+        sumTotalTax += totalTax;
+
+        csvRows.push([
+          invNo,
+          `"${invDateStr}"`,
+          custName,
+          placeOfSupply,
+          grandTotal.toFixed(2),
+          taxable.toFixed(2),
+          "5%",
+          cgst.toFixed(2),
+          sgst.toFixed(2),
+          igst.toFixed(2),
+          totalTax.toFixed(2),
+          `"${group.paymentMethod || 'COD'}"`
+        ].join(","));
+      });
+
+      // सबसे नीचे कुल योग (Summary Total Row)
+      csvRows.push([
+        `"TOTAL (${validOrders.length} Invoices)"`,
+        `""`,
+        `""`,
+        `""`,
+        sumInvoice.toFixed(2),
+        sumTaxable.toFixed(2),
+        `""`,
+        sumCGST.toFixed(2),
+        sumSGST.toFixed(2),
+        sumIGST.toFixed(2),
+        sumTotalTax.toFixed(2),
+        `""`
+      ].join(","));
+
+      const csvString = "\uFEFF" + csvRows.join("\n"); // \uFEFF ताकि हिंदी/रुपये के चिह्न Excel में सही दिखें
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `GSTR1_Report_${fromVal}_to_${toVal}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function filterOrders(status) {
@@ -427,7 +588,6 @@
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold px-2.5 py-1 rounded-full uppercase ${badgeColor}">${status.replaceAll('_', ' ')}</span>
               
-              <!-- 🖨️ Download / View Invoice Button for Admin Album[span_0](start_span)[span_0](end_span) -->
               <a href="invoice.html?orderId=${firstOrderId}" target="_blank" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
                 <i class="fa-solid fa-file-invoice mr-1"></i> Invoice
               </a>
