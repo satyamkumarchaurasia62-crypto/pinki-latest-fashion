@@ -126,11 +126,12 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   
   <script>
-    const AUTHORIZED_ADMIN_EMAIL = "skumar54124@gmail.com";
+    // यहाँ आपकी सही ईमेल आईडी सेट कर दी गई है
+    const AUTHORIZED_ADMIN_EMAIL = "shyamk54124@gmail.com";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
-      authDomain: "auth.pinkilatestfashions.in",
+      authDomain: "pinki-latest-fashions.firebaseapp.com",
       projectId: "pinki-latest-fashions",
       storageBucket: "pinki-latest-fashions.firebasestorage.app",
       messagingSenderId: "668264461811",
@@ -167,7 +168,7 @@
         loadDashboardData();
       } else {
         auth.signOut();
-        showLoginError("एक्सेस अस्वीकार: केवल skumar54124@gmail.com ही अनुमति प्राप्त है।");
+        showLoginError("एक्सेस अस्वीकार: केवल shyamk54124@gmail.com ही अनुमति प्राप्त है।");
       }
     }
 
@@ -426,7 +427,7 @@
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold px-2.5 py-1 rounded-full uppercase ${badgeColor}">${status.replaceAll('_', ' ')}</span>
               
-              <!-- 🖨️ Download / View Invoice Button for Admin Album[span_2](start_span)[span_2](end_span) -->
+              <!-- 🖨️ Download / View Invoice Button for Admin Album[span_0](start_span)[span_0](end_span) -->
               <a href="invoice.html?orderId=${firstOrderId}" target="_blank" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
                 <i class="fa-solid fa-file-invoice mr-1"></i> Invoice
               </a>
