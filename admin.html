@@ -130,7 +130,7 @@
 
     const firebaseConfig = {
       apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
-      authDomain: "auth.pinkilatestfashions.in",
+      authDomain: "pinki-latest-fashions.firebaseapp.com",
       projectId: "pinki-latest-fashions",
       storageBucket: "pinki-latest-fashions.firebasestorage.app",
       messagingSenderId: "668264461811",
@@ -145,38 +145,38 @@
     let allOrders = [];
     let currentFilter = 'new';
 
-    // चेक करें कि क्या यूजर पहले से लॉग इन है
+    // 1. चेक करें कि क्या यूजर रीडायरेक्ट होकर वापस आया है
+    auth.getRedirectResult().then((result) => {
+      if (result.user) {
+        handleUserData(result.user);
+      }
+    }).catch((err) => {
+      showLoginError("लॉगिन एरर: " + err.message);
+    });
+
     auth.onAuthStateChanged((user) => {
       if (user) {
-        if (user.email && user.email.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase()) {
-          document.getElementById("admin-login-box").classList.add("hidden");
-          document.getElementById("admin-dashboard").classList.remove("hidden");
-          loadDashboardData();
-        } else {
-          auth.signOut();
-          showLoginError("यह ईमेल एडमिन के रूप में अधिकृत (Authorized) नहीं है।");
-        }
+        handleUserData(user);
       }
     });
 
-    // गूगल पॉप-अप से लॉगिन कराने का फंक्शन
-    async function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
-
-        if (user.email && user.email.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase()) {
-          document.getElementById("admin-login-box").classList.add("hidden");
-          document.getElementById("admin-dashboard").classList.remove("hidden");
-          loadDashboardData();
-        } else {
-          await auth.signOut();
-          showLoginError("एक्सेस अस्वीकार: केवल skumar54124@gmail.com ही अनुमति प्राप्त है।");
-        }
-      } catch (err) {
-        showLoginError("लॉगिन में समस्या आई: " + err.message);
+    function handleUserData(user) {
+      if (user.email && user.email.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase()) {
+        document.getElementById("admin-login-box").classList.add("hidden");
+        document.getElementById("admin-dashboard").classList.remove("hidden");
+        loadDashboardData();
+      } else {
+        auth.signOut();
+        showLoginError("एक्सेस अस्वीकार: केवल skumar54124@gmail.com ही अनुमति प्राप्त है।");
       }
+    }
+
+    // 2. मोबाइल फ्रेंडली गूगल लॉगिन (Redirect Method)
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithRedirect(provider).catch((err) => {
+        showLoginError("लॉगिन में समस्या आई: " + err.message);
+      });
     }
 
     function showLoginError(msg) {
@@ -426,7 +426,7 @@
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold px-2.5 py-1 rounded-full uppercase ${badgeColor}">${status.replaceAll('_', ' ')}</span>
               
-              <!-- 🖨️ Download / View Invoice Button for Admin Album[span_1](start_span)[span_1](end_span) -->
+              <!-- 🖨️ Download / View Invoice Button for Admin Album[span_2](start_span)[span_2](end_span) -->
               <a href="invoice.html?orderId=${firstOrderId}" target="_blank" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
                 <i class="fa-solid fa-file-invoice mr-1"></i> Invoice
               </a>
