@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tax Invoice - Pinky Latest Fashions</title>
     
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (App, Auth, Firestore) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <style>
@@ -141,7 +142,7 @@
             width: 130px;
             height: 55px;
             object-fit: contain;
-            z-index: 2; /* सिग्नेचर मोहर के ऊपर दिखेगा */
+            z-index: 2;
         }
         .auth-label {
             font-size: 12px;
@@ -185,7 +186,7 @@
     <button class="btn-print" onclick="window.print()">🖨️ बिल प्रिंट करें / PDF डाउनलोड करें</button>
 </div>
 
-<div id="loadingMsg">ऑर्डर की जानकारी लोड हो रही है, कृपया प्रतीक्षा करें...</div>
+<div id="loadingMsg">सिक्योरिटी चेक और आर्डर लोड हो रहा है, कृपया प्रतीक्षा करें...</div>
 
 <div class="invoice-box" id="invoiceContainer" style="display: none;">
     <!-- दुकान का विवरण -->
@@ -232,7 +233,7 @@
             </tr>
         </thead>
         <tbody id="itemsBody">
-            <!-- डेटाबेस से आइटम यहाँ अपने आप जुड़ेंगे -->
+            <!-- डेटाबेस से आइटम यहाँ जुड़ेंगे -->
         </tbody>
     </table>
 
@@ -271,10 +272,10 @@
         <div class="stamp-sign-wrapper">
             <div style="font-size:11px; margin-bottom:auto; z-index:3;">For <strong>Pinky Latest Fashions</strong></div>
             
-            <!-- 1. आपकी अपलोड की हुई मोहर (stamp.png) -->
+            <!-- 1. मोहर (stamp.png) -->
             <img src="./stamp.png" alt="Stamp" class="stamp-img" onerror="this.style.display='none'">
             
-            <!-- 2. आपका अपलोड किया हुआ सिग्नेचर (signature.png) -->
+            <!-- 2. सिग्नेचर (signature.png) -->
             <img src="./signature.png" alt="Signature" class="sign-img" onerror="this.style.display='none'">
             
             <div class="auth-label">Authorised Signatory</div>
@@ -297,23 +298,72 @@
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // URL से Order ID निकालना (जैसे: invoice.html?orderId=ORDER123)
+    // URL से Order ID निकालना
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('orderId') || urlParams.get('id');
 
-    async function loadInvoiceData() {
+    // 1. सबसे पहले ऑथेंटिकेशन (लॉगिन) चेक करना
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            showWebsitePopup(); // वेबसाइट की थीम वाला सुंदर पॉप-अप
+        } else {
+            if (orderId) {
+                loadInvoiceData(user.uid);
+            } else {
+                document.getElementById('loadingMsg').innerHTML = "❌ कोई Order ID नहीं मिली!";
+            }
+        }
+    });
+
+    // वेबसाइट के डिजाइन से मिलता-जुलता पिंक थीम वाला पॉप-अप
+    function showWebsitePopup() {
+        document.getElementById('loadingMsg').style.display = 'none';
+        
+        const popupHtml = `
+            <div style="
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.5); display: flex;
+                justify-content: center; align-items: center; z-index: 9999;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            ">
+                <div style="
+                    background: #fff; padding: 30px 25px; border-radius: 16px;
+                    max-width: 340px; width: 85%; text-align: center;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                ">
+                    <!-- गोल पिंक आइकॉन और exclamation mark -->
+                    <div style="
+                        width: 50px; height: 50px; background: #fdf2f6; border-radius: 50%;
+                        display: flex; justify-content: center; align-items: center;
+                        margin: 0 auto 15px auto; color: #e91e63; font-size: 24px; font-weight: bold;
+                    ">!</div>
+                    
+                    <h3 style="margin: 0 0 10px 0; color: #111; font-size: 20px;">Login Required</h3>
+                    <p style="color: #666; font-size: 14px; margin: 0 0 20px 0; line-height: 1.4;">
+                        Please log in first to view your invoice!
+                    </p>
+                    
+                    <a href="login.html" style="
+                        display: block; background: #e91e63; color: #fff;
+                        padding: 12px; text-decoration: none; border-radius: 25px;
+                        font-weight: bold; font-size: 15px; box-shadow: 0 4px 12px rgba(233,30,99,0.3);
+                    ">
+                        OK / Login
+                    </a>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', popupHtml);
+    }
+
+    async function loadInvoiceData(currentUserId) {
         const loadingEl = document.getElementById('loadingMsg');
         const containerEl = document.getElementById('invoiceContainer');
 
-        if (!orderId) {
-            loadingEl.innerHTML = "❌ कोई Order ID नहीं मिली! कृपया ऑर्डर हिस्ट्री से बिल खोलें।";
-            return;
-        }
-
         try {
-            // Firestore के 'orders' कलेक्शन से डेटा लाना
             const docRef = db.collection('orders').doc(orderId);
             const docSnap = await docRef.get();
 
@@ -324,10 +374,13 @@
 
             const data = docSnap.data();
 
-            // कस्टमर और ऑर्डर की जानकारी सेट करना
+            if (data.userId && data.userId !== currentUserId) {
+                loadingEl.innerHTML = "❌ आपको इस इनवॉइस को देखने की अनुमति नहीं है!";
+                return;
+            }
+
             document.getElementById('invNo').innerText = data.orderId || orderId;
             
-            // तारीख फॉर्मेट करना
             let orderDate = new Date().toLocaleDateString('en-IN');
             if (data.createdAt && data.createdAt.toDate) {
                 orderDate = data.createdAt.toDate().toLocaleDateString('en-IN');
@@ -342,7 +395,6 @@
             document.getElementById('custAddress').innerText = data.address || '';
             document.getElementById('payMode').innerText = data.paymentMethod || data.paymentMode || 'Online / UPI';
 
-            // आइटम्स की लिस्ट भरना
             const itemsBody = document.getElementById('itemsBody');
             itemsBody.innerHTML = '';
             let grandTotal = 0;
@@ -365,12 +417,10 @@
                 itemsBody.appendChild(tr);
             });
 
-            // यदि डेटाबेस में सीधा totalAmount सेव है और items लिस्ट खाली है
             if (items.length === 0 && data.totalAmount) {
                 grandTotal = Number(data.totalAmount);
             }
 
-            // Inclusive GST (5%) का हिसाब निकालना (बिना ग्राहक का बिल बढ़ाए)
             const taxableVal = grandTotal / 1.05;
             const gstVal = grandTotal - taxableVal;
 
@@ -378,17 +428,14 @@
             document.getElementById('gstVal').innerText = '₹ ' + gstVal.toFixed(2);
             document.getElementById('grandTotal').innerText = '₹ ' + grandTotal.toFixed(2);
 
-            // लोडिंग छुपाकर इनवॉइस दिखाना
             loadingEl.style.display = 'none';
             containerEl.style.display = 'block';
 
         } catch (error) {
             console.error("Error fetching order:", error);
-            loadingEl.innerHTML = "❌ डेटा लोड करने में समस्या आई। कृपया इंटरनेट या Firebase नियम जांचें।";
+            loadingEl.innerHTML = "❌ डेटा लोड करने में समस्या आई।";
         }
     }
-
-    loadInvoiceData();
 </script>
 
 </body>
