@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tax Invoice - Pinky Latest Fashions</title>
     
-    <!-- Firebase SDKs (App, Auth, Firestore) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -89,13 +89,14 @@
             justify-content: space-between;
             margin-top: 10px;
         }
-        .bank-info {
+        .note-info {
             width: 54%;
             font-size: 12px;
-            line-height: 1.5;
+            line-height: 1.6;
             background: #f9f9f9;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #eee;
+            color: #555;
         }
         .totals-table {
             width: 42%;
@@ -112,7 +113,8 @@
             padding-top: 15px;
             border-top: 1px dashed #ccc;
         }
-        /* मोहर और सिग्नेचर का कॉम्बिनेशन बॉक्स */
+        
+        /* सही की गई मोहर और सिग्नेचर लेयरिंग */
         .stamp-sign-wrapper {
             position: relative;
             width: 220px;
@@ -123,6 +125,7 @@
             justify-content: flex-end;
             align-items: center;
         }
+        /* 1. मोहर पीछे रहेगी (z-index: 1) */
         .stamp-img {
             position: absolute;
             top: 5px;
@@ -131,18 +134,19 @@
             width: 115px;
             height: 115px;
             object-fit: contain;
-            opacity: 0.9;
-            z-index: 1;
+            opacity: 0.85;
+            z-index: 1; 
         }
+        /* 2. सिग्नेचर मोहर के ऊपर आएगा (z-index: 2) */
         .sign-img {
             position: absolute;
-            top: 38px;
+            top: 40px;
             left: 50%;
-            transform: translateX(-50%) rotate(-3deg);
+            transform: translateX(-50%) rotate(-2deg);
             width: 130px;
             height: 55px;
             object-fit: contain;
-            z-index: 2;
+            z-index: 2; 
         }
         .auth-label {
             font-size: 12px;
@@ -150,7 +154,7 @@
             padding-top: 4px;
             width: 180px;
             z-index: 3;
-            background: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.8);
         }
         .controls {
             text-align: center;
@@ -165,6 +169,10 @@
             background: #2980b9;
             color: #fff;
             font-weight: bold;
+            box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+        }
+        .btn-print:hover {
+            background: #2471a3;
         }
         #loadingMsg {
             text-align: center;
@@ -182,6 +190,7 @@
 </head>
 <body>
 
+<!-- प्रिंट / डाउनलोड बटन सही जगह पर -->
 <div class="controls">
     <button class="btn-print" onclick="window.print()">🖨️ बिल प्रिंट करें / PDF डाउनलोड करें</button>
 </div>
@@ -200,13 +209,13 @@
         </div>
         <div class="invoice-title">
             <h2>TAX INVOICE</h2>
-            <p><strong>Order / Invoice No:</strong> <span id="invNo">-</span></p>
+            <p><strong>Order No:</strong> <span id="invNo">-</span></p>
             <p><strong>Date:</strong> <span id="invDate">-</span></p>
             <p><strong>Status:</strong> <span id="orderStatus" style="color:green; font-weight:bold;">Confirmed</span></p>
         </div>
     </div>
 
-    <!-- ग्राहक का विवरण -->
+    <!-- ग्राहक का विवरण और पेमेंट मोड -->
     <div class="customer-box">
         <div>
             <strong>Bill To (ग्राहक का नाम व पता):</strong><br>
@@ -215,9 +224,8 @@
             <span id="custAddress">-</span>
         </div>
         <div style="text-align: right;">
-            <strong>Payment Details:</strong><br>
-            Mode: <span id="payMode">Online / UPI</span><br>
-            Place of Supply: Uttar Pradesh (09)
+            <strong>Payment Mode:</strong> <span id="payMode" style="font-weight:bold; color:#c0392b;">COD</span><br>
+            <span style="font-size:12px; color:#555;">Place of Supply: Uttar Pradesh (09)</span>
         </div>
     </div>
 
@@ -239,13 +247,11 @@
 
     <!-- टोटल और जीएसटी ब्रेकअप -->
     <div class="totals-section">
-        <div class="bank-info">
-            <strong>Bank Details (भुगतान हेतु):</strong><br>
-            Bank: Punjab National Bank (PNB)<br>
-            A/c Name: Pinky Latest Fashions<br>
-            A/c No: [खाता खुलने के बाद यहाँ लिखें]<br>
-            IFSC: [ब्रांच IFSC]<br><br>
-            <em>* सभी कीमतें GST-सहित (Inclusive of GST) हैं। यह एक कंप्यूटर जनरेटेड डिजिटल इनवॉइस है।</em>
+        <div class="note-info">
+            <strong>Terms & Conditions:</strong><br>
+            1. सभी कीमतें GST-सहित (Inclusive of GST) हैं।<br>
+            2. यह एक कंप्यूटर जनरेटेड डिजिटल टैक्स इनवॉइस है।<br>
+            3. बिका हुआ माल नियमानुसार बदला जा सकता है।
         </div>
         <table class="totals-table">
             <tr>
@@ -263,7 +269,7 @@
         </table>
     </div>
 
-    <!-- डिजिटल मोहर और सिग्नेचर का कॉम्बिनेशन -->
+    <!-- डिजिटल मोहर और सिग्नेचर (मोहर पीछे, सिग्नेचर ऊपर) -->
     <div class="footer-sign">
         <div style="font-size:12px;">
             Thank you for shopping with us!<br>
@@ -272,10 +278,10 @@
         <div class="stamp-sign-wrapper">
             <div style="font-size:11px; margin-bottom:auto; z-index:3;">For <strong>Pinky Latest Fashions</strong></div>
             
-            <!-- 1. मोहर (stamp.png) -->
+            <!-- 1. मोहर पीछे रहेगी (stamp.png) -->
             <img src="./stamp.png" alt="Stamp" class="stamp-img" onerror="this.style.display='none'">
             
-            <!-- 2. सिग्नेचर (signature.png) -->
+            <!-- 2. सिग्नेचर मोहर के ऊपर आएगा (signature.png) -->
             <img src="./signature.png" alt="Signature" class="sign-img" onerror="this.style.display='none'">
             
             <div class="auth-label">Authorised Signatory</div>
@@ -283,8 +289,17 @@
     </div>
 </div>
 
+<!-- वेबसाइट थीम वाला लॉगिन पॉप-अप -->
+<div id="loginPopupModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 9999; font-family: 'Segoe UI', Arial, sans-serif;">
+    <div style="background: #fff; padding: 30px 25px; border-radius: 16px; max-width: 340px; width: 85%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <div style="width: 50px; height: 50px; background: #fdf2f6; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; color: #e91e63; font-size: 24px; font-weight: bold;">!</div>
+        <h3 style="margin: 0 0 10px 0; color: #111; font-size: 20px;">Login Required</h3>
+        <p style="color: #666; font-size: 14px; margin: 0 0 20px 0; line-height: 1.4;">Please log in first to view your invoice!</p>
+        <a href="login.html" style="display: block; background: #e91e63; color: #fff; padding: 12px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 12px rgba(233,30,99,0.3);">OK / Login</a>
+    </div>
+</div>
+
 <script>
-    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
         authDomain: "auth.pinkilatestfashions.in",
@@ -301,14 +316,13 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // URL से Order ID निकालना
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('orderId') || urlParams.get('id');
 
-    // 1. सबसे पहले ऑथेंटिकेशन (लॉगिन) चेक करना
     auth.onAuthStateChanged((user) => {
         if (!user) {
-            showWebsitePopup(); // वेबसाइट की थीम वाला सुंदर पॉप-अप
+            document.getElementById('loadingMsg').style.display = 'none';
+            document.getElementById('loginPopupModal').style.display = 'flex';
         } else {
             if (orderId) {
                 loadInvoiceData(user.uid);
@@ -317,47 +331,6 @@
             }
         }
     });
-
-    // वेबसाइट के डिजाइन से मिलता-जुलता पिंक थीम वाला पॉप-अप
-    function showWebsitePopup() {
-        document.getElementById('loadingMsg').style.display = 'none';
-        
-        const popupHtml = `
-            <div style="
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0, 0, 0, 0.5); display: flex;
-                justify-content: center; align-items: center; z-index: 9999;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            ">
-                <div style="
-                    background: #fff; padding: 30px 25px; border-radius: 16px;
-                    max-width: 340px; width: 85%; text-align: center;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-                ">
-                    <!-- गोल पिंक आइकॉन और exclamation mark -->
-                    <div style="
-                        width: 50px; height: 50px; background: #fdf2f6; border-radius: 50%;
-                        display: flex; justify-content: center; align-items: center;
-                        margin: 0 auto 15px auto; color: #e91e63; font-size: 24px; font-weight: bold;
-                    ">!</div>
-                    
-                    <h3 style="margin: 0 0 10px 0; color: #111; font-size: 20px;">Login Required</h3>
-                    <p style="color: #666; font-size: 14px; margin: 0 0 20px 0; line-height: 1.4;">
-                        Please log in first to view your invoice!
-                    </p>
-                    
-                    <a href="login.html" style="
-                        display: block; background: #e91e63; color: #fff;
-                        padding: 12px; text-decoration: none; border-radius: 25px;
-                        font-weight: bold; font-size: 15px; box-shadow: 0 4px 12px rgba(233,30,99,0.3);
-                    ">
-                        OK / Login
-                    </a>
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', popupHtml);
-    }
 
     async function loadInvoiceData(currentUserId) {
         const loadingEl = document.getElementById('loadingMsg');
@@ -393,7 +366,14 @@
             document.getElementById('custName').innerText = data.customerName || data.name || 'Valued Customer';
             document.getElementById('custPhone').innerText = data.phone || data.mobile || '';
             document.getElementById('custAddress').innerText = data.address || '';
-            document.getElementById('payMode').innerText = data.paymentMethod || data.paymentMode || 'Online / UPI';
+
+            // पेमेंट मोड का लॉजिक (COD या Online चेक करना)
+            let rawPayment = (data.paymentMethod || data.paymentMode || 'COD').toUpperCase();
+            let displayPayment = 'COD';
+            if (rawPayment.includes('ONLINE') || rawPayment.includes('UPI') || rawPayment.includes('PAID')) {
+                displayPayment = 'Online / UPI';
+            }
+            document.getElementById('payMode').innerText = displayPayment;
 
             const itemsBody = document.getElementById('itemsBody');
             itemsBody.innerHTML = '';
