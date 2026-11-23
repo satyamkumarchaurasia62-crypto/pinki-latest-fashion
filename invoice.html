@@ -114,7 +114,7 @@
             border-top: 1px dashed #ccc;
         }
         
-        /* सही की गई मोहर और सिग्नेचर लेयरिंग */
+        /* सही की गई लेयरिंग: सिग्नेचर नीचे और मोहर ऊपर */
         .stamp-sign-wrapper {
             position: relative;
             width: 220px;
@@ -125,27 +125,27 @@
             justify-content: flex-end;
             align-items: center;
         }
-        /* 1. मोहर पीछे रहेगी (z-index: 1) */
-        .stamp-img {
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%) rotate(-6deg);
-            width: 115px;
-            height: 115px;
-            object-fit: contain;
-            opacity: 0.85;
-            z-index: 1; 
-        }
-        /* 2. सिग्नेचर मोहर के ऊपर आएगा (z-index: 2) */
+        /* 1. सिग्नेचर नीचे रहेगा (z-index: 1) */
         .sign-img {
             position: absolute;
-            top: 40px;
+            top: 35px;
             left: 50%;
             transform: translateX(-50%) rotate(-2deg);
             width: 130px;
             height: 55px;
             object-fit: contain;
+            z-index: 1; 
+        }
+        /* 2. मोहर सिग्नेचर के ऊपर आएगी (z-index: 2) */
+        .stamp-img {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            opacity: 0.9;
             z-index: 2; 
         }
         .auth-label {
@@ -190,7 +190,7 @@
 </head>
 <body>
 
-<!-- प्रिंट / डाउनलोड बटन सही जगह पर -->
+<!-- प्रिंट / डाउनलोड बटन -->
 <div class="controls">
     <button class="btn-print" onclick="window.print()">🖨️ बिल प्रिंट करें / PDF डाउनलोड करें</button>
 </div>
@@ -269,7 +269,7 @@
         </table>
     </div>
 
-    <!-- डिजिटल मोहर और सिग्नेचर (मोहर पीछे, सिग्नेचर ऊपर) -->
+    <!-- डिजिटल मोहर और सिग्नेचर (मोहर ऊपर, सिग्नेचर नीचे) -->
     <div class="footer-sign">
         <div style="font-size:12px;">
             Thank you for shopping with us!<br>
@@ -278,11 +278,11 @@
         <div class="stamp-sign-wrapper">
             <div style="font-size:11px; margin-bottom:auto; z-index:3;">For <strong>Pinky Latest Fashions</strong></div>
             
-            <!-- 1. मोहर पीछे रहेगी (stamp.png) -->
-            <img src="./stamp.png" alt="Stamp" class="stamp-img" onerror="this.style.display='none'">
-            
-            <!-- 2. सिग्नेचर मोहर के ऊपर आएगा (signature.png) -->
+            <!-- 1. सिग्नेचर नीचे रहेगा (signature.png) -->
             <img src="./signature.png" alt="Signature" class="sign-img" onerror="this.style.display='none'">
+            
+            <!-- 2. मोहर सिग्नेचर के ऊपर आएगी (stamp.png) -->
+            <img src="./stamp.png" alt="Stamp" class="stamp-img" onerror="this.style.display='none'">
             
             <div class="auth-label">Authorised Signatory</div>
         </div>
