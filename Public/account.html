@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Firebase SDKs (App, Firestore & Auth) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pinki Latest Fashion - Account & Security</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #fcfaf9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px;
+    }
+    .auth-container {
+      background: #ffffff;
+      padding: 32px 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e7e5e4;
+      width: 100%;
+      max-width: 460px;
+      box-sizing: border-box;
+    }
+    h2 { margin: 0 0 8px 0; color: #1f2937; font-size: 24px; font-weight: 700; }
+    .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 22px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #374151; }
+    input, select { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 14px; background: #f9fafb; }
+    input:focus, select:focus { outline: none; border-color: #db2777; background: #fff; box-shadow: 0 0 0 3px rgba(219,39,119,0.15); }
+    button.main-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; margin-top: 10px; }
+    .btn-primary { background-color: #db2777; }
+    .btn-primary:hover { background-color: #be185d; }
+    .google-btn {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: #374151;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .google-btn:hover { background-color: #f9fafb; border-color: #9ca3af; }
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 16px 0;
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .divider:not(:empty)::before { margin-right: 12px; }
+    .divider:not(:empty)::after { margin-left: 12px; }
+    .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
+    .toggle-text a { color: #db2777; text-decoration: none; font-weight: 600; cursor: pointer; }
+    .toggle-text a:hover { text-decoration: underline; }
+    .profile-view { background: #f9fafb; padding: 18px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 16px; word-break: break-word; }
+    .profile-view p { margin: 10px 0; color: #374151; font-size: 14px; line-height: 1.5; }
+    .forgot-link { display: block; text-align: right; font-size: 12px; color: #db2777; text-decoration: none; margin-top: 4px; cursor: pointer; }
+    @keyframes popScale {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Invisible reCAPTCHA Container for Firebase Mobile OTP -->
+  <div id="recaptcha-container"></div>
+
+  <div class="auth-container">
+    
+    <!-- 1. Login Box -->
+    <div id="login-box">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Please enter your details to sign in</p>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+          <div class="flex justify-between items-center mt-1">
+            <a class="text-xs text-pink-600 hover:underline cursor-pointer font-semibold" onclick="resendVerificationFromLogin()">Resend Verification Link?</a>
+            <a class="forgot-link" style="margin-top:0;" onclick="showBox('forgot')">Forgot Password?</a>
+          </div>
+        </div>
+        <button type="submit" class="main-btn btn-primary transition">Sign In</button>
+      </form>
+
+      <!-- Google Login Button -->
+      <div class="divider">OR</div>
+      <button type="button" onclick="handleGoogleAuth()" class="google-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+        Continue with Google
+      </button>
+
+      <p class="toggle-text">Don't have an account? <a onclick="showBox('signup')">Sign Up</a></p>
+    </div>
+
+    <!-- 2. Registration Box -->
+    <div id="signup-box" style="display: none;">
+      <h2>Create Account</h2>
+      <p class="subtitle">Join Pinki Latest Fashion today!</p>
+
+      <div id="google-connected-banner" class="hidden mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4">
+          <span class="text-xs font-bold text-emerald-800">Google Email Verified! Complete details below.</span>
+        </div>
+        <button type="button" onclick="resetGoogleSignup()" class="text-[11px] text-rose-600 font-bold underline">Reset</button>
+      </div>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="signup-name" placeholder="Anjali Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label id="signup-email-label">Email Address * (Verification link will be sent here)</label>
+          <input type="email" id="signup-email" placeholder="example@mail.com" required>
+        </div>
+
+        <!-- Phone Number + SMS OTP Verification -->
+        <div class="form-group">
+          <div class="flex justify-between items-center mb-1">
+            <label style="margin:0;">Mobile Number (10 Digits) *</label>
+            <span id="mobile-otp-status" class="text-[11px] font-semibold text-amber-600">SMS Verification Required</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="tel" id="signup-phone" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="9876543210" required>
+            <button type="button" id="send-mobile-otp-btn" onclick="sendMobileOtp('signup')" class="px-3 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-lg shrink-0 transition">
+              Send OTP
+            </button>
+          </div>
+          <div id="mobile-otp-box" class="hidden mt-2 flex gap-2 bg-pink-50 p-2 rounded-lg border border-pink-200">
+            <input type="text" id="mobile-otp-input" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="Enter 6-digit SMS OTP" class="text-xs font-mono font-bold bg-white">
+            <button type="button" onclick="verifyMobileOtp('signup')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shrink-0 transition">
+              Verify
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Create Password * <span class="text-[11px] font-normal text-stone-500">(For direct email login too)</span></label>
+          <input type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
+        </div>
+        <div class="form-group">
+          <label>Security Question *</label>
+          <select id="signup-question" required>
+            <option value="pet">What was the name of your first pet?</option>
+            <option value="school">What was the name of your first school?</option>
+            <option value="city">What city were you born in?</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Your Answer *</label>
+          <input type="text" id="signup-answer" placeholder="Enter your secret answer" required>
+        </div>
+        <div class="form-group">
+          <label>Full Address *</label>
+          <input type="text" id="signup-address" placeholder="House number, street, area" required>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="signup-city" placeholder="City name" required>
+          </div>
+          <div class="form-group">
+            <label>Pincode *</label>
+            <input type="text" id="signup-pincode" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="6-digit Pincode" required>
+          </div>
+        </div>
+        <button type="submit" id="register-submit-btn" class="main-btn btn-primary transition">Create My Account</button>
+      </form>
+
+      <div id="google-signup-section">
+        <div class="divider">OR</div>
+        <button type="button" onclick="handleGoogleAuth()" class="google-btn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+          Continue with Google
+        </button>
+      </div>
+
+      <p class="toggle-text">Already have an account? <a onclick="showBox('login')">Sign In</a></p>
+    </div>
+
+    <!-- 3. Password Reset Box -->
+    <div id="forgot-box" style="display: none;">
+      <h2>Reset Password</h2>
+      <p class="subtitle">Answer your security question to set a new password directly.</p>
+      <form id="forgot-form">
+        <div class="form-group">
+          <label>Registered Email Address</label>
+          <input type="email" id="forgot-email" placeholder="Enter your registered email" required>
+        </div>
+        <div class="form-group">
+          <label>Select Your Security Question</label>
+          <select id="forgot-question" required>
+            <option value="pet">What was the name of your first pet?</option>
+            <option value="school">What was the name of your first school?</option>
+            <option value="city">What city were you born in?</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Your Answer</label>
+          <input type="text" id="forgot-answer" placeholder="Type your correct answer" required>
+        </div>
+        <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
+          <label>New Password</label>
+          <input type="password" id="forgot-new-password" placeholder="Set new password (min 8 chars)" minlength="8" required>
+        </div>
+        <button type="submit" class="main-btn btn-primary transition">Update Password</button>
+      </form>
+      <p class="toggle-text"><a onclick="showBox('login')">← Back to Sign In</a></p>
+    </div>
+
+    <!-- 4. Profile & Edit Box -->    
+    <div id="profile-box" style="display: none;">  
+      <div class="mb-4">
+        <h2 style="margin-bottom:2px;">My Account</h2>
+        <p class="text-xs text-stone-500">Manage your profile & delivery details</p>
+      </div>
+
+      <div id="profile-view-card" class="profile-view">
+        <p><strong>Name:</strong> <span id="user-display-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-display-email"></span></p>
+        <p><strong>Mobile:</strong> <span id="user-display-phone"></span> <span class="text-xs text-emerald-600 font-bold">✓ Verified</span></p>
+        <p><strong>Address:</strong> <span id="user-display-address"></span></p>
+      </div>
+
+      <div id="edit-profile-form-box" class="hidden bg-stone-50 p-4 rounded-xl border border-stone-200 mb-4 space-y-3">
+        <div class="flex justify-between items-center border-b border-stone-200 pb-2">
+          <span class="text-sm font-bold text-stone-800"><i class="fa-solid fa-pen-to-square text-pink-600 mr-1"></i>Update Profile</span>
+          <span id="name-limit-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Name Change: 1 Time Left</span>
+        </div>
+
+        <div>
+          <label class="text-xs">Full Name * <span id="name-edit-note" class="text-[10px] text-amber-700 font-normal">(Can only be changed ONCE)</span></label>
+          <input type="text" id="edit-name" class="text-sm font-semibold">
+        </div>
+
+        <div>
+          <label class="text-xs">Email Address *</label>
+          <input type="email" id="edit-email" class="text-sm">
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs" style="margin:0;">Mobile Number (10 Digits) *</label>
+            <span id="edit-phone-status" class="text-[10px] font-bold text-emerald-600">✓ Current Verified</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="tel" id="edit-phone" maxlength="10" oninput="handleEditPhoneChange()" class="text-sm">
+            <button type="button" id="edit-send-otp-btn" onclick="sendMobileOtp('edit')" class="hidden px-3 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-lg shrink-0">
+              Send OTP
+            </button>
+          </div>
+          <div id="edit-otp-box" class="hidden mt-2 flex gap-2 bg-pink-50 p-2 rounded-lg border border-pink-200">
+            <input type="text" id="edit-otp-input" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="6-digit OTP" class="text-xs font-mono font-bold bg-white">
+            <button type="button" onclick="verifyMobileOtp('edit')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shrink-0">
+              Verify
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs">Full Address *</label>
+          <input type="text" id="edit-address" class="text-sm">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-xs">City *</label>
+            <input type="text" id="edit-city" class="text-sm">
+          </div>
+          <div>
+            <label class="text-xs">Pincode *</label>
+            <input type="text" id="edit-pincode" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')" class="text-sm">
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="toggleEditProfile(false)" class="flex-1 py-2.5 bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-bold rounded-lg transition">
+            Cancel
+          </button>
+          <button type="button" id="save-profile-btn" onclick="saveProfileUpdates()" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg shadow transition">
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-3">
+        <a href="index.html" class="w-full text-center py-3 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 transition flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-house mr-2"></i>Home
+        </a>
+        <button onclick="logout()" class="w-full py-3 bg-stone-900 text-white font-semibold rounded-xl hover:bg-stone-800 transition flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
+        </button>
+        <button id="open-edit-btn" onclick="toggleEditProfile(true)" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 font-semibold rounded-xl transition flex items-center justify-center">
+          <i class="fa-solid fa-user-pen mr-2 text-pink-600"></i>Edit Details
+        </button>
+      </div>
+    </div>
+
+    <!-- Privacy Policy Link Footer -->
+    <div class="mt-6 text-center border-t border-stone-100 pt-4">
+      <a href="privacy-policy.html" class="text-xs text-stone-500 hover:text-pink-600 font-medium transition">Privacy Policy</a>
+    </div>
+
+  </div>
+
+  <!-- Custom Smooth White Alert & Confirm Modal -->
+  <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px; transition:opacity 0.2s ease;">
+    <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; animation:popScale 0.2s ease-out;">
+      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
+      <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
+      <p id="customPopupMessage" style="margin:0 0 20px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
+      <div id="customPopupButtons" style="display:flex; gap:10px; justify-content:center;">
+        <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; margin-top:0;">Cancel</button>
+        <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25); margin-top:0;">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("customPopupOverlay");
+        const icon = document.getElementById("customPopupIcon");
+        document.getElementById("customPopupTitle").innerText = title;
+        document.getElementById("customPopupMessage").innerText = message;
+        
+        if (type === "error") {
+          icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
+        } else if (type === "success") {
+          icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
+        } else {
+          icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
+        }
+
+        document.getElementById("customPopupCancelBtn").style.display = "none";
+        const okBtn = document.getElementById("customPopupOkBtn");
+        okBtn.innerText = "Okay";
+        overlay.style.display = "flex";
+
+        okBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(true);
+        };
+      });
+    };
+
+    const firebaseConfig = {
+      apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let isPhoneVerified = false;
+    let isEditPhoneVerified = true;
+    let phoneConfirmationResult = null;
+    let verifiedPhoneNumber = "";
+    let isGoogleAuthFlow = false;
+
+    window.addEventListener("load", () => {
+      try {
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
+          window.recaptchaVerifier.render();
+        }
+      } catch (e) {}
+    });
+
+    async function handleGoogleAuth() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        const googleUser = result.user;
+        const email = (googleUser.email || "").trim().toLowerCase();
+        const displayName = googleUser.displayName || "";
+
+        if (!email) {
+          await showAlert("Could not retrieve email from Google account.", "Error", "error");
+          return;
+        }
+
+        const userDoc = await db.collection("users").doc(email).get();
+
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+          await showAlert(`Welcome back, ${userData.name || displayName}!`, "Signed In with Google", "success");
+          window.location.href = "index.html";
+        } else {
+          isGoogleAuthFlow = true;
+          showBox('signup');
+
+          const nameInput = document.getElementById("signup-name");
+          const emailInput = document.getElementById("signup-email");
+          const emailLabel = document.getElementById("signup-email-label");
+
+          nameInput.value = displayName;
+          emailInput.value = email;
+          emailInput.readOnly = true;
+          emailInput.style.background = "#ecfdf5";
+          emailInput.style.borderColor = "#10b981";
+          emailLabel.innerHTML = `Email Address * <span class="text-emerald-600 font-bold">(✓ Verified via Google)</span>`;
+
+          document.getElementById("google-signup-section").classList.add("hidden");
+          document.getElementById("google-connected-banner").classList.remove("hidden");
+
+          await showAlert(
+            "Your Google account is connected!\n\nPlease verify your mobile number and fill in your delivery address to finish creating your account.",
+            "Almost Done!",
+            "info"
+          );
+        }
+      } catch (error) {
+        console.error("Google Auth Error:", error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          await showAlert("Google Sign-In could not be completed. Make sure you are opening this page on your live website domain (https://) and not directly from file manager.", "Notice", "error");
+        }
+      }
+    }
+
+    function resetGoogleSignup() {
+      isGoogleAuthFlow = false;
+      const emailInput = document.getElementById("signup-email");
+      const emailLabel = document.getElementById("signup-email-label");
+
+      emailInput.value = "";
+      emailInput.readOnly = false;
+      emailInput.style.background = "#f9fafb";
+      emailInput.style.borderColor = "#d1d5db";
+      emailLabel.innerText = "Email Address * (Verification link will be sent here)";
+
+      document.getElementById("google-signup-section").classList.remove("hidden");
+      document.getElementById("google-connected-banner").classList.add("hidden");
+    }
+
+    async function sendMobileOtp(mode = 'signup') {
+      const inputId = mode === 'edit' ? "edit-phone" : "signup-phone";
+      const btnId = mode === 'edit' ? "edit-send-otp-btn" : "send-mobile-otp-btn";
+      const otpBoxId = mode === 'edit' ? "edit-otp-box" : "mobile-otp-box";
+
+      const rawPhone = (document.getElementById(inputId).value || "").replace(/\D/g, "");
+      if (rawPhone.length !== 10) {
+        await showAlert("Please enter a valid 10-digit mobile number.", "Almost There", "error");
+        return;
+      }
+
+      const fullPhone = "+91" + rawPhone;
+      verifiedPhoneNumber = rawPhone;
+      if (mode === 'edit') isEditPhoneVerified = false;
+      else isPhoneVerified = false;
+
+      const btn = document.getElementById(btnId);
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+
+      try {
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
+        }
+        phoneConfirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, window.recaptchaVerifier);
+        document.getElementById(otpBoxId).classList.remove("hidden");
+        await showAlert(`We have sent a 6-digit verification code to ${fullPhone}. Please enter it below.`, "OTP Sent", "success");
+      } catch (err) {
+        await showAlert("Could not send OTP right now. Please check your number and try again.", "Notice", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send OTP";
+      }
+    }
+
+    async function verifyMobileOtp(mode = 'signup') {
+      const otpInputId = mode === 'edit' ? "edit-otp-input" : "mobile-otp-input";
+      const phoneInputId = mode === 'edit' ? "edit-phone" : "signup-phone";
+      const btnId = mode === 'edit' ? "edit-send-otp-btn" : "send-mobile-otp-btn";
+      const boxId = mode === 'edit' ? "edit-otp-box" : "mobile-otp-box";
+      const statusId = mode === 'edit' ? "edit-phone-status" : "mobile-otp-status";
+
+      const otpCode = (document.getElementById(otpInputId).value || "").trim();
+
+      if (!phoneConfirmationResult) {
+        await showAlert("Please click 'Send OTP' first to receive the code.", "Notice", "error");
+        return;
+      }
+      if (otpCode.length !== 6) {
+        await showAlert("Please enter the complete 6-digit code.", "Notice", "error");
+        return;
+      }
+
+      try {
+        await phoneConfirmationResult.confirm(otpCode);
+        if (mode === 'edit') {
+          isEditPhoneVerified = true;
+          document.getElementById(btnId).classList.add("hidden");
+        } else {
+          isPhoneVerified = true;
+          document.getElementById(btnId).style.display = "none";
+        }
+        document.getElementById(phoneInputId).readOnly = true;
+        document.getElementById(phoneInputId).style.background = "#ecfdf5";
+        document.getElementById(boxId).classList.add("hidden");
+        document.getElementById(statusId).innerHTML = `<span class="text-emerald-600 font-bold">✓ Mobile Verified</span>`;
+        await showAlert("Your mobile number has been verified successfully!", "Wonderful", "success");
+      } catch (err) {
+        await showAlert("The OTP you entered is incorrect. Please check and try again.", "Incorrect Code", "error");
+      }
+    }
+
+    function showBox(type) {
+      document.getElementById("login-box").style.display = (type === 'login') ? 'block' : 'none';
+      document.getElementById("signup-box").style.display = (type === 'signup') ? 'block' : 'none';
+      document.getElementById("forgot-box").style.display = (type === 'forgot') ? 'block' : 'none';
+      document.getElementById("profile-box").style.display = (type === 'profile') ? 'block' : 'none';
+    }
+
+    function loadProfile(user) {
+      showBox('profile');
+      document.getElementById("user-display-name").innerText = user.name || "";
+      document.getElementById("user-display-email").innerText = user.email || "";
+      document.getElementById("user-display-phone").innerText = user.phone || "N/A";
+      document.getElementById("user-display-address").innerText = `${user.address || ''}, ${user.city || ''} - ${user.pincode || ''}`;
+    }
+
+    function toggleEditProfile(show) {
+      const formBox = document.getElementById("edit-profile-form-box");
+      const viewCard = document.getElementById("profile-view-card");
+      const openEditBtn = document.getElementById("open-edit-btn");
+
+      if (!show) {
+        formBox.classList.add("hidden");
+        viewCard.classList.remove("hidden");
+        if (openEditBtn) openEditBtn.classList.remove("hidden");
+        return;
+      }
+
+      const rawUser = sessionStorage.getItem("currentLoggedInUser");
+      if (!rawUser) return;
+      const user = JSON.parse(rawUser);
+
+      document.getElementById("edit-name").value = user.name || "";
+      document.getElementById("edit-email").value = user.email || "";
+      document.getElementById("edit-phone").value = user.phone || "";
+      document.getElementById("edit-address").value = user.address || "";
+      document.getElementById("edit-city").value = user.city || "";
+      document.getElementById("edit-pincode").value = user.pincode || "";
+
+      isEditPhoneVerified = true;
+      document.getElementById("edit-send-otp-btn").classList.add("hidden");
+      document.getElementById("edit-otp-box").classList.add("hidden");
+
+      const nameChangeCount = user.nameChangedCount || 0;
+      const nameInput = document.getElementById("edit-name");
+      const nameBadge = document.getElementById("name-limit-badge");
+
+      if (nameChangeCount >= 1) {
+        nameInput.readOnly = true;
+        nameInput.style.background = "#e5e7eb";
+        nameInput.style.color = "#6b7280";
+        nameBadge.innerText = "Name Locked (Already Changed Once)";
+        nameBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700";
+      } else {
+        nameInput.readOnly = false;
+        nameInput.style.background = "#fff";
+        nameBadge.innerText = "Name Change: 1 Time Left";
+        nameBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800";
+      }
+
+      viewCard.classList.add("hidden");
+      formBox.classList.remove("hidden");
+      if (openEditBtn) openEditBtn.classList.add("hidden");
+    }
+
+    function handleEditPhoneChange() {
+      const phoneInput = document.getElementById("edit-phone");
+      phoneInput.value = phoneInput.value.replace(/\D/g, "");
+      const rawUser = sessionStorage.getItem("currentLoggedInUser");
+      const user = rawUser ? JSON.parse(rawUser) : {};
+
+      if (phoneInput.value !== (user.phone || "")) {
+        isEditPhoneVerified = false;
+        document.getElementById("edit-send-otp-btn").classList.remove("hidden");
+        document.getElementById("edit-phone-status").innerHTML = `<span class="text-amber-600 font-bold">Verification Needed</span>`;
+      } else {
+        isEditPhoneVerified = true;
+        document.getElementById("edit-send-otp-btn").classList.add("hidden");
+        document.getElementById("edit-otp-box").classList.add("hidden");
+        document.getElementById("edit-phone-status").innerHTML = `<span class="text-emerald-600 font-bold">✓ Current Verified</span>`;
+      }
+    }
+
+    async function saveProfileUpdates() {
+      const rawUser = sessionStorage.getItem("currentLoggedInUser");
+      if (!rawUser) return;
+      const currentUser = JSON.parse(rawUser);
+      const oldEmail = currentUser.email.trim().toLowerCase();
+
+      const newName = document.getElementById("edit-name").value.trim();
+      const newEmail = document.getElementById("edit-email").value.trim().toLowerCase();
+      const newPhone = document.getElementById("edit-phone").value.trim();
+      const newAddress = document.getElementById("edit-address").value.trim();
+      const newCity = document.getElementById("edit-city").value.trim();
+      const newPincode = document.getElementById("edit-pincode").value.trim();
+
+      if (!newName || !newEmail || newPhone.length !== 10 || !newAddress || !newCity || newPincode.length !== 6) {
+        await showAlert("Please check all fields and fill them correctly.", "Incomplete Details", "error");
+        return;
+      }
+
+      if (!isEditPhoneVerified) {
+        await showAlert("Please verify your updated mobile number with OTP before saving.", "OTP Verification Required", "error");
+        return;
+      }
+
+      let nameChangedCount = currentUser.nameChangedCount || 0;
+      if (newName !== currentUser.name) {
+        if (nameChangedCount >= 1) {
+          await showAlert("Your name can only be changed once and is now locked.", "Name Locked", "error");
+          return;
+        }
+        nameChangedCount = 1;
+      }
+
+      const btn = document.getElementById("save-profile-btn");
+      btn.disabled = true;
+      btn.innerText = "Saving...";
+
+      try {
+        const updatedData = {
+          ...currentUser,
+          name: newName,
+          email: newEmail,
+          phone: newPhone,
+          address: newAddress,
+          city: newCity,
+          pincode: newPincode,
+          nameChangedCount: nameChangedCount,
+          updatedAt: new Date().toISOString()
+        };
+
+        if (newEmail !== oldEmail) {
+          const checkNew = await db.collection("users").doc(newEmail).get();
+          if (checkNew.exists) {
+            await showAlert("This email address is already registered with another account.", "Email Already Used", "error");
+            btn.disabled = false;
+            btn.innerText = "Save Changes";
+            return;
+          }
+
+          try {
+            const cred = await firebase.auth().createUserWithEmailAndPassword(newEmail, currentUser.password);
+            await cred.user.sendEmailVerification();
+          } catch (authErr) {}
+
+          await db.collection("users").doc(newEmail).set(updatedData);
+          await db.collection("users").doc(oldEmail).delete();
+          await showAlert(`Profile updated successfully! A verification link has also been sent to your new email (${newEmail}).`, "Success", "success");
+        } else {
+          await db.collection("users").doc(oldEmail).update(updatedData);
+          await showAlert("Your profile details have been successfully updated.", "Updated", "success");
+        }
+
+        sessionStorage.setItem("currentLoggedInUser", JSON.stringify(updatedData));
+        loadProfile(updatedData);
+        toggleEditProfile(false);
+      } catch (err) {
+        await showAlert("Could not update profile right now. Please try again.", "Notice", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Save Changes";
+      }
+    }
+
+    async function logout() {
+      sessionStorage.removeItem("currentLoggedInUser");
+      await firebase.auth().signOut();
+      await showAlert("You have been successfully logged out. Have a wonderful day!", "Logged Out", "success");
+      window.location.href = "index.html";
+    }
+
+    async function resendVerificationFromLogin() {
+      const email = document.getElementById("login-email").value.trim().toLowerCase();
+      const password = document.getElementById("login-password").value;
+
+      if (!email || !password) {
+        await showAlert("Please enter your Email and Password above first, then click resend link.", "Details Needed", "info");
+        return;
+      }
+
+      try {
+        const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const authUser = userCred.user;
+
+        if (authUser.emailVerified) {
+          await showAlert("Your email is already verified! You can sign in directly.", "Already Verified", "success");
+        } else {
+          await authUser.sendEmailVerification();
+          await showAlert("We have sent a fresh verification link to your email. Please check your inbox and spam folder.", "Verification Link Sent", "success");
+        }
+        await firebase.auth().signOut();
+      } catch (err) {
+        await showAlert("Please check your email and password, then try again.", "Notice", "error");
+      }
+    }
+
+    const signupForm = document.getElementById("signup-form");
+    if (signupForm) {
+      signupForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        if (!isPhoneVerified) {
+          await showAlert("Please verify your 10-digit mobile number via SMS OTP first.", "Mobile Verification Required", "error");
+          return;
+        }
+
+        const name = document.getElementById("signup-name").value.trim();
+        const email = document.getElementById("signup-email").value.trim().toLowerCase();
+        const password = document.getElementById("signup-password").value;
+        const question = document.getElementById("signup-question").value;
+        const answer = document.getElementById("signup-answer").value.trim().toLowerCase();
+        const phone = document.getElementById("signup-phone").value.trim();
+        const address = document.getElementById("signup-address").value.trim();
+        const city = document.getElementById("signup-city").value.trim();
+        const pincode = document.getElementById("signup-pincode").value.trim();
+
+        const btn = document.getElementById("register-submit-btn");
+        btn.disabled = true;
+        btn.innerText = "Creating Account...";
+
+        try {
+          const doc = await db.collection("users").doc(email).get();
+          if (doc.exists) {
+            await showAlert("An account with this email already exists. Please sign in instead.", "Already Registered", "info");
+          } else {
+            if (!isGoogleAuthFlow) {
+              let userCred;
+              try {
+                userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                await userCred.user.sendEmailVerification();
+              } catch (authErr) {
+                if (authErr.code === 'auth/email-already-in-use') {
+                  userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+                } else {
+                  throw authErr;
+                }
+              }
+            } else {
+              try {
+                await firebase.auth().createUserWithEmailAndPassword(email, password);
+              } catch (ignoreErr) {}
+            }
+
+            const newUserData = {
+              name, email, password, question, answer, phone,
+              phoneVerified: true,
+              authProvider: isGoogleAuthFlow ? "google" : "password",
+              address, city, pincode,
+              nameChangedCount: 0, orders: [], createdAt: new Date().toISOString()
+            };
+
+            await db.collection("users").doc(email).set(newUserData);
+
+            if (isGoogleAuthFlow) {
+              sessionStorage.setItem("currentLoggedInUser", JSON.stringify(newUserData));
+              await showAlert("Your account has been created with Google! Welcome to Pinki Latest Fashion.", "Welcome!", "success");
+              window.location.href = "index.html";
+            } else {
+              await showAlert("Your account has been created successfully!\n\nWe have sent a verification link to your email. Please verify your email before signing in.", "Welcome!", "success");
+              await firebase.auth().signOut();
+              signupForm.reset();
+              showBox('login');
+            }
+          }
+        } catch (error) {
+          await showAlert("Could not create account right now. Please check your details.", "Notice", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Create My Account";
+        }
+      });
+    }
+
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById("login-email").value.trim().toLowerCase();
+        const password = document.getElementById("login-password").value;
+
+        if (!email || !password) {
+          await showAlert("Please enter both your email and password.", "Missing Details", "error");
+          return;
+        }
+
+        try {
+          const userDoc = await db.collection("users").doc(email).get();
+
+          if (!userDoc.exists) {
+            await showAlert("This email is not registered yet. Let's create your account!", "Account Not Found", "info");
+            loginForm.reset();
+            showBox('signup');
+            document.getElementById("signup-email").value = email;
+            return;
+          }
+
+          const userData = userDoc.data();
+
+          if (userData.authProvider === "google" && userData.password === password) {
+            sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+            await showAlert("Welcome back! Glad to see you again.", "Success", "success");
+            window.location.href = "index.html";
+            return;
+          }
+
+          const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
+          const authUser = userCred.user;
+
+          if (!authUser.emailVerified && userData.authProvider !== "google") {
+            await firebase.auth().signOut();
+            await showAlert("Please verify your email address before signing in. Check your inbox or click 'Resend Verification Link' above.", "Email Verification Required", "warning");
+            return;
+          }
+
+          if (userData.password !== password) {
+            await db.collection("users").doc(email).update({ password: password });
+            userData.password = password;
+          }
+
+          sessionStorage.setItem("currentLoggedInUser", JSON.stringify(userData));
+          await showAlert("Welcome back! Glad to see you again.", "Success", "success");
+          window.location.href = "index.html";
+
+        } catch (error) {
+          await showAlert("Incorrect password. Please check your details and try again.", "Sign In Failed", "error");
+        }
+      });
+    }
+
+    const forgotForm = document.getElementById("forgot-form");
+    if (forgotForm) {
+      forgotForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const email = document.getElementById("forgot-email").value.trim().toLowerCase();
+        const question = document.getElementById("forgot-question").value;
+        const answer = document.getElementById("forgot-answer").value.trim().toLowerCase();
+        const newPassword = document.getElementById("forgot-new-password").value;
+
+        const btn = forgotForm.querySelector("button[type='submit']");
+        btn.disabled = true;
+        btn.innerText = "Updating...";
+
+        try {
+          const doc = await db.collection("users").doc(email).get();
+          if (!doc.exists) {
+            await showAlert("We couldn't find an account with this email address.", "Not Found", "error");
+            return;
+          }
+          
+          const user = doc.data();
+
+          if (user.question === question && user.answer.trim().toLowerCase() === answer) {
+            try {
+              const tempUserCred = await firebase.auth().signInWithEmailAndPassword(email, user.password);
+              await tempUserCred.user.updatePassword(newPassword);
+            } catch (authSkip) {}
+            
+            await db.collection("users").doc(email).update({ 
+              password: newPassword,
+              updatedAt: new Date().toISOString()
+            });
+
+            await firebase.auth().signOut();
+            sessionStorage.removeItem("currentLoggedInUser");
+
+            await showAlert("Your password has been updated successfully! You can now sign in with your new password.", "Success", "success");
+            forgotForm.reset();
+            showBox('login');
+
+          } else {
+            await showAlert("The security answer you entered is incorrect. Please check and try again.", "Verification Failed", "error");
+          }
+        } catch (error) {
+          console.error("Reset Error:", error);
+          await showAlert("Could not update password. Make sure your account is in sync or try signing in with Google.", "Notice", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Update Password";
+        }
+      });
+    }
+
+    const savedUser = sessionStorage.getItem("currentLoggedInUser");
+    if (savedUser) {
+      loadProfile(JSON.parse(savedUser));
+    }
+  </script>
+</body>
+</html>

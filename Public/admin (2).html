@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Control Panel | Pinki Latest Fashion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-stone-100 text-stone-800 font-sans min-h-screen">
+
+  <!-- DEVICE LOCK SCREEN (Google Auth) -->
+  <div id="admin-login-box" class="fixed inset-0 bg-stone-900/95 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 class="text-xl font-bold text-stone-900">Private Admin Control</h2>
+      <p class="text-xs text-stone-500">इस पैनल को खोलने के लिए अपनी अधिकृत (Authorized) गूगल आईडी से लॉगिन करें</p>
+      
+      <button onclick="loginWithGoogle()" class="w-full bg-white border border-stone-300 hover:bg-stone-50 text-stone-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
+        <i class="fa-brands fa-google text-red-500"></i> Google से लॉगिन करें
+      </button>
+      
+      <p id="login-error" class="text-xs text-red-600 hidden font-semibold"></p>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN IMAGE ZOOM MODAL -->
+  <div id="image-zoom-modal" onclick="closeImageZoom()" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 cursor-zoom-out">
+    <div class="relative max-w-2xl w-full flex flex-col items-center">
+      <button onclick="closeImageZoom()" class="self-end mb-2 bg-white text-stone-900 px-3 py-1 rounded-full text-xs font-bold shadow">✕ Close</button>
+      <img id="zoomed-img-tag" src="" alt="Proof" class="max-h-[82vh] w-auto rounded-xl border-2 border-white shadow-2xl object-contain bg-white">
+    </div>
+  </div>
+
+  <!-- MAIN PRIVATE DASHBOARD -->
+  <div id="admin-dashboard" class="hidden max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-stone-200 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full mb-1">
+          <i class="fa-solid fa-mobile-screen"></i> Local Private Device Mode
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold text-stone-900">Pinki Latest Fashion — Control Panel</h1>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="loadDashboardData()" class="px-3.5 py-2 bg-stone-800 text-white text-xs font-bold rounded-xl hover:bg-stone-900">
+          <i class="fa-solid fa-rotate mr-1"></i> Refresh
+        </button>
+        <button onclick="logoutAdmin()" class="px-3.5 py-2 bg-red-100 text-red-700 text-xs font-bold rounded-xl hover:bg-red-200">
+          Lock Device
+        </button>
+      </div>
+    </div>
+
+    <!-- CUSTOM DATE RANGE GST EXPORT PANEL -->
+    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 sm:p-5 border border-emerald-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+          <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+          <span>GSTR-1 Tax Report Generator (Custom Date)</span>
+        </div>
+        <p class="text-xs text-emerald-700">तारीख चुनें और सीधे GSTR-1 फाइलिंग के लिए तैयार Excel/CSV फाइल डाउनलोड करें (Cancelled/Returned ऑर्डर्स अपने आप हट जाएंगे)।</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+        <div class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-emerald-200">
+          <label class="text-[11px] font-bold text-stone-500">From:</label>
+          <input type="date" id="gst-from-date" class="text-xs font-bold text-stone-800 outline-none">
+        </div>
+        <div class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-emerald-200">
+          <label class="text-[11px] font-bold text-stone-500">To:</label>
+          <input type="date" id="gst-to-date" class="text-xs font-bold text-stone-800 outline-none">
+        </div>
+        <button onclick="downloadGSTReport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-download"></i> Download GST File
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Summary Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5">
+      <div class="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm">
+        <div class="text-[10px] text-stone-500 font-semibold">Total Orders</div>
+        <div id="stat-total-orders" class="text-lg font-extrabold text-stone-900 mt-1">0</div>
+      </div>
+      <div class="bg-amber-50 p-3 rounded-2xl border border-amber-200 shadow-sm">
+        <div class="text-[10px] text-amber-800 font-semibold">COD Orders</div>
+        <div id="stat-cod-count" class="text-lg font-extrabold text-amber-700 mt-1">0</div>
+      </div>
+      <div class="bg-blue-50 p-3 rounded-2xl border border-blue-200 shadow-sm">
+        <div class="text-[10px] text-blue-800 font-semibold">Online UPI</div>
+        <div id="stat-online-count" class="text-lg font-extrabold text-blue-700 mt-1">0</div>
+      </div>
+      <div class="bg-purple-50 p-3 rounded-2xl border border-purple-200 shadow-sm">
+        <div class="text-[10px] text-purple-800 font-semibold">Total Delivery</div>
+        <div id="stat-total-delivery" class="text-lg font-extrabold text-purple-700 mt-1">₹0</div>
+      </div>
+      <div class="bg-rose-50 p-3 rounded-2xl border border-rose-200 shadow-sm">
+        <div class="text-[10px] text-rose-800 font-semibold">Returns Req</div>
+        <div id="stat-return-orders" class="text-lg font-extrabold text-rose-700 mt-1">0</div>
+      </div>
+      <div class="bg-orange-50 p-3 rounded-2xl border border-orange-200 shadow-sm">
+        <div class="text-[10px] text-orange-800 font-semibold">Return Rejects</div>
+        <div id="stat-reject-count" class="text-lg font-extrabold text-orange-700 mt-1">0</div>
+      </div>
+      <div class="bg-red-50 p-3 rounded-2xl border border-red-200 shadow-sm">
+        <div class="text-[10px] text-red-800 font-semibold">Cancelled</div>
+        <div id="stat-cancel-orders" class="text-lg font-extrabold text-red-700 mt-1">0</div>
+      </div>
+      <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200 shadow-sm">
+        <div class="text-[10px] text-emerald-800 font-semibold">Net Sales</div>
+        <div id="stat-total-sales" class="text-lg font-extrabold text-emerald-700 mt-1">₹0</div>
+      </div>
+    </div>
+
+    <!-- SEARCH & FILTER BAR -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-stone-200 flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <div class="flex gap-2 overflow-x-auto pb-1 w-full sm:w-auto">
+        <button onclick="filterOrders('new')" id="tab-new" class="px-3 py-2 rounded-xl text-xs font-bold bg-pink-600 text-white shrink-0">✨ New Orders</button>
+        <button onclick="filterOrders('packing')" id="tab-packing" class="px-3 py-2 rounded-xl text-xs font-bold bg-white border border-stone-300 text-stone-700 shrink-0">📦 Packing</button>
+        <button onclick="filterOrders('shipped')" id="tab-shipped" class="px-3 py-2 rounded-xl text-xs font-bold bg-white border border-stone-300 text-stone-700 shrink-0">🚚 Shipped</button>
+        <button onclick="filterOrders('returns')" id="tab-returns" class="px-3 py-2 rounded-xl text-xs font-bold bg-white border border-rose-300 text-rose-700 shrink-0">🔄 Return Requests</button>
+        <button onclick="filterOrders('cancelled')" id="tab-cancelled" class="px-3 py-2 rounded-xl text-xs font-bold bg-white border border-red-300 text-red-700 shrink-0">🚫 Cancelled</button>
+        <button onclick="filterOrders('history')" id="tab-history" class="px-3 py-2 rounded-xl text-xs font-bold bg-white border border-emerald-300 text-emerald-800 shrink-0">📂 History</button>
+      </div>
+      
+      <!-- Order ID Search Input -->
+      <div class="relative w-full sm:w-72 shrink-0">
+        <input type="text" id="order-search-input" oninput="renderOrders()" placeholder="🔍 Order ID या Customer Name से खोजें..." class="w-full border border-stone-300 rounded-xl px-3.5 py-2 text-xs bg-stone-50 focus:bg-white focus:border-pink-600 outline-none">
+      </div>
+    </div>
+
+    <!-- Active Orders Container -->
+    <div class="space-y-4">
+      <div class="flex justify-between items-center px-1">
+        <h2 id="section-title" class="text-base font-bold text-stone-900">नए ऑर्डर्स (New Orders Session) — <span id="active-list-count" class="text-pink-600">0</span></h2>
+      </div>
+      <div id="admin-orders-list" class="space-y-4">
+        <div class="text-center py-10 text-stone-500 text-sm">डेटा लोड हो रहा है...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    const AUTHORIZED_ADMIN_EMAIL = "shyamk54124@gmail.com";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+      authDomain: "auth.pinkilatestfashions.in",
+      projectId: "pinki-latest-fashions",
+      storageBucket: "pinki-latest-fashions.firebasestorage.app",
+      messagingSenderId: "668264461811",
+      appId: "1:668264461811:web:d51468e474750e69634e86",
+      measurementId: "G-21HR2KLRJY"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let allOrders = [];
+    let currentFilter = 'new';
+
+    // डिफ़ॉल्ट रूप से चालू महीने की 1 तारीख से आज की तारीख तक डेट सेट करें
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = new Date();
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      const formatDate = (d) => d.toISOString().split('T')[0];
+      
+      const fromEl = document.getElementById('gst-from-date');
+      const toEl = document.getElementById('gst-to-date');
+      if (fromEl) fromEl.value = formatDate(firstDay);
+      if (toEl) toEl.value = formatDate(today);
+    });
+
+    auth.getRedirectResult().then((result) => {
+      if (result.user) handleUserData(result.user);
+    }).catch((err) => {
+      showLoginError("लॉगिन एरर: " + err.message);
+    });
+
+    auth.onAuthStateChanged((user) => {
+      if (user) handleUserData(user);
+    });
+
+    function handleUserData(user) {
+      if (user.email && user.email.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase()) {
+        document.getElementById("admin-login-box").classList.add("hidden");
+        document.getElementById("admin-dashboard").classList.remove("hidden");
+        loadDashboardData();
+      } else {
+        auth.signOut();
+        showLoginError("एक्सेस अस्वीकार: केवल shyamk54124@gmail.com ही अनुमति प्राप्त है।");
+      }
+    }
+
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithRedirect(provider).catch((err) => {
+        showLoginError("लॉगिन में समस्या आई: " + err.message);
+      });
+    }
+
+    function showLoginError(msg) {
+      const errEl = document.getElementById("login-error");
+      errEl.innerText = msg;
+      errEl.classList.remove("hidden");
+    }
+
+    function logoutAdmin() {
+      auth.signOut().then(() => location.reload());
+    }
+
+    function openImageZoom(src) {
+      if (!src) return;
+      document.getElementById("zoomed-img-tag").src = src;
+      document.getElementById("image-zoom-modal").classList.remove("hidden");
+    }
+
+    function closeImageZoom() {
+      document.getElementById("image-zoom-modal").classList.add("hidden");
+    }
+
+    function toggleRejectReasonBox(groupId) {
+      const statusVal = document.getElementById(`status-${groupId}`).value;
+      const rejectInput = document.getElementById(`reject-reason-${groupId}`);
+      if (!rejectInput) return;
+      if (statusVal === 'return_rejected' || statusVal.toLowerCase().includes('reject')) {
+        rejectInput.classList.remove("hidden");
+        rejectInput.focus();
+      } else {
+        rejectInput.classList.add("hidden");
+      }
+    }
+
+    async function loadDashboardData() {
+      const listEl = document.getElementById("admin-orders-list");
+      if (listEl) listEl.innerHTML = `<div class="text-center py-8 text-stone-500 text-sm">ऑर्डर्स लोड हो रहे हैं...</div>`;
+
+      try {
+        const ordersSnap = await db.collection("orders").get();
+        allOrders = [];
+        let codCount = 0, onlineCount = 0, totalDeliveryCharges = 0;
+        let returnCount = 0, rejectCount = 0, cancelCount = 0, totalRevenue = 0;
+
+        ordersSnap.forEach(doc => {
+          const data = doc.data();
+          data.docId = doc.id;
+
+          const rawSt = (data.deliveryStatus || "").toLowerCase();
+          if ((data.cancelReason || rawSt.includes('cancel')) && !rawSt.includes('cancel')) {
+            data.deliveryStatus = 'cancelled';
+          }
+
+          allOrders.push(data);
+        });
+
+        const groupedMap = {};
+        allOrders.forEach(o => {
+          const gId = o.groupOrderId || o.docId;
+          if (!groupedMap[gId]) {
+            groupedMap[gId] = {
+              groupOrderId: gId,
+              orderIds: [],
+              userName: o.userName,
+              phone: o.phone,
+              shippingAddress: o.shippingAddress,
+              paymentMethod: o.paymentMethod,
+              paymentStatus: o.paymentStatus,
+              utrNumber: o.utrNumber,
+              paymentScreenshot: o.paymentScreenshot,
+              couponCode: o.couponCode || o.coupon || 'None',
+              couponDiscount: Number(o.couponDiscount || o.discountAmount || 0),
+              deliveryCharge: Number(o.deliveryCharge || 0),
+              deliveryStatus: o.deliveryStatus || 'new',
+              orderDate: o.orderDate,
+              createdAt: o.createdAt,
+              returnReason: o.returnReason,
+              cancelReason: o.cancelReason,
+              rejectionReason: o.rejectionReason,
+              courierName: o.courierName,
+              trackingId: o.trackingId,
+              items: [],
+              totalGroupAmount: 0
+            };
+          }
+          groupedMap[gId].items.push({
+            docId: o.docId,
+            orderId: o.orderId || o.docId,
+            productName: o.productName,
+            productImage: o.productImage,
+            size: o.size,
+            quantity: Number(o.quantity || 1),
+            price: Number(o.price || o.totalAmount || 0)
+          });
+          groupedMap[gId].totalGroupAmount += Number(o.totalAmount || 0);
+        });
+
+        const groupedOrders = Object.values(groupedMap);
+        groupedOrders.sort((a, b) => new Date(b.orderDate || 0) - new Date(a.orderDate || 0));
+
+        groupedOrders.forEach(group => {
+          const st = (group.deliveryStatus || "new").toLowerCase();
+          const pm = (group.paymentMethod || '').toUpperCase();
+          const isOnline = pm.includes('ONLINE') || pm.includes('UPI') || Boolean(group.utrNumber);
+          const amt = Number(group.totalGroupAmount || 0);
+          const delCharge = Number(group.deliveryCharge || 0);
+
+          if (st.includes('cancel')) cancelCount++;
+          else if (st.includes('return_rejected') || st.includes('reject')) rejectCount++;
+          else if (st.includes('return') || st.includes('pickup')) returnCount++;
+          else {
+            totalDeliveryCharges += delCharge;
+            if (!isOnline) codCount++;
+            else onlineCount++;
+          }
+
+          if (!st.includes('cancel') && !st.includes('returned')) {
+            totalRevenue += amt;
+          }
+        });
+
+        window.cachedGroupedOrders = groupedOrders;
+
+        if (document.getElementById("stat-total-orders")) document.getElementById("stat-total-orders").innerText = groupedOrders.length;
+        if (document.getElementById("stat-cod-count")) document.getElementById("stat-cod-count").innerText = codCount;
+        if (document.getElementById("stat-online-count")) document.getElementById("stat-online-count").innerText = onlineCount;
+        if (document.getElementById("stat-total-delivery")) document.getElementById("stat-total-delivery").innerText = `₹${totalDeliveryCharges}`;
+        if (document.getElementById("stat-return-orders")) document.getElementById("stat-return-orders").innerText = returnCount;
+        if (document.getElementById("stat-reject-count")) document.getElementById("stat-reject-count").innerText = rejectCount;
+        if (document.getElementById("stat-cancel-orders")) document.getElementById("stat-cancel-orders").innerText = cancelCount;
+        if (document.getElementById("stat-total-sales")) document.getElementById("stat-total-sales").innerText = `₹${totalRevenue}`;
+
+        renderOrders();
+      } catch (err) {
+        if (listEl) listEl.innerHTML = `<div class="text-center py-8 text-red-600 text-sm">Error: ${err.message}</div>`;
+      }
+    }
+
+    // कस्टमाइज डेट रेंज के अनुसार GST CSV/Excel फाइल डाउनलोड करने का फंक्शन
+    function downloadGSTReport() {
+      const fromVal = document.getElementById('gst-from-date').value;
+      const toVal = document.getElementById('gst-to-date').value;
+
+      if (!fromVal || !toVal) {
+        alert("⚠️ कृपया From Date और To Date दोनों चुनें!");
+        return;
+      }
+
+      const startDate = new Date(fromVal);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(toVal);
+      endDate.setHours(23, 59, 59, 999);
+
+      const orders = window.cachedGroupedOrders || [];
+      const validOrders = orders.filter(group => {
+        const st = (group.deliveryStatus || '').toLowerCase();
+        // Cancelled और Returned ऑर्डर्स को जीएसटी सेल में नहीं जोड़ते
+        if (st.includes('cancel') || st.includes('returned')) return false;
+
+        let oDate = null;
+        if (group.createdAt && group.createdAt.toDate) {
+          oDate = group.createdAt.toDate();
+        } else if (group.orderDate) {
+          oDate = new Date(group.orderDate);
+        }
+
+        if (!oDate || isNaN(oDate.getTime())) return false;
+        return oDate >= startDate && oDate <= endDate;
+      });
+
+      if (validOrders.length === 0) {
+        alert("❌ चुनी गई तारीखों के बीच कोई वैध (Valid) ऑर्डर नहीं मिला!");
+        return;
+      }
+
+      // CSV हेडर (GSTR-1 के हिसाब से)
+      let csvRows = [
+        [
+          "Invoice / Order No",
+          "Invoice Date",
+          "Customer Name",
+          "Place of Supply",
+          "Invoice Value (Incl. GST)",
+          "Taxable Value",
+          "GST Rate (%)",
+          "CGST (2.5%)",
+          "SGST (2.5%)",
+          "IGST (5%)",
+          "Total Tax",
+          "Payment Mode"
+        ].join(",")
+      ];
+
+      let sumInvoice = 0, sumTaxable = 0, sumCGST = 0, sumSGST = 0, sumIGST = 0, sumTotalTax = 0;
+
+      validOrders.forEach(group => {
+        const invNo = `"${group.items[0]?.orderId || group.groupOrderId}"`;
+        let invDateStr = group.orderDate || "";
+        if (group.createdAt && group.createdAt.toDate) {
+          invDateStr = group.createdAt.toDate().toLocaleDateString('en-IN');
+        }
+        const custName = `"${(group.userName || 'Customer').replace(/"/g, '""')}"`;
+        const addr = (group.shippingAddress || "").toLowerCase();
+        
+        // चेक करें कि ऑर्डर उत्तर प्रदेश (09) का है या किसी दूसरे राज्य का
+        const isUP = addr.includes('uttar pradesh') || addr.includes('noida') || addr.includes('ghaziabad') || addr.includes('lucknow') || addr.includes('kanpur') || addr.includes('varanasi') || addr.includes('agra') || addr.includes('meerut') || addr.includes('up') || addr === "";
+        
+        const placeOfSupply = isUP ? `"09-Uttar Pradesh"` : `"Inter-State (Other)"`;
+        const grandTotal = Number(group.totalGroupAmount || 0);
+        const taxable = grandTotal / 1.05;
+        const totalTax = grandTotal - taxable;
+
+        let cgst = 0, sgst = 0, igst = 0;
+        if (isUP) {
+          cgst = totalTax / 2;
+          sgst = totalTax / 2;
+        } else {
+          igst = totalTax;
+        }
+
+        sumInvoice += grandTotal;
+        sumTaxable += taxable;
+        sumCGST += cgst;
+        sumSGST += sgst;
+        sumIGST += igst;
+        sumTotalTax += totalTax;
+
+        csvRows.push([
+          invNo,
+          `"${invDateStr}"`,
+          custName,
+          placeOfSupply,
+          grandTotal.toFixed(2),
+          taxable.toFixed(2),
+          "5%",
+          cgst.toFixed(2),
+          sgst.toFixed(2),
+          igst.toFixed(2),
+          totalTax.toFixed(2),
+          `"${group.paymentMethod || 'COD'}"`
+        ].join(","));
+      });
+
+      // सबसे नीचे कुल योग (Summary Total Row)
+      csvRows.push([
+        `"TOTAL (${validOrders.length} Invoices)"`,
+        `""`,
+        `""`,
+        `""`,
+        sumInvoice.toFixed(2),
+        sumTaxable.toFixed(2),
+        `""`,
+        sumCGST.toFixed(2),
+        sumSGST.toFixed(2),
+        sumIGST.toFixed(2),
+        sumTotalTax.toFixed(2),
+        `""`
+      ].join(","));
+
+      const csvString = "\uFEFF" + csvRows.join("\n"); // \uFEFF ताकि हिंदी/रुपये के चिह्न Excel में सही दिखें
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `GSTR1_Report_${fromVal}_to_${toVal}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function filterOrders(status) {
+      currentFilter = status;
+      ['new', 'packing', 'shipped', 'returns', 'cancelled', 'history'].forEach(tab => {
+        const btn = document.getElementById(`tab-${tab}`);
+        if (!btn) return;
+        if (tab === status) {
+          btn.className = "px-3 py-2 rounded-xl text-xs font-bold bg-pink-600 text-white shrink-0";
+        } else {
+          btn.className = "px-3 py-2 rounded-xl text-xs font-bold bg-white border border-stone-300 text-stone-700 shrink-0";
+        }
+      });
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const listEl = document.getElementById("admin-orders-list");
+      const titleEl = document.getElementById("section-title");
+      const searchQuery = (document.getElementById("order-search-input")?.value || "").trim().toLowerCase();
+      if (!listEl) return;
+      const groupedOrders = window.cachedGroupedOrders || [];
+
+      const filtered = groupedOrders.filter(group => {
+        const st = (group.deliveryStatus || 'new').toLowerCase();
+        
+        if (searchQuery) {
+          const matchGroup = (group.groupOrderId || "").toLowerCase().includes(searchQuery);
+          const matchName = (group.userName || "").toLowerCase().includes(searchQuery);
+          const matchPhone = (group.phone || "").toLowerCase().includes(searchQuery);
+          const matchItem = group.items.some(i => i.productName.toLowerCase().includes(searchQuery) || i.orderId.toLowerCase().includes(searchQuery));
+          if (!matchGroup && !matchName && !matchPhone && !matchItem) return false;
+        }
+
+        if (currentFilter === 'new') return st === 'new' || !group.deliveryStatus;
+        if (currentFilter === 'packing') return st === 'packing';
+        if (currentFilter === 'shipped') return st === 'shipped';
+        if (currentFilter === 'returns') return st.includes('return') || st.includes('pickup');
+        if (currentFilter === 'cancelled') return st.includes('cancel');
+        if (currentFilter === 'history') return st === 'delivered' || st === 'returned';
+        return false;
+      });
+
+      if (document.getElementById("active-list-count")) document.getElementById("active-list-count").innerText = filtered.length;
+      if (titleEl) titleEl.innerText = `फोल्डर: ${currentFilter.toUpperCase()} (${filtered.length} ऑर्डर ग्रुप्स)`;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center text-stone-500 text-sm border">कोई आर्डर नहीं मिला।</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(group => buildGroupCardHTML(group)).join('');
+    }
+
+    function buildGroupCardHTML(group) {
+      const status = group.deliveryStatus || 'new';
+      const stLower = status.toLowerCase();
+      const pm = (group.paymentMethod || 'COD').toUpperCase();
+      const isOnline = pm.includes('ONLINE') || pm.includes('UPI') || Boolean(group.utrNumber);
+      
+      let badgeColor = 'bg-pink-100 text-pink-800';
+      if (stLower === 'packing') badgeColor = 'bg-amber-100 text-amber-800';
+      else if (stLower === 'shipped') badgeColor = 'bg-blue-100 text-blue-800';
+      else if (stLower === 'delivered') badgeColor = 'bg-emerald-100 text-emerald-800';
+      else if (stLower.includes('cancel')) badgeColor = 'bg-red-100 text-red-800';
+      else if (stLower.includes('reject')) badgeColor = 'bg-orange-100 text-orange-800';
+      else if (stLower.includes('return')) badgeColor = 'bg-rose-100 text-rose-800';
+
+      const customerReason = group.returnReason || group.cancelReason || group.reason || "";
+      const groupTotal = group.totalGroupAmount ?? 0;
+
+      let statusOptionsHTML = `
+        <option value="new" ${stLower === 'new' ? 'selected' : ''}>✨ New Order</option>
+        <option value="packing" ${stLower === 'packing' ? 'selected' : ''}>📦 Packing</option>
+        <option value="shipped" ${stLower === 'shipped' ? 'selected' : ''}>🚚 Shipped</option>
+        <option value="delivered" ${stLower === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
+        <option value="return_approved" ${stLower === 'return_approved' ? 'selected' : ''}>🔄 Return Approved / Pickup</option>
+        <option value="return_rejected" ${stLower === 'return_rejected' ? 'selected' : ''}>❌ Reject Payment / Return</option>
+        <option value="cancelled" ${stLower === 'cancelled' ? 'selected' : ''}>🚫 Cancel Order</option>
+      `;
+
+      const itemsHtml = group.items.map(item => `
+        <div class="bg-white border border-stone-200 p-3 rounded-xl flex items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-3 min-w-0">
+            ${item.productImage ? `<img src="${item.productImage}" onclick="openImageZoom('${item.productImage}')" class="w-12 h-14 object-cover rounded-lg border shrink-0 cursor-zoom-in">` : ''}
+            <div class="space-y-0.5 min-w-0">
+              <div class="font-bold text-stone-900 truncate">${item.productName}</div>
+              <div class="text-[11px] text-stone-500">Order ID: <span class="font-mono text-stone-700">${item.orderId}</span></div>
+              <div class="text-stone-600">Size: <span class="font-bold">${item.size}</span> | Qty: <span class="font-bold">${item.quantity}</span></div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-[10px] text-stone-400 font-bold uppercase">Price</div>
+            <div class="text-sm font-extrabold text-stone-900">₹${item.price}</div>
+          </div>
+        </div>
+      `).join('');
+
+      const firstOrderId = group.items[0]?.orderId || group.groupOrderId;
+
+      return `
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border-2 border-pink-200 shadow-sm space-y-4">
+          <!-- Card Header -->
+          <div class="flex flex-wrap justify-between items-center gap-2 border-b border-stone-100 pb-3">
+            <div>
+              <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2.5 py-1 rounded-lg">📦 Combined Order Group</span>
+              <span class="text-xs font-mono text-stone-500 ml-2">${group.groupOrderId}</span>
+              <span class="text-[11px] text-stone-400 ml-2">${group.orderDate || ''}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full uppercase ${badgeColor}">${status.replaceAll('_', ' ')}</span>
+              
+              <a href="invoice.html?orderId=${firstOrderId}" target="_blank" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                <i class="fa-solid fa-file-invoice mr-1"></i> Invoice
+              </a>
+
+              <button onclick="copyGroupDetails('${group.groupOrderId}')" class="px-3 py-1 bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold rounded-lg">
+                <i class="fa-regular fa-copy mr-1"></i> Copy
+              </button>
+              <button onclick="deleteGroupOrder('${group.groupOrderId}')" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition" title="Delete entire group">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Payment & Coupon Verification Panel -->
+          <div class="bg-stone-50 border border-stone-200 p-3.5 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-3 text-xs items-center">
+            <div class="space-y-0.5">
+              <div class="text-[10px] uppercase font-bold text-stone-400">Payment Mode & Status</div>
+              <div class="font-bold text-stone-900">${group.paymentMethod || 'COD'}</div>
+              <div class="text-emerald-700 font-semibold">${group.paymentStatus || ''}</div>
+            </div>
+
+            <div class="space-y-0.5 bg-white p-2.5 rounded-lg border border-stone-200">
+              <div class="text-[10px] uppercase font-bold text-stone-400">Coupon & Discount Applied</div>
+              <div class="font-bold text-pink-600">🏷️ ${group.couponCode}</div>
+              <div class="text-stone-600">Discount: <span class="font-bold text-emerald-700">-₹${group.couponDiscount}</span></div>
+            </div>
+            
+            ${isOnline ? `
+              <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-stone-200">
+                ${group.paymentScreenshot ? `
+                  <div onclick="openImageZoom('${group.paymentScreenshot}')" class="w-10 h-12 rounded cursor-zoom-in overflow-hidden border shrink-0 bg-stone-100">
+                    <img src="${group.paymentScreenshot}" class="w-full h-full object-cover">
+                  </div>
+                ` : '<span class="text-[11px] text-stone-400">No Screenshot</span>'}
+                <div class="text-[11px] min-w-0">
+                  <div class="text-stone-400 font-bold">UTR Number:</div>
+                  <div class="font-mono font-bold text-stone-800 truncate">${group.utrNumber || 'N/A'}</div>
+                </div>
+              </div>
+            ` : `
+              <div class="bg-amber-50 text-amber-800 p-2.5 rounded-lg text-xs font-bold border border-amber-200 text-center">
+                💵 Cash on Delivery (COD)
+              </div>
+            `}
+          </div>
+
+          ${(customerReason || group.rejectionReason) ? `
+            <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl text-xs space-y-1 text-rose-950">
+              <div class="font-bold">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Feedback / Reason: 
+                <span class="font-normal bg-white px-2 py-0.5 rounded border border-rose-200">${customerReason || group.rejectionReason}</span>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Products List Inside Group -->
+          <div class="space-y-2">
+            <div class="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Products in this shipment (${group.items.length}):</div>
+            <div class="grid grid-cols-1 gap-2">
+              ${itemsHtml}
+            </div>
+          </div>
+
+          <!-- Customer & Total Summary Bar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-stone-50 p-3.5 rounded-xl">
+            <div class="space-y-1">
+              <div class="text-[10px] uppercase text-stone-400 font-bold">Customer Delivery Address</div>
+              <div class="font-bold text-stone-900">${group.userName} (${group.phone || 'No Phone'})</div>
+              <div class="text-stone-600">${group.shippingAddress}</div>
+            </div>
+            <div class="flex flex-col justify-center items-end bg-emerald-50/80 border border-emerald-200 p-3 rounded-xl">
+              <div class="text-[10px] uppercase text-emerald-800 font-bold">Final Total Payable (All Items)</div>
+              <div class="text-xl font-extrabold text-pink-600">₹${groupTotal}</div>
+              <div class="text-[11px] text-stone-600">Delivery Charge: ₹${group.deliveryCharge || 0}</div>
+            </div>
+          </div>
+
+          <!-- Update Status Controls -->
+          <div class="bg-pink-50/50 border border-pink-100 p-3 rounded-xl flex flex-wrap items-center gap-2 text-xs">
+            <div class="flex items-center gap-1.5">
+              <label class="font-bold text-stone-700">Update Status:</label>
+              <select id="status-${group.groupOrderId}" onchange="toggleRejectReasonBox('${group.groupOrderId}')" class="border border-stone-300 rounded-lg px-2 py-1.5 bg-white font-semibold">
+                ${statusOptionsHTML}
+              </select>
+            </div>
+
+            <input type="text" id="reject-reason-${group.groupOrderId}" value="${group.rejectionReason || ''}" placeholder="रिजेक्ट करने का कारण लिखें..." class="${stLower.includes('reject') ? '' : 'hidden'} border border-red-300 bg-red-50 text-red-900 rounded-lg px-2.5 py-1.5 flex-1 min-w-[160px]">
+
+            <input type="text" id="courier-${group.groupOrderId}" value="${group.courierName || ''}" placeholder="Courier Name" class="border border-stone-300 rounded-lg px-2.5 py-1.5 bg-white flex-1 min-w-[90px]">
+            <input type="text" id="track-${group.groupOrderId}" value="${group.trackingId || ''}" placeholder="Tracking ID" class="border border-stone-300 rounded-lg px-2.5 py-1.5 bg-white flex-1 min-w-[90px]">
+
+            <button onclick="updateGroupOrderStatus('${group.groupOrderId}')" class="px-4 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg shadow-sm transition">
+              Save & Update All
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function updateGroupOrderStatus(groupId) {
+      const newStatus = document.getElementById(`status-${groupId}`).value;
+      const courierName = document.getElementById(`courier-${groupId}`).value.trim();
+      const trackingId = document.getElementById(`track-${groupId}`).value.trim();
+      const rejectInput = document.getElementById(`reject-reason-${groupId}`);
+      const rejectionReason = rejectInput ? rejectInput.value.trim() : "";
+
+      const group = (window.cachedGroupedOrders || []).find(g => g.groupOrderId === groupId);
+      if (!group) return;
+
+      try {
+        const batch = db.batch();
+        group.items.forEach(item => {
+          const ref = db.collection("orders").doc(item.docId);
+          batch.update(ref, {
+            deliveryStatus: newStatus,
+            courierName: courierName,
+            trackingId: trackingId,
+            rejectionReason: newStatus.includes('reject') ? rejectionReason : ""
+          });
+        });
+        await batch.commit();
+        alert("✅ इस ग्रुप के सभी ऑर्डर्स का स्टेटस अपडेट हो गया!");
+        loadDashboardData();
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function deleteGroupOrder(groupId) {
+      if (!confirm("⚠️ क्या आप वाकई इस पूरे ऑर्डर ग्रुप को हमेशा के लिए delete करना चाहते हैं?")) return;
+      const group = (window.cachedGroupedOrders || []).find(g => g.groupOrderId === groupId);
+      if (!group) return;
+
+      try {
+        const batch = db.batch();
+        group.items.forEach(item => {
+          const ref = db.collection("orders").doc(item.docId);
+          batch.delete(ref);
+        });
+        await batch.commit();
+        alert("🗑️ Group successfully delete ho gaya!");
+        loadDashboardData();
+      } catch (err) {
+        alert("Error deleting group: " + err.message);
+      }
+    }
+
+    function copyGroupDetails(groupId) {
+      const group = (window.cachedGroupedOrders || []).find(g => g.groupOrderId === groupId);
+      if (!group) return;
+      
+      const itemsText = group.items.map(i => `- ${i.productName} (Size: ${i.size}, Qty: ${i.quantity}, Price: ₹${i.price})`).join('\n');
+      const textToCopy = `Name: ${group.userName}\nPhone: ${group.phone}\nAddress: ${group.shippingAddress}\n\nProducts:\n${itemsText}\n\nCoupon: ${group.couponCode} (-₹${group.couponDiscount})\nTotal Payable: ₹${group.totalGroupAmount}`;
+      navigator.clipboard.writeText(textToCopy).then(() => alert("पूरे ग्रुप की डिटेल्स कॉपी हो गई!"));
+    }
+  </script>
+</body>
+</html>

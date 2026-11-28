@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice - Pinky Latest Fashions</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 15px;
+            color: #222;
+        }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 25px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .shop-details h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 23px;
+            text-transform: uppercase;
+        }
+        .shop-details p {
+            margin: 3px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .invoice-title {
+            text-align: right;
+        }
+        .invoice-title h2 {
+            margin: 0;
+            color: #c0392b;
+            font-size: 20px;
+        }
+        .invoice-title p {
+            margin: 4px 0;
+            font-size: 13px;
+        }
+        .customer-box {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            background: #f9fbfc;
+            padding: 12px;
+            border: 1px solid #e1e8ed;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 9px;
+            text-align: center;
+        }
+        th {
+            background: #2c3e50;
+            color: #fff;
+        }
+        td.item-name {
+            text-align: left;
+        }
+        .totals-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .note-info {
+            width: 54%;
+            font-size: 12px;
+            line-height: 1.6;
+            background: #f9f9f9;
+            padding: 12px;
+            border: 1px solid #eee;
+            color: #555;
+        }
+        .totals-table {
+            width: 42%;
+        }
+        .totals-table td {
+            text-align: right;
+            padding: 6px 10px;
+        }
+        .footer-sign {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 35px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .stamp-sign-wrapper {
+            position: relative;
+            width: 220px;
+            height: 135px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .sign-img {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 130px;
+            height: 55px;
+            object-fit: contain;
+            z-index: 1; 
+        }
+        .stamp-img {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            opacity: 0.9;
+            z-index: 2; 
+        }
+        .auth-label {
+            font-size: 12px;
+            border-top: 1px solid #333;
+            padding-top: 4px;
+            width: 180px;
+            z-index: 3;
+            background: rgba(255,255,255,0.8);
+        }
+        .controls {
+            text-align: center;
+            margin: 15px auto;
+        }
+        .btn-print {
+            padding: 10px 22px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: #2980b9;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+        }
+        .btn-print:hover {
+            background: #2471a3;
+        }
+        #loadingMsg {
+            text-align: center;
+            font-size: 16px;
+            padding: 40px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .invoice-box { box-shadow: none; border: none; }
+            .controls { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button class="btn-print" onclick="window.print()">🖨️ बिल प्रिंट करें / PDF डाउनलोड करें</button>
+</div>
+
+<div id="loadingMsg">सिक्योरिटी चेक और आर्डर लोड हो रहा है, कृपया प्रतीक्षा करें...</div>
+
+<div class="invoice-box" id="invoiceContainer" style="display: none;">
+    <div class="header">
+        <div class="shop-details">
+            <h1>Pinki Latest Fashions</h1>
+            <p><strong>Proprietor:</strong> Pinky Ji</p>
+            <p><strong>Address:</strong> Greater Noida, Uttar Pradesh</p>
+            <p><strong>GSTIN:</strong> 09IPVPD7605Q1ZS</p>
+            <p><strong>Udyam Reg:</strong> UDYAM-UP-28-0178340</p>
+        </div>
+        <div class="invoice-title">
+            <h2>TAX INVOICE</h2>
+            <p><strong>Order No:</strong> <span id="invNo">-</span></p>
+            <p><strong>Date:</strong> <span id="invDate">-</span></p>
+            <p><strong>Status:</strong> <span id="orderStatus" style="color:green; font-weight:bold;">Confirmed</span></p>
+        </div>
+    </div>
+
+    <div class="customer-box">
+        <div>
+            <strong>Bill To (ग्राहक का नाम व पता):</strong><br>
+            <span id="custName" style="font-size:14px; font-weight:bold;">-</span><br>
+            <span id="custPhone">-</span><br>
+            <span id="custAddress">-</span>
+        </div>
+        <div style="text-align: right;">
+            <strong>Payment Mode:</strong> <span id="payMode" style="font-weight:bold; color:#c0392b;">COD</span><br>
+            <span style="font-size:12px; color:#555;">Place of Supply: Uttar Pradesh (09)</span>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 6%;">#</th>
+                <th style="width: 49%;">Item Description (सामान का विवरण)</th>
+                <th style="width: 12%;">Qty</th>
+                <th style="width: 16%;">Rate (₹)</th>
+                <th style="width: 17%;">Total Amount (₹)</th>
+            </tr>
+        </thead>
+        <tbody id="itemsBody">
+        </tbody>
+    </table>
+
+    <div class="totals-section">
+        <div class="note-info">
+            <strong>Terms & Conditions:</strong><br>
+            1. सभी कीमतें GST-सहित (Inclusive of GST) हैं।<br>
+            2. यह एक कंप्यूटर जनरेटेड डिजिटल टैक्स इनवॉइस है।<br>
+            3. बिका हुआ माल नियमानुसार बदला जा सकता है।
+        </div>
+        <table class="totals-table">
+            <tr>
+                <td>Taxable Amount:</td>
+                <td id="taxableVal">₹ 0.00</td>
+            </tr>
+            <tr>
+                <td>Included GST (5%):</td>
+                <td id="gstVal">₹ 0.00</td>
+            </tr>
+            <tr style="font-weight:bold; font-size:16px; background:#f0f4f8;">
+                <td>Grand Total:</td>
+                <td id="grandTotal">₹ 0.00</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer-sign">
+        <div style="font-size:12px;">
+            Thank you for shopping with us!<br>
+            <strong>Pinki Latest Fashions</strong>
+        </div>
+        <div class="stamp-sign-wrapper">
+            <div style="font-size:11px; margin-bottom:auto; z-index:3;">For <strong>Pinky Latest Fashions</strong></div>
+            <img src="./signature.png" alt="Signature" class="sign-img" onerror="this.style.display='none'">
+            <img src="./stamp.png" alt="Stamp" class="stamp-img" onerror="this.style.display='none'">
+            <div class="auth-label">Authorised Signatory</div>
+        </div>
+    </div>
+</div>
+
+<div id="loginPopupModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 9999; font-family: 'Segoe UI', Arial, sans-serif;">
+    <div style="background: #fff; padding: 30px 25px; border-radius: 16px; max-width: 340px; width: 85%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <div style="width: 50px; height: 50px; background: #fdf2f6; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; color: #e91e63; font-size: 24px; font-weight: bold;">!</div>
+        <h3 style="margin: 0 0 10px 0; color: #111; font-size: 20px;">Login Required</h3>
+        <p style="color: #666; font-size: 14px; margin: 0 0 20px 0; line-height: 1.4;">Please log in first to view your invoice!</p>
+        <a href="login.html" style="display: block; background: #e91e63; color: #fff; padding: 12px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 12px rgba(233,30,99,0.3);">OK / Login</a>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+        authDomain: "auth.pinkilatestfashions.in",
+        projectId: "pinki-latest-fashions",
+        storageBucket: "pinki-latest-fashions.firebasestorage.app",
+        messagingSenderId: "668264461811",
+        appId: "1:668264461811:web:d51468e474750e69634e86",
+        measurementId: "G-21HR2KLRJY"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId') || urlParams.get('id');
+
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            document.getElementById('loadingMsg').style.display = 'none';
+            document.getElementById('loginPopupModal').style.display = 'flex';
+        } else {
+            if (orderId) {
+                loadInvoiceData(user.email);
+            } else {
+                document.getElementById('loadingMsg').innerHTML = "❌ कोई Order ID नहीं मिली!";
+            }
+        }
+    });
+
+    async function loadInvoiceData(userEmail) {
+        const loadingEl = document.getElementById('loadingMsg');
+        const containerEl = document.getElementById('invoiceContainer');
+
+        try {
+            const docRef = db.collection('orders').doc(orderId);
+            const docSnap = await docRef.get();
+
+            if (!docSnap.exists) {
+                loadingEl.innerHTML = `❌ ऑर्डर ID (${orderId}) डेटाबेस में नहीं मिली।`;
+                return;
+            }
+
+            const data = docSnap.data();
+
+            // एडमिन (shyamk54124@gmail.com) या असली ग्राहक दोनों इसे देख सकते हैं
+            const isAdmin = userEmail && userEmail.toLowerCase() === "shyamk54124@gmail.com";
+            if (!isAdmin && data.userId && auth.currentUser && data.userId !== auth.currentUser.uid) {
+                loadingEl.innerHTML = "❌ आपको इस इनवॉइस को देखने की अनुमति नहीं है!";
+                return;
+            }
+
+            document.getElementById('invNo').innerText = data.orderId || orderId;
+            
+            let orderDate = new Date().toLocaleDateString('en-IN');
+            if (data.createdAt && data.createdAt.toDate) {
+                orderDate = data.createdAt.toDate().toLocaleDateString('en-IN');
+            } else if (data.orderDate) {
+                orderDate = data.orderDate;
+            }
+            document.getElementById('invDate').innerText = orderDate;
+            document.getElementById('orderStatus').innerText = data.deliveryStatus || data.status || 'Confirmed';
+
+            // सही फील्ड्स मैप किए गए हैं (userName और shippingAddress)
+            document.getElementById('custName').innerText = data.userName || data.customerName || data.name || 'Valued Customer';
+            document.getElementById('custPhone').innerText = data.phone || data.mobile || '';
+            document.getElementById('custAddress').innerText = data.shippingAddress || data.address || '';
+
+            let rawPayment = (data.paymentMethod || data.paymentMode || 'COD').toUpperCase();
+            let displayPayment = 'COD';
+            if (rawPayment.includes('ONLINE') || rawPayment.includes('UPI') || rawPayment.includes('PAID') || data.utrNumber) {
+                displayPayment = 'Online / UPI';
+            }
+            document.getElementById('payMode').innerText = displayPayment;
+
+            const itemsBody = document.getElementById('itemsBody');
+            itemsBody.innerHTML = '';
+            let grandTotal = 0;
+
+            // अगर आर्डर में सिंगल आइटम या array items दोनों को सपोर्ट करेगा
+            let items = data.items || [];
+            if (items.length === 0 && data.productName) {
+                items = [{
+                    name: data.productName,
+                    size: data.size || 'M',
+                    qty: data.quantity || 1,
+                    price: data.price || data.totalAmount || 0
+                }];
+            }
+
+            items.forEach((item, index) => {
+                const qty = Number(item.qty || item.quantity || 1);
+                const price = Number(item.price || item.rate || 0);
+                const rowTotal = qty * price;
+                grandTotal += rowTotal;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="item-name">${item.name || item.productName || 'Apparel Item'} ${item.size ? `(Size: ${item.size})` : ''}</td>
+                    <td>${qty}</td>
+                    <td>₹ ${price.toFixed(2)}</td>
+                    <td>₹ ${rowTotal.toFixed(2)}</td>
+                `;
+                itemsBody.appendChild(tr);
+            });
+
+            if (grandTotal === 0 && data.totalAmount) {
+                grandTotal = Number(data.totalAmount);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>1</td>
+                    <td class="item-name">Designer Apparel / Kurta</td>
+                    <td>1</td>
+                    <td>₹ ${grandTotal.toFixed(2)}</td>
+                    <td>₹ ${grandTotal.toFixed(2)}</td>
+                `;
+                itemsBody.appendChild(tr);
+            }
+
+            const taxableVal = grandTotal / 1.05;
+            const gstVal = grandTotal - taxableVal;
+
+            document.getElementById('taxableVal').innerText = '₹ ' + taxableVal.toFixed(2);
+            document.getElementById('gstVal').innerText = '₹ ' + gstVal.toFixed(2);
+            document.getElementById('grandTotal').innerText = '₹ ' + grandTotal.toFixed(2);
+
+            loadingEl.style.display = 'none';
+            containerEl.style.display = 'block';
+
+        } catch (error) {
+            console.error("Error fetching order:", error);
+            loadingEl.innerHTML = "❌ डेटा लोड करने में समस्या आई।";
+        }
+    }
+</script>
+
+</body>
+</html>

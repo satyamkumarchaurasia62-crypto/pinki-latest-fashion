@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pinki Latest Fashions | Premium Ladies Clothes</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            boutique: {
+              50: '#fdf8f6',
+              100: '#f2e8e5',
+              200: '#eaddd7',
+              600: '#9b2c2c',
+              800: '#742a2a',
+              900: '#4a1515',
+              gold: '#c59b27',
+              goldHover: '#ad871f'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-rose-100 selection:text-stone-900">
+
+<div class="bg-stone-900 text-stone-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide">
+</div>
+
+  <!-- Minimalist Sticky Header -->
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200/80 shadow-sm py-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo / Typography -->
+      <a href="#" class="flex flex-col min-w-0">
+        <span class="font-serif text-xl sm:text-3xl font-bold tracking-tight text-stone-800 truncate">
+          Pinki <span class="text-boutique-800 italic font-medium">Latest Fashions</span>
+        </span>
+        <span class="text-[9px] sm:text-[10px] tracking-[0.15em] uppercase text-stone-500 font-semibold truncate">
+          Ready-to-Wear Ladies Designer Clothes
+        </span>
+      </a>
+
+      <!-- Direct Actions (Profile, Orders & Cart) -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="live-profile-widget">
+            <a href="account.html" id="home-profile-card" class="inline-flex items-center bg-[#f9fafb] hover:bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 shadow-sm text-stone-700 text-xs font-semibold whitespace-nowrap">
+                <div style="width: 20px; height: 20px;" class="bg-stone-600 text-white rounded-full flex items-center justify-center font-bold mr-1.5 text-[10px]" id="home-user-logo">
+                    <i class="fa-solid fa-user text-[10px]"></i>
+                </div>
+                <span id="home-user-text" class="max-w-[70px] sm:max-w-none truncate">Account</span>
+            </a>
+        </div>
+
+        <!-- My Orders Button -->
+        <a href="orders.html" id="my-orders-btn" class="hidden inline-flex items-center px-2.5 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-full hover:bg-stone-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-box mr-1"></i> <span class="hidden sm:inline">Orders</span>
+        </a>
+
+        <!-- Floating/Header Cart Button -->
+        <button onclick="openCartModal()" class="relative inline-flex items-center px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-full shadow-sm transition whitespace-nowrap">
+            <i class="fa-solid fa-cart-shopping mr-1.5"></i>
+            <span>Cart</span>
+            <span id="cart-badge-count" class="ml-1.5 bg-white text-pink-700 font-extrabold px-1.5 py-0.2 rounded-full text-[11px]">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-stone-100 via-[#fbf7f5] to-[#fcfaf9] py-12 sm:py-16 border-b border-stone-200/70">
+    <div class="max-w-5xl mx-auto px-4 text-center space-y-4">
+      <div class="inline-flex items-center gap-2 bg-rose-50 border border-rose-200/60 text-boutique-800 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+        <i class="fa-solid fa-sparkles text-xs"></i>
+        New Festive & Wedding Arrivals
+      </div>
+      
+      <h1 class="font-serif text-3xl sm:text-5xl font-bold text-stone-900 tracking-tight leading-tight">
+        Handcrafted Ready Fashion Clothes & <br class="hidden sm:inline"/><span class="italic font-normal text-boutique-800">Premium Ladies Outfits</span>
+      </h1>
+      
+      <p class="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+        Add single or multiple outfits to your cart, apply your promo code at checkout, and pay via Cash on Delivery or Instant UPI.
+      </p>
+    </div>
+  </section>
+
+  <!-- Products Catalog -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow w-full">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-stone-200 pb-4 mb-8 gap-2">
+      <div>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Curated Ethnic Collection</h2>
+        <p class="text-xs sm:text-sm text-stone-500 mt-1">Select your size & quantity, then add to your shopping cart</p>
+      </div>
+      <div id="catalog-count" class="text-xs font-semibold text-stone-500">
+        Exclusive Readymade Outfits
+      </div>
+    </div>
+    
+    <!-- Dynamic Product Populating Grid -->
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
+    </div>
+  </main>
+
+  <!-- Contact & Footer Section -->
+  <section class="bg-white border-t border-stone-200 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-stone-50 rounded-3xl p-6 sm:p-10 border border-stone-200/80 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-full bg-rose-100 text-boutique-800 flex items-center justify-center">
+            <i class="fa-solid fa-location-dot text-base"></i>
+          </div>
+          <h3 class="font-bold text-stone-900 text-base">Pinki Latest Fashions</h3>
+          <p class="text-stone-600 text-xs leading-relaxed">
+            Omicron-1,EWS Apartment, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh
+          </p>
+          <span class="inline-block text-[11px] text-stone-500 font-semibold bg-stone-200/60 px-2 py-0.5 rounded">
+            Open Monday - Sunday (10 AM - 5 PM)
+          </span>
+        </div>
+
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <i class="fa-solid fa-phone text-base"></i>
+          </div>
+          <h3 class="font-bold text-stone-900 text-base">Call & WhatsApp Order</h3>
+          <div class="space-y-1">
+            <a href="tel:8130748293" class="text-stone-900 font-bold hover:text-boutique-800 text-base block transition">
+              +91 8130748293
+            </a>
+            <a href="https://wa.me/918130748293?text=Hello%20Pinki%20Latest%20Fashion" target="_blank" class="text-xs text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1">
+              <i class="fa-brands fa-whatsapp"></i> Chat directly on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center">
+            <i class="fa-solid fa-shield-halved text-base"></i>
+          </div>
+          <h3 class="font-bold text-stone-900 text-base">Safe Shopping Guarantee</h3>
+          <ul class="text-stone-600 text-xs space-y-2">
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>100% Ready-to-wear with inner lining</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Online UPI & Cash on Delivery</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-emerald-600 text-xs"></i><span>Pan-India Doorstep Delivery</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clean Footer -->
+  <footer class="bg-stone-950 text-stone-400 py-8 text-xs text-center border-t border-stone-800">
+    <div class="max-w-7xl mx-auto px-4 space-y-4">
+      <div class="font-serif text-lg text-white font-bold tracking-tight">Pinki Latest Fashions</div>
+      
+      <!-- Social Media Buttons -->
+      <div class="flex justify-center gap-3 flex-wrap pt-1">
+        <a href="https://www.instagram.com/pinkilatestfashions?rpxt=dW5nbGh1NG13M3J3" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#E1306C] text-white rounded-md font-semibold text-xs hover:opacity-90 transition">
+          <i class="fab fa-instagram"></i> Instagram
+        </a>
+        <a href="https://www.facebook.com/share/1FZweGYpVC/" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#1877F2] text-white rounded-md font-semibold text-xs hover:opacity-90 transition">
+          <i class="fab fa-facebook-f"></i> Facebook
+        </a>
+        <a href="https://youtube.com/@pinkilatestfashions?si=KAnav9glxd0_-28K" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF0000] text-white rounded-md font-semibold text-xs hover:opacity-90 transition">
+          <i class="fab fa-youtube"></i> YouTube
+        </a>
+      </div>
+
+      <p class="text-stone-500 pt-2">Omicron-1, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh | Helpline: +91 8130748293</p>
+      <p class="text-[11px] text-stone-600 pt-1">© 2026 Pinki Latest Fashions. All rights reserved.</p>
+    </div>
+    <a href="about.html" class="inline-flex items-center px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-full transition whitespace-nowrap">
+    <i class="fa-solid fa-circle-info mr-1"></i> About Us / हमारे बारे में
+</a>
+
+  </footer>
+
+  <!-- FULLSCREEN IMAGE PREVIEW MODAL -->
+  <div id="productZoomModal" onclick="closeProductZoom()" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 cursor-zoom-out">
+    <div class="relative max-w-xl w-full flex flex-col items-center">
+      <button onclick="closeProductZoom()" class="self-end mb-2 bg-white text-stone-900 px-3 py-1 rounded-full text-xs font-bold shadow">✕ Close</button>
+      <img id="productZoomImg" src="" alt="Outfit Preview" class="max-h-[82vh] w-auto rounded-2xl border-2 border-white shadow-2xl object-contain bg-white">
+    </div>
+  </div>
+
+  <!-- SHOPPING CART & BILL CHECKOUT MODAL -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-bold text-stone-800 flex items-center gap-2">
+          <i class="fa-solid fa-bag-shopping text-pink-600"></i> Your Shopping Cart
+        </h3>
+        <button onclick="closeCartModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+      </div>
+
+      <div id="empty-cart-view" class="hidden text-center py-10 space-y-3">
+        <i class="fa-solid fa-cart-arrow-down text-4xl text-stone-300"></i>
+        <p class="text-sm font-semibold text-stone-600">Your cart is currently empty.</p>
+        <button onclick="closeCartModal()" class="px-5 py-2 bg-pink-600 text-white text-xs font-bold rounded-xl hover:bg-pink-700">Continue Shopping</button>
+      </div>
+
+      <div id="filled-cart-view" class="space-y-4">
+        <div id="cart-items-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1"></div>
+
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1.5">
+          <label class="block text-xs font-bold text-stone-700">Have a Promo / Coupon Code?</label>
+          <div class="flex gap-2">
+            <input type="text" id="cart-coupon-input" placeholder="Enter coupon code (e.g. PINKI100)" class="w-full text-xs uppercase border border-stone-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-pink-500">
+            <button type="button" onclick="applyCartCoupon()" class="px-4 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-lg shrink-0 transition">
+              Apply
+            </button>
+          </div>
+          <div id="cart-coupon-msg" class="text-[11px] font-medium"></div>
+        </div>
+
+        <div class="bg-pink-50/60 border border-pink-100 rounded-xl p-3.5 space-y-2 text-xs">
+          <div class="flex justify-between text-stone-600">
+            <span>Total Outfits (<span id="bill-total-qty">0</span> pcs):</span>
+            <span id="bill-subtotal" class="font-semibold text-stone-800">₹0</span>
+          </div>
+          <div class="flex justify-between text-stone-600">
+            <span>Delivery Charges:</span>
+            <span id="bill-delivery" class="font-semibold text-stone-800">₹0</span>
+          </div>
+          <div id="delivery-free-hint" class="text-[11px] text-emerald-700 font-medium"></div>
+          <div id="bill-discount-row" class="hidden flex justify-between text-emerald-700 font-bold">
+            <span>Coupon Discount (<span id="bill-coupon-name"></span>):</span>
+            <span id="bill-discount">-₹0</span>
+          </div>
+          <div class="border-t border-pink-200 pt-2 flex justify-between text-sm font-extrabold text-stone-900">
+            <span>Grand Total Payable:</span>
+            <span id="bill-grand-total" class="text-pink-600 text-base">₹0</span>
+          </div>
+        </div>
+
+        <!-- Return, Refund & Unboxing Policy Agreement Box -->
+        <div class="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-3 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-stone-900">📜 Return, Refund & Cancellation Policy</span>
+            <a href="privacy.html" target="_blank" class="text-pink-600 font-bold underline hover:text-pink-700">
+              View Rules ↗
+            </a>
+          </div>
+          
+          <div class="flex items-start gap-2.5">
+            <input type="checkbox" id="policy-agree-checkbox" class="mt-0.5 w-4 h-4 text-pink-600 rounded border-stone-300 focus:ring-pink-500 cursor-pointer">
+            <label for="policy-agree-checkbox" class="text-stone-700 leading-relaxed cursor-pointer font-medium">
+              मैंने रिटर्न, रिफंड, कैंसिलेशन और <span class="font-bold text-stone-900">अनबॉक्सिंग वीडियो (Unboxing Video)</span> के नियम पढ़ लिए हैं और मैं इनसे सहमत हूँ। (बिना वीडियो के डैमेज/रिटर्न मान्य नहीं होगा)।
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          <div class="font-bold text-stone-700">Select Payment Method:</div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 border border-stone-200 rounded-xl p-2.5 cursor-pointer hover:bg-stone-50">
+              <input type="radio" name="cart-payment-mode" value="COD" checked onchange="updateCheckoutButtonText()">
+              <span class="font-semibold text-stone-700">Cash on Delivery</span>
+            </label>
+            <label class="flex items-center gap-2 border border-stone-200 rounded-xl p-2.5 cursor-pointer hover:bg-stone-50">
+              <input type="radio" name="cart-payment-mode" value="Online UPI" onchange="updateCheckoutButtonText()">
+              <span class="font-semibold text-stone-700">Online UPI</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex gap-2.5 pt-2">
+          <button onclick="closeCartModal()" class="w-1/3 py-2.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl text-xs transition">
+            + Add More
+          </button>
+          <button id="checkout-submit-btn" onclick="checkoutCart()" class="w-2/3 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-sm shadow transition">
+            Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONLINE UPI PAYMENT POPUP (Updated with New QR / Details) -->
+  <div id="upiPaymentModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-emerald-600"></i> Complete UPI Payment
+        </h3>
+        <button onclick="closeUpiPaymentModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+      </div>
+
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2.5 text-center">
+        <div class="text-xs font-bold text-emerald-900">Step 1: Pay Amount to Store UPI / QR</div>
+        <div class="text-2xl font-extrabold text-pink-600" id="upi-modal-amount">₹0</div>
+        
+        <!-- QR Code Image Added Here -->
+        <div class="flex justify-center my-2">
+          <img src="26332.jpeg" alt="Payment QR Code" class="w-40 h-40 object-contain rounded-xl border border-emerald-300 p-1 bg-white shadow-sm">
+        </div>
+
+        <div class="bg-white border border-emerald-300 rounded-lg py-1.5 px-3 inline-flex items-center gap-2">
+          <span class="font-mono font-bold text-xs text-stone-800">paytm.s3e76cq@pty</span>
+          <button type="button" onclick="copyStoreUpiId()" class="text-[11px] font-bold text-emerald-700 hover:underline">Copy UPI</button>
+        </div>
+
+        <!-- Bank Details Display Inside UPI Modal -->
+        <div class="bg-white p-2.5 rounded-lg border border-emerald-200 text-left text-xs space-y-1 text-stone-700">
+          <div class="font-bold text-stone-900">Direct Bank Transfer Also Available:</div>
+          <div><strong>A/c No:</strong> 2747311708</div>
+          <div><strong>IFSC Code:</strong> KKBK0005028</div>
+        </div>
+
+        <div>
+          <button type="button" onclick="openUpiAppForPendingOrder()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen-button"></i> Open UPI App (GPay / PhonePe / Paytm)
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="font-bold text-stone-800 border-b pb-1">
+          Step 2: Submit Payment Proof (Both Mandatory to Confirm Order)
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 mb-1">1. 12-Digit UPI Transaction ID / UTR Number *</label>
+          <input type="text" id="upi-modal-utr" maxlength="12" oninput="this.value = this.value.replace(/\D/g, '')" placeholder="Enter 12-digit UTR No. (e.g. 412345678901)" class="w-full font-mono text-xs font-bold border border-stone-300 rounded-xl px-3 py-2.5 bg-stone-50 focus:bg-white focus:border-pink-600 outline-none">
+        </div>
+
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-2 text-center">
+          <label class="block font-bold text-stone-700 text-left">2. Upload Payment Success Screenshot *</label>
+          <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-3 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold rounded-xl transition">
+            <i class="fa-solid fa-image"></i> Select Payment Screenshot
+            <input type="file" id="upi-screenshot-file" accept="image/*" onchange="handleUpiScreenshotUpload(event)" class="hidden">
+          </label>
+          <img id="upi-screenshot-preview" src="" alt="Payment Screenshot Preview" class="hidden mx-auto max-h-40 rounded-xl border border-stone-300 shadow-sm object-contain bg-white">
+          <div id="upi-screenshot-status" class="text-[11px] font-semibold text-stone-500">No screenshot selected yet</div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2 border-t">
+        <button type="button" onclick="closeUpiPaymentModal()" class="w-1/3 py-2.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl text-xs">
+          Cancel
+        </button>
+        <button type="button" id="upi-final-confirm-btn" onclick="confirmAndCreateUpiOrder()" class="w-2/3 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow transition">
+          Verify & Confirm Order
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public Reviews List Pop-up -->
+  <div id="viewReviewsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:9999;">
+    <div style="background:#fff; padding:20px; border-radius:14px; width:90%; max-width:400px; max-height:80vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px;">
+        <h3 style="margin:0; font-size:16px; font-weight:bold;">Customer Reviews</h3>
+        <button onclick="document.getElementById('viewReviewsModal').style.display='none'" style="border:none; background:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <div id="publicReviewsList"></div>
+    </div>
+  </div>
+
+  <!-- Custom Smooth White Alert & Confirm Modal -->
+  <div id="customPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
+    <div style="background:#ffffff; border-radius:20px; width:100%; max-width:360px; padding:24px; box-shadow:0 20px 35px rgba(0,0,0,0.18); text-align:center; font-family:'Plus Jakarta Sans', sans-serif; animation:popScale 0.2s ease-out;">
+      <div id="customPopupIcon" style="width:48px; height:48px; margin:0 auto 14px; border-radius:50%; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">!</div>
+      <h3 id="customPopupTitle" style="margin:0 0 8px; font-size:18px; font-weight:700; color:#1c1917;">Notice</h3>
+      <p id="customPopupMessage" style="margin:0 0 20px; font-size:14px; color:#57534e; line-height:1.5; white-space:pre-line;"></p>
+      <div id="customPopupButtons" style="display:flex; gap:10px; justify-content:center;">
+        <button id="customPopupCancelBtn" style="display:none; flex:1; padding:10px 16px; border:1px solid #d6d3d1; background:#f5f5f4; color:#44403c; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Cancel</button>
+        <button id="customPopupOkBtn" style="flex:1; padding:10px 16px; border:none; background:#db2777; color:#ffffff; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(219,39,119,0.25);">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes popScale {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+
+  <!-- 1. Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZusA-DD8Tgz1Ak3GYT7zxFcqIvomDgj0",
+      authDomain: "auth.pinkilatestfashions.in",
+      projectId: "pinki-latest-fashions",
+      storageBucket: "pinki-latest-fashions.firebasestorage.app",
+      messagingSenderId: "668264461811",
+      appId: "1:668264461811:web:d51468e474750e69634e86",
+      measurementId: "G-21HR2KLRJY"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    window.db = firebase.firestore();
+  </script>
+
+  <!-- 2. Core Product Catalog --> 
+  <script src="product.js"></script> 
+
+  <!-- 3. UI Helpers, Stock Sync & Cart Engine -->
+  <script>
+    window.showAlert = function(message, title = "Pinki Latest Fashion", type = "info") {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("customPopupOverlay");
+        const icon = document.getElementById("customPopupIcon");
+        document.getElementById("customPopupTitle").innerText = title;
+        document.getElementById("customPopupMessage").innerText = message;
+        
+        if (type === "error") {
+          icon.style.background = "#fee2e2"; icon.style.color = "#dc2626"; icon.innerText = "✕";
+        } else if (type === "success") {
+          icon.style.background = "#dcfce7"; icon.style.color = "#16a34a"; icon.innerText = "✓";
+        } else {
+          icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "!";
+        }
+
+        document.getElementById("customPopupCancelBtn").style.display = "none";
+        const okBtn = document.getElementById("customPopupOkBtn");
+        okBtn.innerText = "OK";
+        overlay.style.display = "flex";
+
+        okBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(true);
+        };
+      });
+    };
+
+    window.showConfirm = function(message, title = "Confirm Order") {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("customPopupOverlay");
+        const icon = document.getElementById("customPopupIcon");
+        document.getElementById("customPopupTitle").innerText = title;
+        document.getElementById("customPopupMessage").innerText = message;
+        
+        icon.style.background = "#fce7f3"; icon.style.color = "#db2777"; icon.innerText = "?";
+
+        const cancelBtn = document.getElementById("customPopupCancelBtn");
+        const okBtn = document.getElementById("customPopupOkBtn");
+        cancelBtn.style.display = "block";
+        okBtn.innerText = "Confirm";
+        overlay.style.display = "flex";
+
+        cancelBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(false);
+        };
+        okBtn.onclick = () => {
+          overlay.style.display = "none";
+          resolve(true);
+        };
+      });
+    };
+
+    function switchCardPhoto(productId, imgUrl, btnElem) {
+      const mainImg = document.getElementById(`main-img-${productId}`);
+      if (mainImg) mainImg.src = imgUrl;
+      const parent = btnElem.parentElement;
+      if (parent) {
+        Array.from(parent.children).forEach(b => b.classList.remove("ring-2", "ring-pink-600"));
+        btnElem.classList.add("ring-2", "ring-pink-600");
+      }
+    }
+
+    function openProductZoom(productId) {
+      const mainImg = document.getElementById(`main-img-${productId}`); 
+      if (!mainImg) return; 
+      document.getElementById("productZoomImg").src = mainImg.src; 
+      document.getElementById("productZoomModal").classList.remove("hidden"); 
+    }  
+    
+    function closeProductZoom() { 
+      document.getElementById("productZoomModal").classList.add("hidden"); 
+    }
+
+    window.refreshProductStockUI = function(productId) {
+      const badge = document.getElementById(`stock-badge-${productId}`);
+      const sizeElem = document.getElementById(`size-${productId}`);
+      const addCartBtn = document.getElementById(`add-cart-btn-${productId}`);
+      const buyBtn = document.getElementById(`buy-btn-${productId}`);
+      if (!badge || !sizeElem) return;
+
+      const selectedSize = sizeElem.value;
+      const avail = window.liveRemainingStock?.[String(productId)]?.[selectedSize];
+
+      if (avail === undefined) {
+        badge.innerHTML = `<span class="text-emerald-600">✓ In Stock</span>`;
+        return;
+      }
+
+      if (avail <= 0) {
+        badge.innerHTML = `<span class="text-red-600 font-bold">✕ Out of Stock in ${selectedSize}</span>`;
+        if (addCartBtn) { addCartBtn.disabled = true; addCartBtn.classList.add("opacity-50", "cursor-not-allowed"); }
+        if (buyBtn) { buyBtn.disabled = true; buyBtn.classList.add("opacity-50", "cursor-not-allowed"); }
+      } else {
+        if (avail <= 3) {
+          badge.innerHTML = `<span class="text-amber-600 font-bold">⚡ Hurry! Only ${avail} left in ${selectedSize}</span>`;
+        } else {
+          badge.innerHTML = `<span class="text-emerald-600 font-semibold">✓ In Stock (${avail} available)</span>`;
+        }
+        if (addCartBtn) { addCartBtn.disabled = false; addCartBtn.classList.remove("opacity-50", "cursor-not-allowed"); }
+        if (buyBtn) { buyBtn.disabled = false; buyBtn.classList.remove("opacity-50", "cursor-not-allowed"); }
+      }
+    };
+
+    let shoppingCart = JSON.parse(localStorage.getItem("pinki_fashion_cart") || "[]");
+    let activeCartCoupon = null;
+    let pendingUpiOrderPayload = null;
+    let uploadedUpiScreenshotBase64 = "";
+
+    function saveCartToStorage() {
+      localStorage.setItem("pinki_fashion_cart", JSON.stringify(shoppingCart));
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      const totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById("cart-badge-count");
+      if (badge) badge.innerText = totalItems;
+    }
+
+    async function addToCart(productId, openModalAfter = false) {
+      if (typeof PRODUCTS === 'undefined') {
+        await showAlert("Products list is still loading. Please check product.js for syntax errors.", "Error", "error");
+        return false;
+      }
+
+      const item = PRODUCTS.find(p => Number(p.id) === Number(productId));
+      if (!item) return false;
+
+      const sizeElem = document.getElementById(`size-${productId}`);
+      const selectedSize = sizeElem ? sizeElem.value : "Free Size";
+
+      const qtyElem = document.getElementById(`qty-${productId}`); 
+      const addQty = qtyElem ? (parseInt(qtyElem.value) || 1) : 1;  
+      if (addQty < 1) { 
+        await showAlert("Please select at least 1 quantity.", "Invalid Quantity", "error"); 
+        return false; 
+      }  
+
+      const existingIndex = shoppingCart.findIndex(c => Number(c.productId) === Number(item.id) && c.size === selectedSize); 
+      const alreadyInCartQty = existingIndex > -1 ? shoppingCart[existingIndex].quantity : 0; 
+      const totalRequestedQty = alreadyInCartQty + addQty;  
+
+      const avail = window.liveRemainingStock?.[String(item.id)]?.[selectedSize]; 
+      if (avail !== undefined && avail <= 0) { 
+        await showAlert(`Sorry, Size ${selectedSize} is currently Out of Stock!`, "Out of Stock", "error");
+        return false;
+      }
+      if (avail !== undefined && totalRequestedQty > avail) {
+        await showAlert(`Only ${avail} piece(s) available in Size ${selectedSize} (You already have ${alreadyInCartQty} in cart).`, "Limited Stock", "error");
+        return false;
+      }
+
+      if (existingIndex > -1) {
+        shoppingCart[existingIndex].quantity += addQty;
+      } else {
+        shoppingCart.push({
+          productId: item.id,
+          title: item.title,
+          price: item.price,
+          image: item.image,
+          size: selectedSize,
+          quantity: addQty
+        });
+      }
+
+      saveCartToStorage();
+
+      if (openModalAfter) {
+        openCartModal();
+      } else {
+        await showAlert(`"${item.title}" (Size: ${selectedSize}) has been added to your cart!`, "Added to Cart", "success");
+      }
+      return true;
+    }
+
+    async function buyNowNow(productId) {
+      await addToCart(productId, true);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() { 
+      const loggedInUser = sessionStorage.getItem("currentLoggedInUser"); 
+      if (loggedInUser) { 
+        const user = JSON.parse(loggedInUser); 
+        document.getElementById("home-user-text").innerText = "Hi, " + user.name; 
+        document.getElementById("home-user-logo").innerText = user.name.charAt(0).toUpperCase(); 
+        document.getElementById("home-user-logo").style.background = "#10b981"; 
+      } 
+      const ordersBtn = document.getElementById("my-orders-btn"); 
+      if (ordersBtn) ordersBtn.classList.remove("hidden");  
+
+      const gridContainer = document.getElementById("product-grid"); 
+      if (gridContainer && typeof PRODUCTS !== 'undefined') { 
+        const countEl = document.getElementById("catalog-count"); 
+        if (countEl) countEl.innerText = `${PRODUCTS.length} Exclusive Readymade Outfits`;
+
+        gridContainer.innerHTML = "";
+        PRODUCTS.forEach(product => {
+          let sizeOptions = (product.sizes || ["Free Size"]).map(s => `<option value="${s}">${s}</option>`).join("");
+          let discountPercent = 0;
+          if (product.mrp && product.mrp > product.price) {
+            discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+          }
+
+          const allPhotos = (Array.isArray(product.images) && product.images.length > 0) ? product.images : [product.image];
+          const thumbsHtml = allPhotos.length > 1 ? `
+            <div class="absolute bottom-2 inset-x-2 flex justify-center gap-1.5 z-10">
+              ${allPhotos.map((url, idx) => `
+                <button type="button" onclick="event.stopPropagation(); switchCardPhoto(${product.id}, '${url}', this)" class="w-8 h-9 rounded-md overflow-hidden border border-white bg-white shadow ${idx === 0 ? 'ring-2 ring-pink-600' : 'opacity-85 hover:opacity-100'}">
+                  <img src="${url}" class="w-full h-full object-cover">
+                </button>
+              `).join('')}
+            </div>
+          ` : '';
+
+          const productCard = `
+            <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
+              <div>
+                <div onclick="openProductZoom(${product.id})" class="relative pt-[125%] bg-stone-50 overflow-hidden cursor-zoom-in group">
+                  <img id="main-img-${product.id}" src="${allPhotos[0]}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  ${discountPercent > 0 ? `<span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">${discountPercent}% OFF</span>` : ''}
+                  ${thumbsHtml}
+                </div>
+                <div class="p-4">
+                  <h3 class="font-serif font-bold text-stone-900 text-base line-clamp-1">${product.title}</h3>
+                  <p class="text-xs text-stone-500 mt-1">${product.desc || 'Premium Ready-made Collection'}</p>
+                  
+                  <div class="public-rating-box mt-1.5" data-product-id="${product.id}"></div>
+                  <div id="stock-badge-${product.id}" class="mt-1.5 text-xs font-semibold text-stone-400">Checking stock...</div>
+
+                  <div class="flex items-start justify-between mt-3 gap-2">
+                    <div class="flex flex-col">
+                      <div class="flex items-baseline gap-1.5">
+                        <span class="text-lg font-bold text-pink-600">₹${product.price}</span>${product.mrp && product.mrp > product.price ? `<span class="text-xs text-stone-400 line-through">₹${product.mrp}</span>` : ''}
+                      </div>
+                      ${discountPercent > 0 ? `<span class="text-[11px] font-bold text-emerald-600">Save ₹${product.mrp - product.price} (${discountPercent}% OFF)</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <span class="text-xs text-stone-500">Size:</span>
+                      <select id="size-${product.id}" onchange="if(typeof refreshProductStockUI==='function') refreshProductStockUI(${product.id})" class="text-xs bg-stone-50 border border-stone-300 rounded px-2 py-1">
+                        ${sizeOptions}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 pt-0 space-y-2.5">
+                <div class="flex items-center justify-between text-xs text-stone-600">
+                  <label>Quantity (Qty):</label>
+                  <input type="number" id="qty-${product.id}" value="1" min="1" max="10" class="w-16 border border-stone-300 rounded px-2 py-1 text-center bg-white">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" id="add-cart-btn-${product.id}" onclick="addToCart(${product.id}, false)" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-cart-plus"></i> ADD TO CART
+                  </button>
+                  <button type="button" id="buy-btn-${product.id}" onclick="buyNowNow(${product.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-bolt"></i> BUY NOW
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          gridContainer.innerHTML += productCard;
+        });
+
+        if (typeof syncProductsAndLiveStock === "function") {
+          syncProductsAndLiveStock();
+        }
+        if (typeof loadPublicReviews === "function") {
+          loadPublicReviews();
+        }
+        updateCartBadge();
+      }
+    });
+
+    function getSavedUserPincode() {
+      try {
+        const raw = sessionStorage.getItem("currentLoggedInUser");
+        if (raw) {
+          const u = JSON.parse(raw);
+          return String(u.pincode || "").replace(/\D/g, "");
+        }
+      } catch (e) {}
+      return "";
+    }
+
+    function calculateDeliverySilent(subtotal) {
+      const pin = getSavedUserPincode();
+
+      if (pin.length < 3) {
+        const freeLimit = 1499;
+        return {
+          fee: subtotal >= freeLimit ? 0 : 60,
+          hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
+        };
+      }
+
+      const prefix3 = pin.slice(0, 3);
+
+      if (prefix3 === "201") {
+        const freeLimit = 999;
+        return {
+          fee: subtotal >= freeLimit ? 0 : 40,
+          hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
+        };
+      }
+
+      const ncrPrefixes = ["110", "121", "122", "202", "203", "250"];
+      if (ncrPrefixes.includes(prefix3)) {
+        const freeLimit = 1499;
+        return {
+          fee: subtotal >= freeLimit ? 0 : 60,
+          hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
+        };
+      }
+
+      const freeLimit = 1999;
+      return {
+        fee: subtotal >= freeLimit ? 0 : 90,
+        hint: subtotal >= freeLimit ? "✓ Free Delivery unlocked on this order!" : `Add ₹${freeLimit - subtotal} more for FREE Delivery`
+      };
+    }
+
+    function copyStoreUpiId() {
+      navigator.clipboard.writeText("paytm.s3e76cq@pty").then(() => {
+        showAlert("UPI ID copied: paytm.s3e76cq@pty", "Copied", "success");
+      });
+    }
+
+    function updateCheckoutButtonText() {
+      const payElem = document.querySelector('input[name="cart-payment-mode"]:checked');
+      const btn = document.getElementById("checkout-submit-btn");
+      if (!btn || !payElem) return;
+
+      if (payElem.value === "COD") {
+        btn.innerText = "Place Order";
+      } else {
+        btn.innerText = "Proceed to Pay & Place Order";
+      }
+    }
+
+    function removeCartItem(index) {
+      shoppingCart.splice(index, 1);
+      saveCartToStorage();
+      renderCartModal();
+    }
+
+    async function updateCartItemQty(index, delta) {
+      const cartItem = shoppingCart[index];
+      if (!cartItem) return;
+
+      const newQty = cartItem.quantity + delta;
+      if (newQty <= 0) {
+        removeCartItem(index);
+        return;
+      }
+
+      const avail = window.liveRemainingStock?.[String(cartItem.productId)]?.[cartItem.size];
+      if (avail !== undefined && newQty > avail) {
+        await showAlert(`Maximum ${avail} piece(s) available in Size ${cartItem.size}.`, "Stock Limit", "error");
+        return;
+      }
+
+      cartItem.quantity = newQty;
+      saveCartToStorage();
+      renderCartModal();
+    }
+
+    function openCartModal() {
+      renderCartModal();
+      document.getElementById("cartModal").classList.remove("hidden");
+    }
+
+    function closeCartModal() {
+      document.getElementById("cartModal").classList.add("hidden");
+    }
+
+    function renderCartModal() {
+      const emptyView = document.getElementById("empty-cart-view");
+      const filledView = document.getElementById("filled-cart-view");
+      const listContainer = document.getElementById("cart-items-list");
+
+      if (shoppingCart.length === 0) {
+        emptyView.classList.remove("hidden");
+        filledView.classList.add("hidden");
+        activeCartCoupon = null;
+        return;
+      }
+
+      emptyView.classList.add("hidden");
+      filledView.classList.remove("hidden");
+      listContainer.innerHTML = "";
+
+      let subtotal = 0;
+      let totalQty = 0;
+
+      shoppingCart.forEach((cItem, idx) => {
+        const itemTotal = cItem.price * cItem.quantity;
+        subtotal += itemTotal;
+        totalQty += cItem.quantity;
+
+        listContainer.innerHTML += `
+          <div class="flex items-center justify-between gap-3 bg-white border border-stone-200 rounded-xl p-2.5">
+            <img src="${cItem.image}" class="w-12 h-14 object-cover rounded-lg border shrink-0">
+            <div class="flex-grow min-w-0">
+              <div class="text-xs font-bold text-stone-800 truncate">${cItem.title}</div>
+              <div class="text-[11px] text-stone-500">Size: <span class="font-semibold">${cItem.size}</span> | ₹${cItem.price} each</div>
+              <div class="flex items-center gap-2 mt-1">
+                <button onclick="updateCartItemQty(${idx}, -1)" class="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 font-bold text-xs">-</button>
+                <span class="text-xs font-bold">${cItem.quantity}</span>
+                <button onclick="updateCartItemQty(${idx}, 1)" class="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 font-bold text-xs">+</button>
+              </div>
+            </div>
+            <div class="text-right shrink-0 space-y-1">
+              <div class="text-xs font-extrabold text-pink-600">₹${itemTotal}</div>
+              <button onclick="removeCartItem(${idx})" class="text-[11px] text-red-500 hover:underline">Remove</button>
+            </div>
+          </div>
+        `;
+      });
+
+      const deliveryInfo = calculateDeliverySilent(subtotal);
+      const deliveryCharge = deliveryInfo.fee;
+
+      document.getElementById("delivery-free-hint").innerText = deliveryInfo.hint;
+
+      let discountAmount = 0;
+      const discountRow = document.getElementById("bill-discount-row");
+      const msgEl = document.getElementById("cart-coupon-msg");
+
+      if (activeCartCoupon) {
+        if (totalQty < activeCartCoupon.minQty) {
+          msgEl.innerHTML = `<span class="text-red-600">✕ Coupon '${activeCartCoupon.code}' removed (requires at least ${activeCartCoupon.minQty} items in cart).</span>`;
+          activeCartCoupon = null;
+          discountRow.classList.add("hidden");
+        } else {
+          discountAmount = activeCartCoupon.discount;
+          discountRow.classList.remove("hidden");
+          document.getElementById("bill-coupon-name").innerText = activeCartCoupon.code;
+          document.getElementById("bill-discount").innerText = `-₹${discountAmount}`;
+        }
+      } else {
+        discountRow.classList.add("hidden");
+      }
+
+      const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);
+      document.getElementById("bill-total-qty").innerText = totalQty;
+      document.getElementById("bill-subtotal").innerText = `₹${subtotal}`;
+      document.getElementById("bill-delivery").innerHTML = deliveryCharge === 0 
+        ? `<span class="text-emerald-600 font-bold">FREE</span>` 
+        : `₹${deliveryCharge}`;
+      document.getElementById("bill-grand-total").innerText = `₹${grandTotal}`;
+      
+      updateCheckoutButtonText();
+    }
+
+    async function applyCartCoupon() {
+      const input = document.getElementById("cart-coupon-input");
+      const msgEl = document.getElementById("cart-coupon-msg");
+      const inputCouponCode = (input.value || "").trim().toUpperCase();
+
+      if (!inputCouponCode) {
+        msgEl.innerHTML = `<span class="text-red-600">Please enter a coupon code.</span>`;
+        activeCartCoupon = null;
+        renderCartModal();
+        return;
+      }
+
+      msgEl.innerHTML = `<span class="text-stone-500">Verifying coupon...</span>`;
+
+      try {
+        const couponDoc = await db.collection("coupons").doc(inputCouponCode).get();
+
+        if (!couponDoc.exists) {
+          msgEl.innerHTML = `<span class="text-red-600">❌ यह कूपन कोड गलत है!</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        const coupon = couponDoc.data();
+
+        if (coupon.type === "festival" && coupon.expiryDate) {
+          if (new Date() > new Date(coupon.expiryDate)) {
+            msgEl.innerHTML = `<span class="text-red-600">❌ इस कूपन की समय सीमा समाप्त हो चुकी है।</span>`;
+            activeCartCoupon = null;
+            renderCartModal();
+            return;
+          }
+        }
+
+        const minRequiredQty = Number(coupon.minQty || 1);
+        const totalCartQty = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+        if (totalCartQty < minRequiredQty) {
+          msgEl.innerHTML = `<span class="text-red-600">❌ इस कूपन के लिए कार्ट में कम से कम ${minRequiredQty} आउटफिट्स होना ज़रूरी है!</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        const minAllowedPrice = Number(coupon.minProductPrice || coupon.minProdPrice || 0);
+        for (let item of shoppingCart) {
+          if (Number(item.price) < minAllowedPrice) {
+            msgEl.innerHTML = `<span class="text-red-600">❌ यह कूपन केवल ₹${minAllowedPrice} या उससे महंगे प्रोडक्ट्स पर लागू होता है!</span>`;
+            activeCartCoupon = null;
+            renderCartModal();
+            return;
+          }
+        }
+
+        const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+        if (!loggedInRaw) {
+          msgEl.innerHTML = `<span class="text-red-600">कृपया कूपन लगाने से पहले लॉगिन करें!</span>`;
+          return;
+        }
+        const user = JSON.parse(loggedInRaw);
+        const userMobile = user.phone || user.email;
+
+        const usageCheck = await db.collection("coupon_usages")
+          .where("mobile", "==", userMobile)
+          .where("couponCode", "==", coupon.code || inputCouponCode)
+          .get();
+
+        if (!usageCheck.empty) {
+          msgEl.innerHTML = `<span class="text-red-600">❌ आप इस कूपन का इस्तेमाल पहले ही कर चुके हैं, यह दोबारा लागू नहीं होगा!</span>`;
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        let subtotal = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let discountVal = Number(coupon.discount) || 0;
+        let dType = (coupon.discType || coupon.discountType || "").toLowerCase();
+        let maxCapLimit = Number(coupon.maxDiscount ?? coupon.maxCap ?? 0);
+
+        let finalDiscount = 0;
+        let labelText = "";
+
+        if (dType === "flat" || dType === "rupees") {
+          finalDiscount = discountVal;
+          labelText = `₹${finalDiscount} फ्लैट छूट`;
+        } else {
+          let rawPercentDiscount = Math.round((subtotal * discountVal) / 100);
+          if (maxCapLimit > 0) {
+            finalDiscount = Math.min(rawPercentDiscount, maxCapLimit);
+            labelText = `${discountVal}% छूट, अधिकतम ₹${maxCapLimit} तक`;
+          } else {
+            finalDiscount = rawPercentDiscount;
+            labelText = `${discountVal}% छूट`;
+          }
+        }
+
+        activeCartCoupon = {
+          code: coupon.code || inputCouponCode,
+          discount: finalDiscount,
+          minQty: minRequiredQty,
+          minProdPrice: minAllowedPrice
+        };
+
+        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ कूपन '${activeCartCoupon.code}' लागू हो गया है (${labelText})!</span>`;
+        renderCartModal();
+
+      } catch (err) {
+        msgEl.innerHTML = `<span class="text-red-600">Error verifying coupon: ${err.message}</span>`;
+      }
+    }
+
+    async function checkoutCart() {
+      if (shoppingCart.length === 0) return;
+
+      const isPolicyChecked = document.getElementById("policy-agree-checkbox").checked;
+      if (!isPolicyChecked) {
+        await showAlert("कृपया आगे बढ़ने से पहले Return, Refund & Unboxing Video Policy के चेकबॉक्स पर टिक (Agree) करें!", "Policy Agreement Required", "error");
+        return;
+      }
+
+      const loggedInRaw = sessionStorage.getItem("currentLoggedInUser");
+      if (!loggedInRaw) {
+        closeCartModal();
+        await showAlert("Please log in first to place your order!", "Login Required", "info");
+        window.location.href = "account.html";
+        return;
+      }
+
+      const user = JSON.parse(loggedInRaw);
+      const payElem = document.querySelector('input[name="cart-payment-mode"]:checked');
+      const paymentMethod = payElem ? payElem.value : "COD";
+
+      let subtotal = 0;
+      let totalQty = 0;
+      for (const cItem of shoppingCart) {
+        const avail = window.liveRemainingStock?.[String(cItem.productId)]?.[cItem.size];
+        if (avail !== undefined && cItem.quantity > avail) {
+          await showAlert(`Sorry, "${cItem.title}" (Size ${cItem.size}) only has ${avail} piece(s) left. Please adjust your cart.`, "Stock Updated", "error");
+          return;
+        }
+        subtotal += cItem.price * cItem.quantity;
+        totalQty += cItem.quantity;
+      }
+
+      const deliveryInfo = calculateDeliverySilent(subtotal);
+      const deliveryCharge = deliveryInfo.fee;
+      let discountAmount = 0;
+      let appliedCode = "";
+
+      if (activeCartCoupon) {
+        const freshSnap = await db.collection("coupons").doc(activeCartCoupon.code).get();
+        if (!freshSnap.exists) {
+          await showAlert("Sorry! This coupon is no longer available. Please remove it or try another.", "Coupon Invalid", "error");
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+        
+        const userMobile = user.phone || user.email;
+        const usageCheck = await db.collection("coupon_usages")
+          .where("mobile", "==", userMobile)
+          .where("couponCode", "==", activeCartCoupon.code)
+          .get();
+
+        if (!usageCheck.empty) {
+          await showAlert("❌ आप इस कूपन का इस्तेमाल पहले ही कर चुके हैं!", "Coupon Already Used", "error");
+          activeCartCoupon = null;
+          renderCartModal();
+          return;
+        }
+
+        discountAmount = activeCartCoupon.discount;
+        appliedCode = activeCartCoupon.code;
+      }
+
+      const grandTotal = Math.max(0, subtotal + deliveryCharge - discountAmount);
+      const batchOrderGroup = "GRP-" + Math.floor(100000 + Math.random() * 900000);
+
+      const orderContext = {
+        user,
+        deliveryCharge,
+        discountAmount,
+        appliedCode,
+        grandTotal,
+        batchOrderGroup,
+        paymentMethod
+      };
+
+      if (paymentMethod === "Online UPI") {
+        pendingUpiOrderPayload = orderContext;
+        uploadedUpiScreenshotBase64 = "";
+        document.getElementById("upi-modal-amount").innerText = `₹${grandTotal}`;
+        document.getElementById("upi-modal-utr").value = "";
+        document.getElementById("upi-screenshot-file").value = "";
+        document.getElementById("upi-screenshot-preview").classList.add("hidden");
+        document.getElementById("upi-screenshot-preview").src = "";
+        document.getElementById("upi-screenshot-status").innerText = "No screenshot selected yet";
+        document.getElementById("upi-screenshot-status").className = "text-[11px] font-semibold text-stone-500";
+
+        closeCartModal();
+        document.getElementById("upiPaymentModal").classList.remove("hidden");
+        openUpiAppForPendingOrder();
+        return;
+      }
+
+      const summaryLines = shoppingCart.map(i => `• ${i.title} (${i.size}) x${i.quantity} = ₹${i.price * i.quantity}`).join("\n");
+      const confirmMsg = `${summaryLines}\n\nSubtotal: ₹${subtotal}\nDelivery: ${deliveryCharge === 0 ? 'FREE' : '₹' + deliveryCharge}${discountAmount > 0 ? `\nCoupon (${appliedCode}): -₹${discountAmount}` : ''}\nGrand Total Payable: ₹${grandTotal}\nPayment Mode: Cash on Delivery (COD)\n\nConfirm this order?`;
+
+      const isConfirmed = await showConfirm(confirmMsg, "Confirm COD Order");
+      if (!isConfirmed) return;
+
+      await finalizeOrderInFirestore(orderContext, "", "");
+    }
+
+    function openUpiAppForPendingOrder() {
+      if (!pendingUpiOrderPayload) return;
+      const myUpiId = "paytm.s3e76cq@pty";
+      const merchantName = "Pinki Latest Fashion";
+      const amt = pendingUpiOrderPayload.grandTotal;
+      const ref = pendingUpiOrderPayload.batchOrderGroup;
+      const upiUrl = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(merchantName)}&am=${amt}&cu=INR&tn=${encodeURIComponent("Order " + ref)}`;
+      window.location.href = upiUrl;
+    }
+
+    function closeUpiPaymentModal() {
+      document.getElementById("upiPaymentModal").classList.add("hidden");
+      pendingUpiOrderPayload = null;
+      uploadedUpiScreenshotBase64 = "";
+    }
+
+    function handleUpiScreenshotUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 550;
+          const scale = img.width > MAX_WIDTH ? (MAX_WIDTH / img.width) : 1;
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          uploadedUpiScreenshotBase64 = canvas.toDataURL("image/jpeg", 0.7);
+          const preview = document.getElementById("upi-screenshot-preview");
+          preview.src = uploadedUpiScreenshotBase64;
+          preview.classList.remove("hidden");
+
+          const statusEl = document.getElementById("upi-screenshot-status");
+          statusEl.innerText = "✓ Payment screenshot attached";
+          statusEl.className = "text-[11px] font-bold text-emerald-600";
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function confirmAndCreateUpiOrder() {
+      if (!pendingUpiOrderPayload) return;
+
+      const utrNumber = (document.getElementById("upi-modal-utr").value || "").trim();
+
+      if (utrNumber.length !== 12) {
+        await showAlert("Please enter the exact 12-digit UPI Transaction ID / UTR Number.", "12-Digit UTR Required", "error");
+        document.getElementById("upi-modal-utr").focus();
+        return;
+      }
+
+      if (!uploadedUpiScreenshotBase64) {
+        await showAlert("Please upload your UPI payment screenshot. Both UTR ID and Screenshot are mandatory.", "Screenshot Required", "error");
+        return;
+      }
+
+      const btn = document.getElementById("upi-final-confirm-btn");
+      btn.disabled = true;
+      btn.innerText = "Creating Order...";
+
+      try {
+        await finalizeOrderInFirestore(pendingUpiOrderPayload, utrNumber, uploadedUpiScreenshotBase64);
+        document.getElementById("upiPaymentModal").classList.add("hidden");
+        pendingUpiOrderPayload = null;
+        uploadedUpiScreenshotBase64 = "";
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Verify & Confirm Order";
+      }
+    }
+
+    async function finalizeOrderInFirestore(ctx, utrNumber, paymentScreenshot) {
+      const checkoutBtn = document.getElementById("checkout-submit-btn");
+      if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerText = "Placing Order...";
+      }
+
+      try {
+        for (let i = 0; i < shoppingCart.length; i++) {
+          const cItem = shoppingCart[i];
+          const singleOrderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+          const itemAmount = cItem.price * cItem.quantity;
+
+          const isFirst = (i === 0);
+          const netItemPayable = isFirst ? Math.max(0, itemAmount + ctx.deliveryCharge - ctx.discountAmount) : itemAmount;
+
+          await db.collection("orders").doc(singleOrderId).set({
+            orderId: singleOrderId,
+            groupOrderId: ctx.batchOrderGroup,
+            productId: cItem.productId,
+            productName: cItem.title,
+            productImage: cItem.image || "",
+            size: cItem.size,
+            quantity: cItem.quantity,
+            subtotal: itemAmount,
+            deliveryCharge: isFirst ? ctx.deliveryCharge : 0,
+            couponUsed: isFirst ? (ctx.appliedCode || "None") : (ctx.appliedCode ? `Included in ${ctx.batchOrderGroup}` : "None"),
+            discountGiven: isFirst ? ctx.discountAmount : 0,
+            totalAmount: netItemPayable,
+            cartGrandTotal: ctx.grandTotal,
+            paymentMethod: ctx.paymentMethod,
+            utrNumber: ctx.paymentMethod === "Online UPI" ? utrNumber : "",
+            paymentScreenshot: ctx.paymentMethod === "Online UPI" ? paymentScreenshot : "",
+            paymentStatus: (ctx.paymentMethod === "COD") ? "Pending (Cash on Delivery)" : `UPI Verification Pending (UTR: ${utrNumber})`, 
+            deliveryStatus: "packing", 
+            userEmail: (ctx.user.email || "").toLowerCase(), 
+            userName: ctx.user.name || "Customer", 
+            phone: ctx.user.phone || "", 
+            shippingAddress: `${ctx.user.address || ""}, ${ctx.user.city || ""}, ${ctx.user.pincode || ""}`,
+            orderDate: new Date().toLocaleString()
+          });
+        }
+
+        if (ctx.appliedCode) {
+          const userMobile = ctx.user.phone || ctx.user.email;
+          
+          await db.collection("coupon_usages").add({
+            mobile: userMobile,
+            couponCode: ctx.appliedCode,
+            usedAt: new Date().toISOString()
+          });
+        }
+
+        shoppingCart = [];
+        activeCartCoupon = null;
+        saveCartToStorage();
+        closeCartModal();
+
+        if (typeof syncProductsAndLiveStock === "function") {
+          await syncProductsAndLiveStock();
+        }
+
+        await showAlert(`Order Placed Successfully!\nReference ID: ${ctx.batchOrderGroup}\nTotal Paid/Payable: ₹${ctx.grandTotal}`, "Order Confirmed", "success");
+        window.location.href = "orders.html";
+      } catch (err) {
+        await showAlert("Error placing order: " + err.message, "Checkout Failed", "error");
+      } finally {
+        if (checkoutBtn) {
+          checkoutBtn.disabled = false;
+          updateCheckoutButtonText();
+        }
+      }
+    }
+  </script>
+
+  <!-- 4. Public Reviews & Security Scripts -->
+  <script src="review.js"></script>
+  <script src="security.js"></script>
+</body>
+</html>

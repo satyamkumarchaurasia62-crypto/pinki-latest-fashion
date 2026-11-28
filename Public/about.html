@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us & Store Policies | Pinki Latest Fashions</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            boutique: {
+              50: '#fdf8f6',
+              100: '#f2e8e5',
+              200: '#eaddd7',
+              600: '#9b2c2c',
+              800: '#742a2a',
+              900: '#4a1515',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fcfaf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Sticky Header with Language Toggle -->
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200/80 shadow-sm py-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
+      <a href="index.html" class="flex flex-col min-w-0">
+        <span class="font-serif text-lg sm:text-3xl font-bold tracking-tight text-stone-800 truncate">
+          Pinki <span class="text-boutique-800 italic font-medium">Latest Fashions</span>
+        </span>
+        <span class="text-[9px] sm:text-[10px] tracking-[0.15em] uppercase text-stone-500 font-semibold truncate">
+          Ready-to-Wear Ladies Designer Clothes
+        </span>
+      </a>
+
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <!-- Language Toggle Buttons -->
+        <div class="inline-flex rounded-full bg-stone-100 p-1 border border-stone-200 shadow-inner">
+          <button type="button" id="btn-lang-hi" onclick="switchLanguage('hi')" class="px-3 py-1 rounded-full text-xs font-bold transition bg-pink-600 text-white shadow-xs">
+            हिंदी
+          </button>
+          <button type="button" id="btn-lang-en" onclick="switchLanguage('en')" class="px-3 py-1 rounded-full text-xs font-bold transition text-stone-600 hover:text-stone-900">
+            English
+          </button>
+        </div>
+
+        <a href="index.html" class="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-full shadow-sm transition">
+          <i class="fa-solid fa-arrow-left sm:mr-1.5"></i> <span class="hidden sm:inline">Shop</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== HINDI VERSION ==================== -->
+  <div id="content-hi" class="flex-grow flex flex-col">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-stone-100 via-[#fbf7f5] to-[#fcfaf9] py-12 sm:py-16 border-b border-stone-200/70">
+      <div class="max-w-4xl mx-auto px-4 text-center space-y-5">
+        
+        <!-- Verified Badges Container (Both badges in one centered line) -->
+        <div class="flex flex-wrap items-center justify-center gap-2.5">
+          <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+            <i class="fa-solid fa-certificate text-emerald-600"></i>
+            भारत सरकार द्वारा पंजीकृत उद्यम: <span class="font-mono tracking-wider">UDYAM-UP-28-0178340</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+            <i class="fa-solid fa-circle-check text-blue-600"></i>
+            GST पंजीकृत (Verified): <span class="font-mono tracking-wider">09IPVPD7605Q1ZS</span>
+          </div>
+        </div>
+
+        <h1 class="font-serif text-3xl sm:text-5xl font-bold text-stone-900 leading-tight">
+          हमारी कहानी और <span class="italic font-normal text-boutique-800">ग्राहक विश्वास</span>
+        </h1>
+
+        <p class="text-stone-600 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto">
+          <strong>Pinki Latest Fashions</strong> की शुरुआत एक सरल और ईमानदार उद्देश्य के साथ की गई है—हर ग्राहक को कम से कम कीमत में बेहतरीन क्वालिटी के रेडीमेड और डिजाइनर परिधान उपलब्ध कराना। हमारा मानना है कि ऑनलाइन शॉपिंग करते समय ग्राहक को क्वालिटी, डिलीवरी या रिफंड को लेकर किसी भी तरह की चिंता नहीं होनी चाहिए। हम पारदर्शिता, समय पर डिलीवरी और आसान रिफंड की पूरी गारंटी देते हैं।
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content Sections (Hindi) -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 flex-grow w-full">
+
+      <!-- 1. Account & Login Guide -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg">1</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">अकाउंट कैसे बनाएं और लॉगिन कैसे करें?</h2>
+            <p class="text-xs text-stone-500">सुरक्षित शॉपिंग और रिफंड के लिए वेरिफाइड अकाउंट अनिवार्य है</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-stone-700">
+          <div class="bg-stone-50 rounded-2xl p-5 border border-stone-200/70 space-y-3">
+            <h3 class="font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-brands fa-google text-rose-600"></i> तरीका 1: Google Authentication द्वारा
+            </h3>
+            <ol class="list-decimal list-inside space-y-2 text-xs leading-relaxed">
+              <li>होमपेज पर ऊपर दिए गए <strong>Account</strong> बटन पर क्लिक करें।</li>
+              <li>लॉगिन पेज खुलने पर नीचे दिए गए <strong>Google Authentication</strong> बटन पर क्लिक करें और अपना ईमेल चुनें।</li>
+              <li>ईमेल वेरिफाई होते ही एक पॉप-अप खुलेगा, उस पर <strong>OK</strong> दबाएं।</li>
+              <li>इसके बाद अपना पासवर्ड, सिक्योरिटी सवाल-जवाब, मोबाइल नंबर (वेरिफिकेशन के साथ) और डिलीवरी एड्रेस भरकर सेव करें।</li>
+            </ol>
+          </div>
+
+          <div class="bg-stone-50 rounded-2xl p-5 border border-stone-200/70 space-y-3">
+            <h3 class="font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-user-plus text-pink-600"></i> तरीका 2: मैन्युअल Sign Up द्वारा
+            </h3>
+            <ol class="list-decimal list-inside space-y-2 text-xs leading-relaxed">
+              <li>लॉगिन पेज पर नीचे की तरफ दिए गए गुलाबी रंग के <strong>Sign Up</strong> बटन पर क्लिक करें।</li>
+              <li>अपना पूरा नाम, मोबाइल नंबर, ईमेल, पूरा पता और पिन कोड दर्ज करें और मोबाइल नंबर वेरिफाई करें।</li>
+              <li><strong>Create Account</strong> पर क्लिक करते ही आपकी ईमेल पर एक कन्फर्मेशन लिंक जाएगा।</li>
+              <li>ईमेल कन्फर्म करने के बाद आप अपने ईमेल और पासवर्ड (या Google) से कभी भी लॉगिन कर सकते हैं।</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 flex items-start gap-2.5">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-sm"></i>
+          <p><strong>महत्वपूर्ण सुरक्षा नियम:</strong> अकाउंट बनाते समय अपना नाम बिल्कुल सही लिखें जो आपके बैंक अकाउंट से मेल खाता हो। रिफंड के समय किसी दूसरे व्यक्ति का बैंक अकाउंट स्वीकार नहीं किया जाएगा। बिना ईमेल और मोबाइल वेरिफिकेशन के अकाउंट नहीं बनेगा।</p>
+        </div>
+      </section>
+
+      <!-- 2. Ordering & Payment Process -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg">2</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">ऑर्डर करने और पेमेंट की प्रक्रिया</h2>
+            <p class="text-xs text-stone-500">बिना किसी अतिरिक्त शुल्क (No Hidden Charges) के आसान चेकआउट</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+          <p>आप वेबसाइट पर उत्पाद देखकर उन्हें कार्ट (Cart) में जोड़ सकते हैं, लेकिन सुरक्षा कारणों से <strong>ऑर्डर प्लेस करने के लिए लॉगिन होना अनिवार्य है</strong>। लॉगिन करने के बाद आपके कार्ट के आइटम सुरक्षित रहेंगे।</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div class="border border-stone-200 rounded-2xl p-5 space-y-2.5">
+              <div class="font-bold text-stone-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-money-bill-wave text-emerald-600"></i> Cash on Delivery (COD)
+              </div>
+              <p class="text-xs text-stone-600">कार्ट में कूपन कोड (यदि उपलब्ध हो) लागू करें, नीचे दी गई नियम व शर्तों (Terms & Conditions) को ध्यान से पढ़कर सहमति (Agree) दें और <strong>Place Order</strong> पर क्लिक करें। COD पर कोई अतिरिक्त प्लेटफॉर्म शुल्क नहीं लिया जाता है।</p>
+            </div>
+
+            <div class="border border-stone-200 rounded-2xl p-5 space-y-2.5">
+              <div class="font-bold text-stone-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-qrcode text-pink-600"></i> Online UPI / Bank Payment
+              </div>
+              <p class="text-xs text-stone-600">ऑनलाइन पेमेंट चुनने पर नियम व शर्तों से सहमत होकर पेमेंट पेज पर जाएं। स्टोर की UPI ID / QR Code पर केवल ऑर्डर राशि का भुगतान करें। भुगतान के बाद <strong>12-अंकों का UTR नंबर और पेमेंट का स्क्रीनशॉट</strong> अपलोड करना अनिवार्य है। इसके बिना ऑर्डर स्वीकार नहीं किया जाएगा और रद्द कर दिया जाएगा।</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Delivery & Shipping Policy -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg">3</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">डिलीवरी और शिपिंग नियम</h2>
+            <p class="text-xs text-stone-500">पूरे भारत में ट्रैकिंग सुविधा के साथ सुरक्षित डिलीवरी</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs">
+          <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="font-bold text-stone-900 text-sm mb-1">नजदीकी क्षेत्र (Local / NCR)</div>
+            <p class="text-stone-600">1 से 3 दिनों के भीतर डिलीवरी</p>
+          </div>
+          <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="font-bold text-stone-900 text-sm mb-1">500 - 600 कि.मी. दूरी</div>
+            <p class="text-stone-600">लगभग 1 सप्ताह (7 दिन) में डिलीवरी</p>
+          </div>
+          <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="font-bold text-stone-900 text-sm mb-1">1000 - 2000 कि.मी. दूरी</div>
+            <p class="text-stone-600">8 से 10 दिनों में डिलीवरी</p>
+          </div>
+        </div>
+
+        <ul class="list-disc list-inside space-y-2 text-xs sm:text-sm text-stone-700 pt-2">
+          <li><strong>फ्री डिलीवरी ऑफर:</strong> ₹999 या उससे अधिक के ऑर्डर पर डिलीवरी पूरी तरह से <strong>मुफ्त (FREE)</strong> है। इससे कम के ऑर्डर पर दूरी के अनुसार सामान्य डिलीवरी शुल्क लागू होगा।</li>
+          <li><strong>लाइव ट्रैकिंग:</strong> ऑर्डर डिस्पैच होने के बाद आपके ऑर्डर विवरण में कूरियर कंपनी का नाम और ट्रैकिंग आईडी (Tracking ID) अपडेट कर दी जाती है।</li>
+        </ul>
+      </section>
+
+      <!-- 4. Return, Exchange, Refund & Cancellation Policy -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-lg">4</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">रिटर्न, एक्सचेंज, रिफंड और कैंसिलेशन पॉलिसी</h2>
+            <p class="text-xs text-stone-500">कृपया ऑर्डर करने से पहले इन नियमों को ध्यान से पढ़ें</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+          <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-2">
+            <h3 class="font-bold text-rose-900 flex items-center gap-2">
+              <i class="fa-solid fa-video"></i> अनबॉक्सिंग वीडियो (Unboxing Video) अनिवार्य है:
+            </h3>
+            <p class="text-xs text-rose-800">पार्सल खोलते समय शुरू से अंत तक बिना किसी कट के <strong>स्पष्ट अनबॉक्सिंग वीडियो</strong> बनाना अनिवार्य है। यदि प्रोडक्ट कटा-फटा या डैमेज निकलता है, तो डिलीवरी के <strong>24 से 48 घंटे के भीतर</strong> वीडियो और डैमेज हिस्से की स्पष्ट फोटो के साथ रिक्वेस्ट डालनी होगी। इसके बाद कोई भी रिक्वेस्ट स्वीकार नहीं की जाएगी।</p>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="font-bold text-stone-900 text-sm">1. ऑर्डर कैंसिलेशन (Cancellation Rules):</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-xs text-stone-600">
+              <li>ऑर्डर करने के <strong>24 घंटे के भीतर</strong> ही ऑर्डर कैंसिल किया जा सकता है। ऑर्डर डिस्पैच/एक्सेप्ट होने के बाद कैंसिलेशन संभव नहीं होगा।</li>
+              <li>यदि आपने ऑनलाइन पेमेंट किया है, तो कैंसिल करते समय रिफंड के लिए अपनी सही <strong>UPI ID या बैंक अकाउंट डिटेल और पेमेंट स्क्रीनशॉट</strong> देना अनिवार्य है।</li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="font-bold text-stone-900 text-sm">2. रिटर्न और एक्सचेंज (Return & Exchange Rules):</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-xs text-stone-600">
+              <li>रिटर्न केवल दो स्थितियों में स्वीकार किया जाता है: <strong>(a) साइज फिट न आने पर</strong> या <strong>(b) प्रोडक्ट पसंद न आने पर</strong>।</li>
+              <li>प्रोडक्ट बिल्कुल <strong>ओरिजिनल कंडीशन</strong> (बिना धुला, बिना दाग-धब्बे और टैग सहित) में होना चाहिए। इस्तेमाल किया हुआ या ग्राहक द्वारा नुकसान पहुँचाया गया प्रोडक्ट वापस नहीं लिया जाएगा।</li>
+              <li><strong>रिटर्न/पिकअप शुल्क:</strong> यदि हमारी तरफ से कोई गलती (जैसे डैमेज या गलत प्रोडक्ट) नहीं है और आप अपनी पसंद या साइज के कारण रिटर्न करते हैं, तो <strong>रिटर्न पिकअप का कूरियर चार्ज ग्राहक को वहन करना होगा</strong> (जो रिफंड राशि में से काट लिया जाएगा)। हमारी तरफ से गलती होने पर रिटर्न बिल्कुल मुफ्त रहेगा।</li>
+              <li>साइज की समस्या होने पर आप रिटर्न के बजाय दूसरा साइज या प्रोडक्ट <strong>एक्सचेंज (Exchange)</strong> भी कर सकते हैं।</li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="font-bold text-stone-900 text-sm">3. रिफंड प्रक्रिया (Refund Process):</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-xs text-stone-600">
+              <li>रिटर्न अप्रूव होने पर आपके डैशबोर्ड में पिकअप कूरियर आईडी अपडेट कर दी जाएगी।</li>
+              <li>जब रिटर्न पार्सल हमारे वेयरहाउस पर वापस प्राप्त हो जाएगा और उसकी क्वालिटी जांच पूरी हो जाएगी, उसके <strong>12 से 27 घंटे के भीतर</strong> आपका रिफंड सीधे आपके दिए गए <strong>UPI या बैंक खाते</strong> में भेज दिया जाएगा।</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Official Verification & Contact Section -->
+      <section class="bg-stone-900 text-stone-200 rounded-3xl p-6 sm:p-10 shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="space-y-4">
+            <span class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full">
+              100% Verified & Trusted Business
+            </span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white">संपर्क और आधिकारिक विवरण</h2>
+            <p class="text-xs text-stone-400 leading-relaxed">
+              किसी भी सहायता, ऑर्डर अपडेट या रिटर्न/एक्सचेंज के लिए आप हमसे सीधे संपर्क कर सकते हैं।
+            </p>
+            <div class="space-y-2 text-xs">
+              <p><strong class="text-white">Udyam Registration No.:</strong> <span class="font-mono text-emerald-400">UDYAM-UP-28-0178340</span></p>
+              <p><strong class="text-white">GSTIN:</strong> <span class="font-mono text-blue-400">09IPVPD7605Q1ZS</span></p>
+              <p><strong class="text-white">Store Address:</strong> Omicron-1, EWS Apartment, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh</p>
+              <p><strong class="text-white">Customer Helpline & WhatsApp:</strong> <a href="tel:8130748293" class="text-pink-400 font-bold hover:underline">+91 8130748293</a></p>
+            </div>
+          </div>
+
+          <div class="bg-stone-800/80 border border-stone-700 rounded-2xl p-6 space-y-4 text-center">
+            <h3 class="font-bold text-white text-sm">हमारे सोशल मीडिया से जुड़ें</h3>
+            <p class="text-xs text-stone-400">नए कलेक्शन और ऑफर्स के अपडेट पाने के लिए हमें फॉलो करें</p>
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+              <a href="https://www.instagram.com/pinkilatestfashions" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-[#E1306C] text-white rounded-xl font-bold text-xs hover:opacity-90 transition">
+                <i class="fab fa-instagram"></i> Instagram
+              </a>
+              <a href="https://youtube.com/@pinkilatestfashions" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-[#FF0000] text-white rounded-xl font-bold text-xs hover:opacity-90 transition">
+                <i class="fab fa-youtube"></i> YouTube
+              </a>
+              <a href="https://wa.me/918130748293" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white rounded-xl font-bold text-xs hover:opacity-90 transition">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== ENGLISH VERSION ==================== -->
+  <div id="content-en" class="hidden flex-grow flex flex-col">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-stone-100 via-[#fbf7f5] to-[#fcfaf9] py-12 sm:py-16 border-b border-stone-200/70">
+      <div class="max-w-4xl mx-auto px-4 text-center space-y-5">
+        
+        <!-- Verified Badges Container (Both badges in one centered line) -->
+        <div class="flex flex-wrap items-center justify-center gap-2.5">
+          <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+            <i class="fa-solid fa-certificate text-emerald-600"></i>
+            Govt. Registered MSME: <span class="font-mono tracking-wider">UDYAM-UP-28-0178340</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+            <i class="fa-solid fa-circle-check text-blue-600"></i>
+            GST Verified: <span class="font-mono tracking-wider">09IPVPD7605Q1ZS</span>
+          </div>
+        </div>
+
+        <h1 class="font-serif text-3xl sm:text-5xl font-bold text-stone-900 leading-tight">
+          Our Story & <span class="italic font-normal text-boutique-800">Customer Trust</span>
+        </h1>
+
+        <p class="text-stone-600 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto">
+          <strong>Pinki Latest Fashions</strong> was started with a simple and honest mission—to deliver high-quality ready-made and designer ethnic wear to every customer at the lowest possible price. We believe that while shopping online, customers should never have to worry about product quality, delivery delays, or refunds. We guarantee complete transparency, timely delivery, and a hassle-free refund experience.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content Sections (English) -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 flex-grow w-full">
+
+      <!-- 1. Account & Login Guide -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg">1</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">How to Create an Account & Log In?</h2>
+            <p class="text-xs text-stone-500">A verified account is mandatory for secure shopping and smooth refunds</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-stone-700">
+          <div class="bg-stone-50 rounded-2xl p-5 border border-stone-200/70 space-y-3">
+            <h3 class="font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-brands fa-google text-rose-600"></i> Method 1: Via Google Authentication
+            </h3>
+            <ol class="list-decimal list-inside space-y-2 text-xs leading-relaxed">
+              <li>Click on the <strong>Account</strong> button at the top of the homepage.</li>
+              <li>On the login page, click the <strong>Google Authentication</strong> button and choose your email address.</li>
+              <li>Once verified, a pop-up will appear—click <strong>OK</strong> to proceed.</li>
+              <li>Set your password, security question & answer, verify your mobile number, enter your delivery address, and click Save.</li>
+            </ol>
+          </div>
+
+          <div class="bg-stone-50 rounded-2xl p-5 border border-stone-200/70 space-y-3">
+            <h3 class="font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-user-plus text-pink-600"></i> Method 2: Via Manual Sign Up
+            </h3>
+            <ol class="list-decimal list-inside space-y-2 text-xs leading-relaxed">
+              <li>Click the pink <strong>Sign Up</strong> button at the bottom of the login page.</li>
+              <li>Enter your full name, mobile number, email, complete address, and PIN code, then verify your mobile number.</li>
+              <li>Click <strong>Create Account</strong>; a confirmation link will be sent to your email address.</li>
+              <li>After confirming your email, you can log in anytime using your email & password (or via Google).</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 flex items-start gap-2.5">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-sm"></i>
+          <p><strong>Important Security Rule:</strong> Please enter your exact full name that matches your bank account. Refunds will not be processed to any third-party bank account. Account creation requires both email and mobile verification.</p>
+        </div>
+      </section>
+
+      <!-- 2. Ordering & Payment Process -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg">2</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">Ordering & Payment Process</h2>
+            <p class="text-xs text-stone-500">Easy checkout with zero extra or hidden platform fees</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+          <p>You can browse products and add items to your cart anytime, but for security reasons, <strong>logging into your account is mandatory to place an order</strong>. Your cart items remain saved after logging in.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div class="border border-stone-200 rounded-2xl p-5 space-y-2.5">
+              <div class="font-bold text-stone-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-money-bill-wave text-emerald-600"></i> Cash on Delivery (COD)
+              </div>
+              <p class="text-xs text-stone-600">Apply a promo coupon code (if available) in your cart, carefully read and tick the <strong>Terms & Conditions</strong> checkbox, and click <strong>Place Order</strong>. No extra fees are charged on COD orders.</p>
+            </div>
+
+            <div class="border border-stone-200 rounded-2xl p-5 space-y-2.5">
+              <div class="font-bold text-stone-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-qrcode text-pink-600"></i> Online UPI / Bank Payment
+              </div>
+              <p class="text-xs text-stone-600">Select Online UPI, accept the Terms & Conditions, and proceed to the payment screen. Pay the exact order amount to our store UPI ID / QR Code. After payment, uploading the <strong>12-digit UTR number and payment screenshot</strong> is mandatory—otherwise, the order will be rejected/cancelled.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Delivery & Shipping Policy -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg">3</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">Delivery & Shipping Rules</h2>
+            <p class="text-xs text-stone-500">Safe Pan-India doorstep delivery with live tracking</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs">
+          <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="font-bold text-stone-900 text-sm mb-1">Nearby / Local & NCR</div>
+            <p class="text-stone-600">Delivered within 1 to 3 days</p>
+          </div>
+          <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="font-bold text-stone-900 text-sm mb-1">500 - 600 km Distance</div>
+            <p class="text-stone-600">Delivered within approx. 1 week (7 days)</p>
+          </div>
+          <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="font-bold text-stone-900 text-sm mb-1">1000 - 2000 km Distance</div>
+            <p class="text-stone-600">Delivered within 8 to 10 days</p>
+          </div>
+        </div>
+
+        <ul class="list-disc list-inside space-y-2 text-xs sm:text-sm text-stone-700 pt-2">
+          <li><strong>Free Delivery Offer:</strong> Enjoy <strong>FREE Delivery</strong> on all orders worth ₹999 or above. For orders below ₹999, standard distance-based delivery charges apply.</li>
+          <li><strong>Live Tracking:</strong> Once dispatched, the courier partner name and tracking ID are updated directly in your order details.</li>
+        </ul>
+      </section>
+
+      <!-- 4. Return, Exchange, Refund & Cancellation Policy -->
+      <section class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 pb-4">
+          <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-lg">4</div>
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-stone-900">Return, Exchange, Refund & Cancellation Policy</h2>
+            <p class="text-xs text-stone-500">Please read these rules carefully before placing an order</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+          <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-2">
+            <h3 class="font-bold text-rose-900 flex items-center gap-2">
+              <i class="fa-solid fa-video"></i> Unboxing Video is Mandatory:
+            </h3>
+            <p class="text-xs text-rose-800">Recording a clear, uncut <strong>360-degree unboxing video</strong> while opening the parcel is strictly mandatory. If you receive a torn or damaged item, you must submit a request within <strong>24 to 48 hours of delivery</strong> along with the unboxing video and clear photos of the defect. Requests without video proof or after 48 hours will not be accepted.</p>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="font-bold text-stone-900 text-sm">1. Order Cancellation Rules:</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-xs text-stone-600">
+              <li>Orders can only be cancelled within <strong>24 hours of placement</strong>. Once accepted or dispatched, an order cannot be cancelled.</li>
+              <li>For prepaid (Online UPI) orders, you must provide your valid <strong>UPI ID or Bank Account details along with the payment screenshot</strong> while cancelling to process the refund.</li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="font-bold text-stone-900 text-sm">2. Return & Exchange Rules:</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-xs text-stone-600">
+              <li>Returns are accepted only in two cases: <strong>(a) Size fitting issues</strong> or <strong>(b) Product dislike</strong>.</li>
+              <li>The outfit must be returned in its <strong>original, unused condition</strong> with all tags intact. Washed, stained, or customer-damaged items will be rejected.</li>
+              <li><strong>Return Pickup Charges:</strong> If there is no fault from our side (i.e., no damage or wrong item) and you return an item due to size or personal preference, <strong>return courier pickup charges must be borne by the customer</strong> (deducted from the refund amount). If the mistake is ours, return pickup is 100% free.</li>
+              <li>For size issues, you can also opt for an <strong>Exchange</strong> for another size or outfit instead of a return.</li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="font-bold text-stone-900 text-sm">3. Refund Process:</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-xs text-stone-600">
+              <li>Once your return request is approved, the pickup courier ID will be updated in your order section.</li>
+              <li>After the returned parcel reaches our warehouse and passes quality inspection, your refund will be credited directly to your <strong>UPI ID or Bank Account within 12 to 27 hours</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Official Verification & Contact Section -->
+      <section class="bg-stone-900 text-stone-200 rounded-3xl p-6 sm:p-10 shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="space-y-4">
+            <span class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full">
+              100% Verified & Trusted Business
+            </span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white">Contact & Official Details</h2>
+            <p class="text-xs text-stone-400 leading-relaxed">
+              For any assistance, order updates, or return/exchange queries, feel free to contact us directly.
+            </p>
+            <div class="space-y-2 text-xs">
+              <p><strong class="text-white">Udyam Registration No.:</strong> <span class="font-mono text-emerald-400">UDYAM-UP-28-0178340</span></p>
+              <p><strong class="text-white">GSTIN:</strong> <span class="font-mono text-blue-400">09IPVPD7605Q1ZS</span></p>
+              <p><strong class="text-white">Store Address:</strong> Omicron-1, EWS Apartment, Lal Building, Block-C 193, Gautam Buddha Nagar, Uttar Pradesh</p>
+              <p><strong class="text-white">Customer Helpline & WhatsApp:</strong> <a href="tel:8130748293" class="text-pink-400 font-bold hover:underline">+91 8130748293</a></p>
+            </div>
+          </div>
+
+          <div class="bg-stone-800/80 border border-stone-700 rounded-2xl p-6 space-y-4 text-center">
+            <h3 class="font-bold text-white text-sm">Connect With Us on Social Media</h3>
+            <p class="text-xs text-stone-400">Follow us for the latest collections, styling tips, and festive offers</p>
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+              <a href="https://www.instagram.com/pinkilatestfashions" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-[#E1306C] text-white rounded-xl font-bold text-xs hover:opacity-90 transition">
+                <i class="fab fa-instagram"></i> Instagram
+              </a>
+              <a href="https://youtube.com/@pinkilatestfashions" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-[#FF0000] text-white rounded-xl font-bold text-xs hover:opacity-90 transition">
+                <i class="fab fa-youtube"></i> YouTube
+              </a>
+              <a href="https://wa.me/918130748293" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white rounded-xl font-bold text-xs hover:opacity-90 transition">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Clean Footer -->
+  <footer class="bg-stone-950 text-stone-500 py-6 text-xs text-center border-t border-stone-800">
+    <p>© 2026 Pinki Latest Fashions (UDYAM-UP-28-0178340 | GST: 09IPVPD7605Q1ZS). All rights reserved.</p>
+  </footer>
+
+  <!-- Language Switcher Script -->
+  <script>
+    function switchLanguage(lang) {
+      const contentHi = document.getElementById('content-hi');
+      const contentEn = document.getElementById('content-en');
+      const btnHi = document.getElementById('btn-lang-hi');
+      const btnEn = document.getElementById('btn-lang-en');
+
+      if (lang === 'hi') {
+        contentHi.classList.remove('hidden');
+        contentEn.classList.add('hidden');
+        
+        btnHi.classList.add('bg-pink-600', 'text-white', 'shadow-xs');
+        btnHi.classList.remove('text-stone-600', 'hover:text-stone-900');
+        
+        btnEn.classList.remove('bg-pink-600', 'text-white', 'shadow-xs');
+        btnEn.classList.add('text-stone-600', 'hover:text-stone-900');
+      } else {
+        contentEn.classList.remove('hidden');
+        contentHi.classList.add('hidden');
+
+        btnEn.classList.add('bg-pink-600', 'text-white', 'shadow-xs');
+        btnEn.classList.remove('text-stone-600', 'hover:text-stone-900');
+
+        btnHi.classList.remove('bg-pink-600', 'text-white', 'shadow-xs');
+        btnHi.classList.add('text-stone-600', 'hover:text-stone-900');
+      }
+    }
+  </script>
+
+</body>
+</html>
