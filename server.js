@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path"); // इसे सबसे ऊपर ले आए
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
 require('dotenv').config();
@@ -15,12 +16,19 @@ const firebaseConfig = {
     measurementId: process.env.FIREBASE_MEASUREMENT_ID
 };
 
-// Firebase ऐप इनिशियलाइज करें
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 
-// **यह लाइन यहाँ जोड़नी है:**
-app.use(express.static(__dirname));
+// **DANGER LINE REMOVED:** app.use(express.static(__dirname)); (इसे हटा दिया है)
+
+// साइटमैप वाले राउट्स (इनको app.listen से ऊपर रखना है)
+app.get('/sitemap.xml.gz', (req, res) => {
+    res.sendFile(path.join(__dirname, 'sitemap.xml.gz'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+    res.sendFile(path.join(__dirname, 'sitemap.xml'));
+});
 
 const PORT = process.env.PORT || 3000;
 
